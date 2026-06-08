@@ -64,7 +64,8 @@ export default function ListingDetailPage() {
     return <div className="text-center py-20">Listing not found</div>
   }
 
-  const margin = ((listing.ebitda / listing.revenue) * 100).toFixed(1)
+  const marginValue = (listing.ebitda / listing.revenue) * 100
+  const margin = marginValue.toFixed(1)
   const multiple = (listing.askingPrice / listing.ebitda).toFixed(1)
 
   return (
@@ -235,7 +236,7 @@ export default function ListingDetailPage() {
                 <strong>Valuation:</strong> This business is valued at AED {(listing.askingPrice / 1000000).toFixed(1)}M based on {multiple}x EBITDA multiple typical for {listing.industry.toLowerCase()} businesses.
               </p>
               <p>
-                <strong>Profitability:</strong> {margin}% EBITDA margin indicates a {margin > 15 ? 'healthy' : 'developing'} business with {listing.ebitda > 1000000 ? 'strong' : 'moderate'} cash generation.
+                <strong>Profitability:</strong> {margin}% EBITDA margin indicates a {marginValue > 15 ? 'healthy' : 'developing'} business with {listing.ebitda > 1000000 ? 'strong' : 'moderate'} cash generation.
               </p>
               <p>
                 <strong>Buyer Types:</strong> Likely acquirers include strategic buyers in the {listing.industry} sector, private equity firms seeking sustainable cash flows, and corporate expansion candidates.
