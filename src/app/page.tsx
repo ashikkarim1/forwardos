@@ -10,7 +10,6 @@ import {
 import { PublicHeader } from '@/components/Navigation'
 import { RoleSelectorButton } from '@/components/RoleSelectorButton'
 import { FeatureIcon } from '@/components/Icons/FeatureIcons'
-import { FeatureIcon } from '@/components/Icons/FeatureIcons'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_TEXT_TERTIARY, COLOR_BORDER } from '@/styles/forward-colors'
 
 const features = [
