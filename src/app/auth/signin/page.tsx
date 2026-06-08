@@ -3,25 +3,22 @@
 import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Mail, Lock, User, ArrowRight, Flame } from 'lucide-react'
+import { Mail, Lock, ArrowRight, Flame } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
-function SignupContent() {
+function SigninContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams?.get('redirect')
 
   const [formData, setFormData] = useState({
-    fullName: '',
     email: '',
-    password: '',
-    confirmPassword: '',
-    userType: 'buyer'
+    password: ''
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
@@ -35,34 +32,22 @@ function SignupContent() {
     setLoading(true)
 
     try {
-      if (!formData.fullName || !formData.email || !formData.password) {
+      if (!formData.email || !formData.password) {
         setError('Please fill in all fields')
         setLoading(false)
         return
       }
 
-      if (formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match')
-        setLoading(false)
-        return
-      }
-
-      if (formData.password.length < 8) {
-        setError('Password must be at least 8 characters')
-        setLoading(false)
-        return
-      }
-
-      const user = {
+      const mockUser = {
         id: Math.random().toString(36).substr(2, 9),
-        fullName: formData.fullName,
         email: formData.email,
-        userType: formData.userType,
+        fullName: formData.email.split('@')[0],
+        userType: 'buyer',
         createdAt: new Date().toISOString()
       }
 
       localStorage.setItem('auth_token', 'demo_token_' + Math.random().toString(36))
-      localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem('user', JSON.stringify(mockUser))
 
       if (redirect) {
         router.push(redirect)
@@ -87,11 +72,11 @@ function SignupContent() {
           </div>
 
           <h2 className="text-4xl font-black mb-4" style={{ color: COLOR_PRIMARY }}>
-            Join the Future of M&A
+            Welcome Back
           </h2>
 
           <p className="text-lg mb-8" style={{ color: COLOR_TEXT_SECONDARY }}>
-            Access exclusive deal flow, market intelligence, and direct connections with buyers, sellers, and brokers.
+            Access your exclusive deal flow, market intelligence, and connections to buyers, sellers, and brokers.
           </p>
 
           <div className="space-y-4">
@@ -102,8 +87,8 @@ function SignupContent() {
                 </div>
               </div>
               <div>
-                <h3 className="font-bold" style={{ color: COLOR_PRIMARY }}>Heat-Based Discovery</h3>
-                <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">Find the hottest deals in your sector</p>
+                <h3 className="font-bold" style={{ color: COLOR_PRIMARY }}>View Hot Deals</h3>
+                <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">Access real-time deal flow ranked by heat</p>
               </div>
             </div>
 
@@ -114,8 +99,8 @@ function SignupContent() {
                 </div>
               </div>
               <div>
-                <h3 className="font-bold" style={{ color: COLOR_PRIMARY }}>Market Intelligence</h3>
-                <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">Deep insights on valuations & comparables</p>
+                <h3 className="font-bold" style={{ color: COLOR_PRIMARY }}>Market Analysis</h3>
+                <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">Compare valuations with market comps</p>
               </div>
             </div>
 
@@ -126,7 +111,7 @@ function SignupContent() {
                 </div>
               </div>
               <div>
-                <h3 className="font-bold" style={{ color: COLOR_PRIMARY }}>Direct Connections</h3>
+                <h3 className="font-bold" style={{ color: COLOR_PRIMARY }}>Contact Deals</h3>
                 <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">Message sellers, buyers & brokers directly</p>
               </div>
             </div>
@@ -137,10 +122,10 @@ function SignupContent() {
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-6 py-12 sm:px-12">
         <div className="max-w-md w-full mx-auto">
           <h1 className="text-3xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>
-            Create Account
+            Sign In
           </h1>
           <p className="mb-8" style={{ color: COLOR_TEXT_SECONDARY }}>
-            Join Forward OS to access exclusive M&A deals
+            Enter your credentials to access Forward OS
           </p>
 
           {error && (
@@ -150,24 +135,6 @@ function SignupContent() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: COLOR_PRIMARY }}>
-                Full Name
-              </label>
-              <div className="relative">
-                <User size={18} className="absolute left-3 top-3.5" style={{ color: COLOR_TEXT_SECONDARY }} />
-                <input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  placeholder="John Doe"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border"
-                  style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
-                />
-              </div>
-            </div>
-
             <div>
               <label className="block text-sm font-bold mb-2" style={{ color: COLOR_PRIMARY }}>
                 Email
@@ -188,24 +155,6 @@ function SignupContent() {
 
             <div>
               <label className="block text-sm font-bold mb-2" style={{ color: COLOR_PRIMARY }}>
-                I am a...
-              </label>
-              <select
-                name="userType"
-                value={formData.userType}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg border"
-                style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
-              >
-                <option value="buyer">Buyer</option>
-                <option value="seller">Seller</option>
-                <option value="broker">Broker</option>
-                <option value="investor">Investor</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: COLOR_PRIMARY }}>
                 Password
               </label>
               <div className="relative">
@@ -215,29 +164,21 @@ function SignupContent() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="Minimum 8 characters"
+                  placeholder="Enter your password"
                   className="w-full pl-10 pr-4 py-2.5 rounded-lg border"
                   style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-bold mb-2" style={{ color: COLOR_PRIMARY }}>
-                Confirm Password
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center gap-2">
+                <input type="checkbox" className="rounded" style={{ accentColor: COLOR_ACCENT }} />
+                <span style={{ color: COLOR_TEXT_SECONDARY }}>Remember me</span>
               </label>
-              <div className="relative">
-                <Lock size={18} className="absolute left-3 top-3.5" style={{ color: COLOR_TEXT_SECONDARY }} />
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Re-enter password"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border"
-                  style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
-                />
-              </div>
+              <Link href="#" className="font-bold" style={{ color: COLOR_ACCENT }}>
+                Forgot password?
+              </Link>
             </div>
 
             <button
@@ -246,16 +187,16 @@ function SignupContent() {
               className="w-full py-3 rounded-lg font-bold text-white transition-all hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
               style={{ background: COLOR_ACCENT }}
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? 'Signing In...' : 'Sign In'}
               {!loading && <ArrowRight size={18} />}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p style={{ color: COLOR_TEXT_SECONDARY }}>
-              Already have an account?{' '}
-              <Link href="/auth/signin" className="font-bold" style={{ color: COLOR_ACCENT }}>
-                Sign In
+              Don't have an account?{' '}
+              <Link href="/auth/signup" className="font-bold" style={{ color: COLOR_ACCENT }}>
+                Sign Up
               </Link>
             </p>
           </div>
@@ -271,10 +212,10 @@ function SignupContent() {
   )
 }
 
-export default function SignupPage() {
+export default function SigninPage() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>}>
-      <SignupContent />
+      <SigninContent />
     </Suspense>
   )
 }
