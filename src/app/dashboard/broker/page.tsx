@@ -589,7 +589,7 @@ export default function BrokerDashboardV2() {
           <motion.div className="bg-white rounded-lg border-2 p-6" style={{ borderColor: COLOR_BORDER }} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}>
             <DealPipeline
               deals={mockDeals}
-              onStageDrop={() => {}}
+              onStageDrop={async () => {}}
               isEditable={false}
             />
           </motion.div>
