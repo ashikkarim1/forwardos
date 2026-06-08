@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   ArrowRight, CheckCircle2, Zap, TrendingUp, Eye, Flame, BarChart3,
-  Globe, Shield, Brain
+  Globe, Shield, Brain, Check
 } from 'lucide-react'
 import { PublicHeader } from '@/components/Navigation'
 import { RoleSelectorButton } from '@/components/RoleSelectorButton'
