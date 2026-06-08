@@ -1082,7 +1082,7 @@ export default function BuyerDashboardV2() {
           <motion.div className="bg-white rounded-lg border-2 p-6" style={{ borderColor: COLOR_BORDER }} variants={itemVariants}>
             <DealPipeline
               deals={mockDeals}
-              onStageDrop={() => {}}
+              onStageDrop={async () => {}}
               isEditable={false}
             />
           </motion.div>
