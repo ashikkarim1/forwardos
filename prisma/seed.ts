@@ -1,133 +1,104 @@
-import { PrismaClient, IndustryType, DealStatus, UserRole } from '@prisma/client'
+import { PrismaClient, IndustryType, DealStatus, UserRole, DealPipelineStage, KYCStatus, VerificationStatus, RiskLevel, MessageType, DocumentAccessLevel, KYCDocumentType } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
 const COMPANIES = [
   // Tech & SaaS
-  { name: 'TechFlow Solutions', industry: 'SAAS', country: 'UAE', city: 'Dubai', revenue: 2500000, ebitda: 750000, growth: '45%' },
-  { name: 'CloudCore Infrastructure', industry: 'SAAS', country: 'UAE', city: 'Abu Dhabi', revenue: 4200000, ebitda: 1260000, growth: '52%' },
-  { name: 'DataStream Analytics', industry: 'SAAS', country: 'KSA', city: 'Riyadh', revenue: 1800000, ebitda: 540000, growth: '38%' },
-  { name: 'SecureVault Systems', industry: 'SAAS', country: 'UAE', city: 'Dubai', revenue: 3100000, ebitda: 930000, growth: '41%' },
-  { name: 'NextGen AI Platform', industry: 'SAAS', country: 'UAE', city: 'Dubai', revenue: 2100000, ebitda: 630000, growth: '58%' },
-  { name: 'Quantum Analytics', industry: 'SAAS', country: 'KSA', city: 'Jeddah', revenue: 1600000, ebitda: 480000, growth: '35%' },
+  { name: 'TechFlow Solutions', industry: 'SAAS', country: 'UAE', city: 'Dubai', revenue: 250000000, ebitda: 75000000, growth: '45%', employees: 45, yearsInOp: 5 },
+  { name: 'CloudCore Infrastructure', industry: 'SAAS', country: 'UAE', city: 'Abu Dhabi', revenue: 420000000, ebitda: 126000000, growth: '52%', employees: 72, yearsInOp: 7 },
+  { name: 'DataStream Analytics', industry: 'SAAS', country: 'KSA', city: 'Riyadh', revenue: 180000000, ebitda: 54000000, growth: '38%', employees: 38, yearsInOp: 4 },
+  { name: 'SecureVault Systems', industry: 'SAAS', country: 'UAE', city: 'Dubai', revenue: 310000000, ebitda: 93000000, growth: '41%', employees: 55, yearsInOp: 6 },
+  { name: 'NextGen AI Platform', industry: 'SAAS', country: 'UAE', city: 'Dubai', revenue: 210000000, ebitda: 63000000, growth: '58%', employees: 62, yearsInOp: 3 },
 
   // Healthcare
-  { name: 'Emirates Healthcare Network', industry: 'HEALTHCARE', country: 'UAE', city: 'Dubai', revenue: 5200000, ebitda: 1560000, growth: '28%' },
-  { name: 'MedTech Innovations', industry: 'HEALTHCARE', country: 'UAE', city: 'Abu Dhabi', revenue: 3800000, ebitda: 1140000, growth: '32%' },
-  { name: 'Wellness Solutions GCC', industry: 'HEALTHCARE', country: 'KSA', city: 'Riyadh', revenue: 2900000, ebitda: 870000, growth: '25%' },
-  { name: 'Diagnostic Centers Plus', industry: 'HEALTHCARE', country: 'UAE', city: 'Dubai', revenue: 4100000, ebitda: 1230000, growth: '22%' },
-  { name: 'Pharma Distribution ME', industry: 'HEALTHCARE', country: 'KSA', city: 'Riyadh', revenue: 6200000, ebitda: 1860000, growth: '18%' },
+  { name: 'Emirates Healthcare Network', industry: 'HEALTHCARE', country: 'UAE', city: 'Dubai', revenue: 520000000, ebitda: 156000000, growth: '28%', employees: 180, yearsInOp: 12 },
+  { name: 'MedTech Innovations', industry: 'HEALTHCARE', country: 'UAE', city: 'Abu Dhabi', revenue: 380000000, ebitda: 114000000, growth: '32%', employees: 125, yearsInOp: 8 },
+  { name: 'Diagnostic Centers Plus', industry: 'HEALTHCARE', country: 'UAE', city: 'Dubai', revenue: 410000000, ebitda: 123000000, growth: '22%', employees: 95, yearsInOp: 9 },
 
   // Retail & E-Commerce
-  { name: 'RetailCo Stores', industry: 'RETAIL', country: 'UAE', city: 'Dubai', revenue: 8900000, ebitda: 1780000, growth: '15%' },
-  { name: 'NextGen E-Commerce', industry: 'ECOMMERCE', country: 'UAE', city: 'Abu Dhabi', revenue: 3400000, ebitda: 680000, growth: '62%' },
-  { name: 'Fashion Hub Middle East', industry: 'RETAIL', country: 'KSA', city: 'Jeddah', revenue: 5600000, ebitda: 1120000, growth: '20%' },
-  { name: 'Luxury Goods Distributor', industry: 'RETAIL', country: 'UAE', city: 'Dubai', revenue: 12000000, ebitda: 3600000, growth: '12%' },
-  { name: 'Online Marketplace GCC', industry: 'ECOMMERCE', country: 'KSA', city: 'Riyadh', revenue: 2800000, ebitda: 840000, growth: '71%' },
+  { name: 'RetailCo Stores', industry: 'RETAIL', country: 'UAE', city: 'Dubai', revenue: 890000000, ebitda: 178000000, growth: '15%', employees: 210, yearsInOp: 15 },
+  { name: 'NextGen E-Commerce', industry: 'ECOMMERCE', country: 'UAE', city: 'Abu Dhabi', revenue: 340000000, ebitda: 68000000, growth: '62%', employees: 85, yearsInOp: 5 },
+  { name: 'Fashion Hub Middle East', industry: 'RETAIL', country: 'KSA', city: 'Jeddah', revenue: 560000000, ebitda: 112000000, growth: '20%', employees: 140, yearsInOp: 10 },
 
   // Manufacturing
-  { name: 'Precision Manufacturing', industry: 'MANUFACTURING', country: 'UAE', city: 'Ajman', revenue: 7200000, ebitda: 1440000, growth: '18%' },
-  { name: 'Industrial Solutions ME', industry: 'MANUFACTURING', country: 'KSA', city: 'Jeddah', revenue: 6500000, ebitda: 1300000, growth: '14%' },
-  { name: 'Advanced Composites Inc', industry: 'MANUFACTURING', country: 'UAE', city: 'Sharjah', revenue: 4800000, ebitda: 960000, growth: '22%' },
-  { name: 'Metal Works & Fabrication', industry: 'MANUFACTURING', country: 'UAE', city: 'Dubai', revenue: 5100000, ebitda: 1020000, growth: '16%' },
-  { name: 'Specialty Products Mfg', industry: 'MANUFACTURING', country: 'KSA', city: 'Dammam', revenue: 3600000, ebitda: 720000, growth: '19%' },
+  { name: 'Precision Manufacturing', industry: 'MANUFACTURING', country: 'UAE', city: 'Ajman', revenue: 720000000, ebitda: 144000000, growth: '18%', employees: 165, yearsInOp: 18 },
+  { name: 'Industrial Solutions ME', industry: 'MANUFACTURING', country: 'KSA', city: 'Jeddah', revenue: 650000000, ebitda: 130000000, growth: '14%', employees: 140, yearsInOp: 20 },
+  { name: 'Advanced Composites Inc', industry: 'MANUFACTURING', country: 'UAE', city: 'Sharjah', revenue: 480000000, ebitda: 96000000, growth: '22%', employees: 98, yearsInOp: 11 },
 
   // FinTech & Finance
-  { name: 'FintechFlow Banking', industry: 'FINTECH', country: 'UAE', city: 'Dubai', revenue: 4200000, ebitda: 1260000, growth: '48%' },
-  { name: 'AlManara Finance', industry: 'FINTECH', country: 'UAE', city: 'Abu Dhabi', revenue: 3100000, ebitda: 930000, growth: '55%' },
-  { name: 'Digital Payment Solutions', industry: 'FINTECH', country: 'KSA', city: 'Riyadh', revenue: 2600000, ebitda: 780000, growth: '64%' },
-  { name: 'Investment Advisory ME', industry: 'FINTECH', country: 'UAE', city: 'Dubai', revenue: 1900000, ebitda: 570000, growth: '52%' },
-  { name: 'Blockchain Solutions Inc', industry: 'FINTECH', country: 'UAE', city: 'Dubai', revenue: 1400000, ebitda: 420000, growth: '75%' },
+  { name: 'FintechFlow Banking', industry: 'FINTECH', country: 'UAE', city: 'Dubai', revenue: 420000000, ebitda: 126000000, growth: '48%', employees: 78, yearsInOp: 6 },
+  { name: 'AlManara Finance', industry: 'FINTECH', country: 'UAE', city: 'Abu Dhabi', revenue: 310000000, ebitda: 93000000, growth: '55%', employees: 62, yearsInOp: 5 },
+  { name: 'Digital Payment Solutions', industry: 'FINTECH', country: 'KSA', city: 'Riyadh', revenue: 260000000, ebitda: 78000000, growth: '64%', employees: 52, yearsInOp: 4 },
 
   // Services
-  { name: 'Digital Marketing Pro', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 2100000, ebitda: 630000, growth: '48%' },
-  { name: 'Consulting & Advisory Group', industry: 'SERVICES', country: 'UAE', city: 'Abu Dhabi', revenue: 3800000, ebitda: 1140000, growth: '28%' },
-  { name: 'Gulf Logistics Hub', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 5600000, ebitda: 1120000, growth: '22%' },
-  { name: 'HR Solutions MENA', industry: 'SERVICES', country: 'KSA', city: 'Riyadh', revenue: 1600000, ebitda: 480000, growth: '35%' },
-  { name: 'Legal Services Network', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 2800000, ebitda: 840000, growth: '18%' },
+  { name: 'Digital Marketing Pro', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 210000000, ebitda: 63000000, growth: '48%', employees: 45, yearsInOp: 8 },
+  { name: 'Consulting & Advisory Group', industry: 'SERVICES', country: 'UAE', city: 'Abu Dhabi', revenue: 380000000, ebitda: 114000000, growth: '28%', employees: 95, yearsInOp: 14 },
+  { name: 'Gulf Logistics Hub', industry: 'LOGISTICS', country: 'UAE', city: 'Dubai', revenue: 560000000, ebitda: 112000000, growth: '22%', employees: 220, yearsInOp: 16 },
 
   // Hospitality
-  { name: 'Premium Hotels Group', industry: 'HOSPITALITY', country: 'UAE', city: 'Dubai', revenue: 11200000, ebitda: 2240000, growth: '16%' },
-  { name: 'Resort & Spa Operator', industry: 'HOSPITALITY', country: 'UAE', city: 'Abu Dhabi', revenue: 6800000, ebitda: 1360000, growth: '12%' },
-  { name: 'Restaurant Chain GCC', industry: 'HOSPITALITY', country: 'KSA', city: 'Jeddah', revenue: 4200000, ebitda: 840000, growth: '24%' },
-  { name: 'Tourism & Travel Agency', industry: 'HOSPITALITY', country: 'UAE', city: 'Dubai', revenue: 2900000, ebitda: 580000, growth: '32%' },
-  { name: 'Event Management Services', industry: 'HOSPITALITY', country: 'KSA', city: 'Riyadh', revenue: 1800000, ebitda: 360000, growth: '28%' },
+  { name: 'Premium Hotels Group', industry: 'HOSPITALITY', country: 'UAE', city: 'Dubai', revenue: 1120000000, ebitda: 224000000, growth: '16%', employees: 450, yearsInOp: 22 },
+  { name: 'Resort & Spa Operator', industry: 'HOSPITALITY', country: 'UAE', city: 'Abu Dhabi', revenue: 680000000, ebitda: 136000000, growth: '12%', employees: 280, yearsInOp: 18 },
+  { name: 'Restaurant Chain GCC', industry: 'HOSPITALITY', country: 'KSA', city: 'Jeddah', revenue: 420000000, ebitda: 84000000, growth: '24%', employees: 180, yearsInOp: 13 },
 
-  // Education & EdTech
-  { name: 'EdTech Innovators', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 1900000, ebitda: 570000, growth: '62%' },
-  { name: 'Online Learning Platform', industry: 'SERVICES', country: 'UAE', city: 'Abu Dhabi', revenue: 1200000, ebitda: 360000, growth: '71%' },
-  { name: 'Training & Development ME', industry: 'SERVICES', country: 'KSA', city: 'Riyadh', revenue: 1600000, ebitda: 480000, growth: '42%' },
-  { name: 'International School Group', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 8200000, ebitda: 2460000, growth: '8%' },
+  // Energy
+  { name: 'Renewable Energy Solutions', industry: 'ENERGY', country: 'UAE', city: 'Abu Dhabi', revenue: 780000000, ebitda: 234000000, growth: '35%', employees: 125, yearsInOp: 9 },
+  { name: 'Solar Installation Services', industry: 'ENERGY', country: 'UAE', city: 'Dubai', revenue: 240000000, ebitda: 72000000, growth: '48%', employees: 65, yearsInOp: 6 },
 
-  // Energy & Renewable
-  { name: 'Renewable Energy Solutions', industry: 'MANUFACTURING', country: 'UAE', city: 'Abu Dhabi', revenue: 7800000, ebitda: 2340000, growth: '35%' },
-  { name: 'Solar Installation Services', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 2400000, ebitda: 720000, growth: '48%' },
-  { name: 'Energy Efficiency Tech', industry: 'SAAS', country: 'KSA', city: 'Riyadh', revenue: 1300000, ebitda: 390000, growth: '55%' },
-  { name: 'Sustainable Solutions Inc', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 2100000, ebitda: 630000, growth: '42%' },
+  // Real Estate
+  { name: 'Real Estate Ventures', industry: 'REAL_ESTATE', country: 'UAE', city: 'Dubai', revenue: 920000000, ebitda: 276000000, growth: '14%', employees: 85, yearsInOp: 19 },
+  { name: 'Property Management ME', industry: 'REAL_ESTATE', country: 'UAE', city: 'Abu Dhabi', revenue: 360000000, ebitda: 108000000, growth: '20%', employees: 75, yearsInOp: 12 },
 
-  // Real Estate & Property
-  { name: 'Real Estate Ventures', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 9200000, ebitda: 2760000, growth: '14%' },
-  { name: 'Property Management ME', industry: 'SERVICES', country: 'UAE', city: 'Abu Dhabi', revenue: 3600000, ebitda: 1080000, growth: '20%' },
-  { name: 'Construction Services', industry: 'SERVICES', country: 'KSA', city: 'Riyadh', revenue: 12800000, ebitda: 2560000, growth: '12%' },
-  { name: 'Developer & Builder Group', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 15200000, ebitda: 3040000, growth: '10%' },
-
-  // Biotech & Research
-  { name: 'BioMed Research Labs', industry: 'HEALTHCARE', country: 'UAE', city: 'Abu Dhabi', revenue: 3200000, ebitda: 960000, growth: '52%' },
-  { name: 'Life Sciences Innovation', industry: 'HEALTHCARE', country: 'UAE', city: 'Dubai', revenue: 2100000, ebitda: 630000, growth: '58%' },
-  { name: 'Clinical Trials Network', industry: 'HEALTHCARE', country: 'KSA', city: 'Riyadh', revenue: 1800000, ebitda: 540000, growth: '48%' },
-
-  // Consumer & CPG
-  { name: 'ConsumerTech Retail', industry: 'RETAIL', country: 'UAE', city: 'Dubai', revenue: 6100000, ebitda: 1220000, growth: '32%' },
-  { name: 'Food & Beverage Producer', industry: 'MANUFACTURING', country: 'UAE', city: 'Ajman', revenue: 8400000, ebitda: 1680000, growth: '18%' },
-  { name: 'Beauty & Personal Care', industry: 'RETAIL', country: 'KSA', city: 'Jeddah', revenue: 4800000, ebitda: 960000, growth: '28%' },
-  { name: 'Consumer Goods Distribution', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 7200000, ebitda: 1440000, growth: '14%' },
-
-  // Media & Entertainment
-  { name: 'Media Production House', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 2800000, ebitda: 840000, growth: '35%' },
-  { name: 'Digital Content Platform', industry: 'SAAS', country: 'UAE', city: 'Abu Dhabi', revenue: 1600000, ebitda: 480000, growth: '68%' },
-  { name: 'Entertainment Group ME', industry: 'SERVICES', country: 'KSA', city: 'Riyadh', revenue: 3100000, ebitda: 930000, growth: '32%' },
-
-  // Automotive
-  { name: 'Auto Dealership Group', industry: 'RETAIL', country: 'UAE', city: 'Dubai', revenue: 14200000, ebitda: 2840000, growth: '11%' },
-  { name: 'Vehicle Maintenance Services', industry: 'SERVICES', country: 'UAE', city: 'Abu Dhabi', revenue: 2900000, ebitda: 870000, growth: '22%' },
-  { name: 'Auto Parts Distributor', industry: 'RETAIL', country: 'KSA', city: 'Dammam', revenue: 5200000, ebitda: 1040000, growth: '16%' },
-  { name: 'Fleet Management Solutions', industry: 'SAAS', country: 'UAE', city: 'Dubai', revenue: 1700000, ebitda: 510000, growth: '54%' },
-
-  // Agriculture
-  { name: 'Agri-Tech Solutions', industry: 'SAAS', country: 'UAE', city: 'Abu Dhabi', revenue: 1100000, ebitda: 330000, growth: '72%' },
-  { name: 'Farming & Agriculture ME', industry: 'SERVICES', country: 'KSA', city: 'Riyadh', revenue: 2600000, ebitda: 520000, growth: '28%' },
-  { name: 'Organic Products Producer', industry: 'MANUFACTURING', country: 'UAE', city: 'Fujairah', revenue: 1800000, ebitda: 360000, growth: '42%' },
-
-  // Additional diverse companies
-  { name: 'Water Treatment Systems', industry: 'MANUFACTURING', country: 'UAE', city: 'Abu Dhabi', revenue: 3400000, ebitda: 680000, growth: '24%' },
-  { name: 'Waste Management Services', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 2700000, ebitda: 810000, growth: '18%' },
-  { name: 'Cybersecurity Firm', industry: 'SAAS', country: 'UAE', city: 'Dubai', revenue: 2300000, ebitda: 690000, growth: '62%' },
-  { name: 'IT Outsourcing Services', industry: 'SERVICES', country: 'UAE', city: 'Abu Dhabi', revenue: 4100000, ebitda: 1230000, growth: '35%' },
-  { name: 'Telecom Solutions', industry: 'FINTECH', country: 'KSA', city: 'Riyadh', revenue: 3800000, ebitda: 1140000, growth: '28%' },
-  { name: 'Business Intelligence Platform', industry: 'SAAS', country: 'UAE', city: 'Dubai', revenue: 1900000, ebitda: 570000, growth: '59%' },
-  { name: 'Mobile App Development', industry: 'SERVICES', country: 'UAE', city: 'Dubai', revenue: 1300000, ebitda: 390000, growth: '54%' },
-  { name: 'Cloud Hosting Provider', industry: 'SAAS', country: 'UAE', city: 'Abu Dhabi', revenue: 2200000, ebitda: 660000, growth: '51%' },
-  { name: 'Supply Chain Software', industry: 'SAAS', country: 'UAE', city: 'Dubai', revenue: 1800000, ebitda: 540000, growth: '48%' },
-  { name: 'Project Management Tools', industry: 'SAAS', country: 'KSA', city: 'Riyadh', revenue: 1500000, ebitda: 450000, growth: '65%' },
+  // Education
+  { name: 'EdTech Innovators', industry: 'EDUCATION', country: 'UAE', city: 'Dubai', revenue: 190000000, ebitda: 57000000, growth: '62%', employees: 48, yearsInOp: 4 },
+  { name: 'International School Group', industry: 'EDUCATION', country: 'UAE', city: 'Dubai', revenue: 820000000, ebitda: 246000000, growth: '8%', employees: 450, yearsInOp: 25 },
 ]
 
 async function main() {
-  console.log('Starting database seed...')
+  console.log('🌱 Starting database seed...')
+  console.log('━'.repeat(50))
 
-  // Delete existing data (careful with this!)
+  // Clear existing data
+  console.log('🔄 Clearing existing data...')
+  await prisma.dealProgressionHistory.deleteMany({})
+  await prisma.dealMilestone.deleteMany({})
+  await prisma.nDASignature.deleteMany({})
+  await prisma.dataRoomAccess.deleteMany({})
+  await prisma.dataRoom.deleteMany({})
+  await prisma.enquiry.deleteMany({})
+  await prisma.message.deleteMany({})
+  await prisma.notification.deleteMany({})
+  await prisma.brokerDelegation.deleteMany({})
+  await prisma.transaction.deleteMany({})
+  await prisma.buyerSeriousness.deleteMany({})
+  await prisma.dealComparable.deleteMany({})
+  await prisma.dealHeat.deleteMany({})
+  await prisma.dealDocument.deleteMany({})
+  await prisma.dealPipeline.deleteMany({})
+  await prisma.savedDeal.deleteMany({})
   await prisma.deal.deleteMany({})
+  await prisma.riskAssessment.deleteMany({})
+  await prisma.fraudFlag.deleteMany({})
+  await prisma.kYCSubmission.deleteMany({})
+  await prisma.kYCDocument.deleteMany({})
   await prisma.user.deleteMany({})
 
   // Create demo users
+  console.log('👥 Creating demo users...')
   const seller = await prisma.user.create({
     data: {
       email: 'seller@forward.com',
       name: 'Sarah Al-Mansouri',
-      password: 'demo123', // In production, hash this!
-      role: 'SELLER',
+      password: 'demo123',
+      role: UserRole.SELLER,
       company: 'TechFlow Solutions',
       phone: '+971 50 123 4567',
-      kycStatus: 'VERIFIED',
+      kycStatus: KYCStatus.VERIFIED,
+      kycVerifiedAt: new Date(),
+      verificationStatus: VerificationStatus.VERIFIED,
+      riskScore: 15,
+      riskLevel: RiskLevel.LOW,
+      emailVerified: true,
+      emailVerifiedAt: new Date(),
     },
   })
 
@@ -136,10 +107,17 @@ async function main() {
       email: 'buyer@forward.com',
       name: 'Ahmed Al-Mazrouei',
       password: 'demo123',
-      role: 'BUYER',
+      role: UserRole.BUYER,
       company: 'AlManara Capital Partners',
       phone: '+971 50 234 5678',
-      kycStatus: 'VERIFIED',
+      kycStatus: KYCStatus.VERIFIED,
+      kycVerifiedAt: new Date(),
+      verificationStatus: VerificationStatus.VERIFIED,
+      riskScore: 20,
+      riskLevel: RiskLevel.LOW,
+      investmentAmount: 500000000, // $5M AED
+      emailVerified: true,
+      emailVerifiedAt: new Date(),
     },
   })
 
@@ -148,91 +126,215 @@ async function main() {
       email: 'broker@forward.com',
       name: 'Fatima Al-Ketbi',
       password: 'demo123',
-      role: 'BROKER',
+      role: UserRole.BROKER,
       company: 'Gulf Advisory Group',
       phone: '+971 50 345 6789',
-      kycStatus: 'VERIFIED',
+      kycStatus: KYCStatus.VERIFIED,
+      kycVerifiedAt: new Date(),
+      verificationStatus: VerificationStatus.VERIFIED,
+      riskScore: 18,
+      riskLevel: RiskLevel.LOW,
+      dealsClosed: 12,
+      averageDealSize: 300000000,
+      emailVerified: true,
+      emailVerifiedAt: new Date(),
     },
   })
 
-  console.log('Created demo users')
+  console.log('✅ Created 3 demo users')
 
-  // Create 100 deals
-  const dealsToCreate = COMPANIES.map((company, index) => ({
-    title: company.name,
-    description: `${company.name} is a leading ${company.industry.toLowerCase()} business based in ${company.city}, ${company.country}. Established business with strong fundamentals and growth potential.`,
-    status: 'PUBLISHED' as DealStatus,
-    sellerId: seller.id,
-    industry: company.industry as IndustryType,
-    revenue: company.revenue,
-    ebitda: company.ebitda,
-    askingPrice: Math.round(company.revenue * (3 + Math.random() * 2)), // 3-5x revenue
-    employees: Math.round(Math.random() * 200) + 10,
-    yearsInOperation: Math.round(Math.random() * 15) + 3,
-    reasonForSale: ['Founder retirement', 'Strategic exit', 'Family succession', 'Growth opportunity'][Math.floor(Math.random() * 4)],
-    country: company.country,
-    city: company.city,
-    inventoryIncluded: Math.random() > 0.7,
-    realEstateIncluded: Math.random() > 0.8,
-    isFranchise: Math.random() > 0.9,
-    views: Math.floor(Math.random() * 500) + 50,
-    uniqueVisitors: Math.floor(Math.random() * 200) + 20,
-    returningVisitors: Math.floor(Math.random() * 50) + 5,
-    inquiries: Math.floor(Math.random() * 30) + 2,
-    publishedAt: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000), // Last 90 days
-  }))
+  // Create deals
+  console.log('🏢 Creating deals...')
+  const deals = []
 
-  const createdDeals = await prisma.deal.createMany({
-    data: dealsToCreate,
-  })
+  for (let i = 0; i < COMPANIES.length; i++) {
+    const company = COMPANIES[i]
+    const askingPrice = Math.round(company.revenue * (3 + Math.random() * 2))
 
-  console.log(`Created ${createdDeals.count} deals`)
+    const deal = await prisma.deal.create({
+      data: {
+        title: company.name,
+        description: `Leading ${company.industry.toLowerCase()} business based in ${company.city}, ${company.country}. Profitable, growing, and ready for new ownership.`,
+        slug: company.name.toLowerCase().replace(/\s+/g, '-'),
+        sellerId: seller.id,
+        status: DealStatus.PUBLISHED,
+        publishedAt: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000),
+        industry: company.industry as IndustryType,
+        country: company.country,
+        city: company.city,
+        revenue: BigInt(company.revenue),
+        ebitda: BigInt(company.ebitda),
+        grossMargin: 45 + Math.random() * 30,
+        ebitdaMargin: (company.ebitda / company.revenue) * 100,
+        askingPrice: BigInt(askingPrice),
+        pricingMultiple: askingPrice / company.revenue,
+        employees: company.employees,
+        yearsInOperation: company.yearsInOp,
+        foundedYear: new Date().getFullYear() - company.yearsInOp,
+        reasonForSale: ['Founder retirement', 'Strategic exit', 'Family succession', 'Growth capital'][Math.floor(Math.random() * 4)],
+        businessModel: ['B2B', 'B2C', 'B2B2C'][Math.floor(Math.random() * 3)],
+        customerConcentration: Math.random() > 0.5 ? 'Top 3 customers = 35% revenue' : 'Diversified customer base',
+        inventoryIncluded: Math.random() > 0.6,
+        realEstateIncluded: Math.random() > 0.7,
+        equipmentIncluded: Math.random() > 0.5,
+        isFranchise: Math.random() > 0.9,
+        views: Math.floor(Math.random() * 500) + 50,
+        uniqueVisitors: Math.floor(Math.random() * 200) + 20,
+        returningVisitors: Math.floor(Math.random() * 50) + 5,
+        inquiries: Math.floor(Math.random() * 15) + 2,
+        heatScore: Math.floor(Math.random() * 100),
+        predictedCloseProb: Math.random() * 100,
+        dealQualityScore: Math.floor(Math.random() * 100),
+      },
+    })
+    deals.push(deal)
+  }
 
-  // Create DealPipeline for each deal
-  const deals = await prisma.deal.findMany({
-    take: 100,
-  })
+  console.log(`✅ Created ${deals.length} deals`)
 
+  // Create pipelines for each deal
+  console.log('📊 Creating deal pipelines...')
   for (const deal of deals) {
+    const stages = Object.values(DealPipelineStage)
+    const randomStage = stages[Math.floor(Math.random() * stages.length)]
+
     await prisma.dealPipeline.create({
       data: {
         dealId: deal.id,
-        currentStage: 'INTEREST',
-        progressPercent: Math.floor(Math.random() * 60),
+        currentStage: randomStage,
+        progressPercent: Math.floor(Math.random() * 100),
         stageStartedAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
         estimatedClosingDate: new Date(Date.now() + (60 + Math.random() * 120) * 24 * 60 * 60 * 1000),
       },
     })
   }
+  console.log('✅ Created deal pipelines')
 
-  console.log('Created deal pipeline records')
+  // Create heat maps
+  console.log('🔥 Creating heat maps...')
+  for (const deal of deals) {
+    await prisma.dealHeat.create({
+      data: {
+        dealId: deal.id,
+        viewsLastWeek: Math.floor(Math.random() * 100),
+        inquiriesLastWeek: Math.floor(Math.random() * 20),
+        buyerCompetition: Math.floor(Math.random() * 8),
+        urgencyLevel: Math.floor(Math.random() * 10),
+        brokerActivity: Math.floor(Math.random() * 10),
+        heatScore: Math.floor(Math.random() * 100),
+        trend: ['rising', 'stable', 'falling'][Math.floor(Math.random() * 3)],
+      },
+    })
+  }
+  console.log('✅ Created heat maps')
 
-  // Create some saved deals for buyer
+  // Create saved deals for buyer
+  console.log('💾 Creating saved deals...')
   const randomDeals = deals.sort(() => Math.random() - 0.5).slice(0, 15)
   for (const deal of randomDeals) {
     await prisma.savedDeal.create({
       data: {
         userId: buyer.id,
         dealId: deal.id,
+        notes: 'Interested in this opportunity',
       },
     })
   }
+  console.log('✅ Created saved deals')
 
-  console.log('Created saved deals for buyer')
+  // Create buyer seriousness scores
+  console.log('🎯 Creating buyer seriousness scores...')
+  for (const deal of deals.slice(0, 10)) {
+    await prisma.buyerSeriousness.create({
+      data: {
+        dealId: deal.id,
+        buyerId: buyer.id,
+        seriousnessScore: Math.floor(Math.random() * 100),
+        confidenceLevel: Math.floor(Math.random() * 100),
+        signals: JSON.stringify({ documentViews: Math.random() > 0.5, dataRoomAccess: Math.random() > 0.5 }),
+        lastEngagementAt: new Date(),
+      },
+    })
+  }
+  console.log('✅ Created buyer seriousness scores')
 
-  console.log('✅ Database seed completed successfully!')
+  // Create sample messages
+  console.log('💬 Creating messages...')
+  await prisma.message.create({
+    data: {
+      authorId: buyer.id,
+      recipientId: seller.id,
+      dealId: deals[0].id,
+      messageType: MessageType.DEAL_INQUIRY,
+      subject: 'Interest in ' + deals[0].title,
+      content: 'Hello, I am very interested in your business. Can we schedule a call to discuss?',
+      isRead: true,
+    },
+  })
+
+  await prisma.message.create({
+    data: {
+      authorId: seller.id,
+      recipientId: buyer.id,
+      dealId: deals[0].id,
+      messageType: MessageType.DIRECT_MESSAGE,
+      subject: 'Re: Interest in ' + deals[0].title,
+      content: 'Thank you for your interest! I would be happy to discuss the opportunity. How about Tuesday at 2 PM?',
+      isRead: false,
+    },
+  })
+  console.log('✅ Created messages')
+
+  // Create data room for first deal
+  console.log('📁 Creating data rooms...')
+  const dataRoom = await prisma.dataRoom.create({
+    data: {
+      dealId: deals[0].id,
+      sellerId: seller.id,
+      title: `Data Room - ${deals[0].title}`,
+      description: 'Complete financial and operational documents for due diligence',
+      accessLevel: DocumentAccessLevel.INITIAL_INFO,
+      ndaRequired: true,
+      passwordProtected: true,
+      documentsCount: 15,
+    },
+  })
+
+  await prisma.dataRoomAccess.create({
+    data: {
+      dataRoomId: dataRoom.id,
+      userId: buyer.id,
+      accessLevel: DocumentAccessLevel.INITIAL_INFO,
+      approvedAt: new Date(),
+      ndaSigned: true,
+      ndaSignedAt: new Date(),
+    },
+  })
+  console.log('✅ Created data rooms')
+
   console.log('')
-  console.log('Demo Accounts:')
-  console.log('  Seller: seller@forward.com / demo123')
-  console.log('  Buyer: buyer@forward.com / demo123')
-  console.log('  Broker: broker@forward.com / demo123')
+  console.log('━'.repeat(50))
+  console.log('✨ Database seed completed successfully!')
+  console.log('━'.repeat(50))
   console.log('')
-  console.log(`Total deals created: ${deals.length}`)
+  console.log('📋 Demo Accounts:')
+  console.log('  • Seller:  seller@forward.com / demo123')
+  console.log('  • Buyer:   buyer@forward.com / demo123')
+  console.log('  • Broker:  broker@forward.com / demo123')
+  console.log('')
+  console.log(`📊 Data Summary:`)
+  console.log(`  • Deals:        ${deals.length}`)
+  console.log(`  • Users:        3`)
+  console.log(`  • Pipelines:    ${deals.length}`)
+  console.log(`  • Heat Maps:    ${deals.length}`)
+  console.log(`  • Data Rooms:   1`)
+  console.log(`  • Messages:     2`)
+  console.log('')
 }
 
 main()
   .catch((e) => {
-    console.error('Error seeding database:', e)
+    console.error('❌ Error seeding database:', e)
     process.exit(1)
   })
   .finally(async () => {

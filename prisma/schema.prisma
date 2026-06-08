@@ -1,5 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Forward OS - Production Database Schema
+// Complete schema for M&A intelligence and deal management platform
 
 generator client {
   provider = "prisma-client-js"
@@ -16,20 +16,34 @@ enum UserRole {
   SELLER
   BUYER
   BROKER
+  ADMIN
 }
 
 enum KYCStatus {
   NOT_STARTED
   PENDING
+  VERIFICATION
   VERIFIED
   REJECTED
   EXPIRED
+}
+
+enum KYCDocumentType {
+  GOVERNMENT_ID
+  PASSPORT
+  BUSINESS_LICENSE
+  TAX_CERTIFICATE
+  BANK_STATEMENT
+  PROOF_OF_ADDRESS
+  BENEFICIAL_OWNER_CERT
+  CORPORATE_CERT
 }
 
 enum DealStatus {
   DRAFT
   PUBLISHED
   ACTIVE
+  ARCHIVED
   CLOSED
   WITHDRAWN
 }
@@ -44,6 +58,15 @@ enum IndustryType {
   SERVICES
   HOSPITALITY
   EDUCATION
+  ENERGY
+  REAL_ESTATE
+  LOGISTICS
+  AUTOMOTIVE
+  AGRICULTURE
+  BIOTECH
+  CPG
+  MEDIA
+  TELECOM
   OTHER
 }
 
@@ -59,117 +82,703 @@ enum DealPipelineStage {
   CLOSED
 }
 
+enum VerificationStatus {
+  NOT_VERIFIED
+  PENDING
+  VERIFIED
+  FAILED
+  FLAGGED
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum MessageType {
+  DIRECT_MESSAGE
+  DEAL_INQUIRY
+  DATA_ROOM_REQUEST
+  SYSTEM_NOTIFICATION
+  BROKER_COMMUNICATION
+}
+
+enum DocumentAccessLevel {
+  NONE
+  TEASER
+  INITIAL_INFO
+  FINANCIAL_DATA
+  FULL_DATA_ROOM
+}
+
+enum TransactionType {
+  DEAL_CLOSED
+  COMMISSION_EARNED
+  COMMISSION_PAID
+  REFUND
+  BROKER_FEE
+}
+
 // ==================== USERS & AUTHENTICATION ====================
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  password      String
-  role          UserRole
-  company       String?
-  phone         String?
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  name                  String
+  password              String    @db.Text
+  role                  UserRole
 
-  // KYC
-  kycStatus     KYCStatus @default(NOT_STARTED)
-  kycVerifiedAt DateTime?
-  kycExpireAt   DateTime?
+  // Profile Information
+  company               String?
+  phone                 String?
+  profileImage          String?
+  bio                   String?   @db.Text
+  website               String?
+  linkedinUrl           String?
+
+  // Buyer specific
+  investmentCriteria    String?   @db.Text // JSON: industries, deal sizes, geographies
+  investmentAmount      BigInt?   // Total capital available in cents
+
+  // Seller/Broker specific
+  yearsInBusiness       Int?
+  dealsClosed           Int?      @default(0)
+  averageDealSize       BigInt?
+
+  // KYC & Verification
+  kycStatus             KYCStatus @default(NOT_STARTED)
+  kycVerifiedAt         DateTime?
+  kycExpireAt           DateTime?
+  kycDocuments          KYCDocument[]
+  kycSubmissions        KYCSubmission[]
+
+  // Risk & Verification Moat
+  verificationStatus    VerificationStatus @default(NOT_VERIFIED)
+  riskScore             Int?      // 0-100, higher = more risk
+  riskLevel             RiskLevel @default(MEDIUM)
+  riskAssessments       RiskAssessment[]
+  fraudFlags            FraudFlag[]
+
+  // Platform engagement
+  emailVerified         Boolean   @default(false)
+  emailVerifiedAt       DateTime?
+  mobileVerified        Boolean   @default(false)
+  twoFactorEnabled      Boolean   @default(false)
 
   // Relationships
-  deals         Deal[]    @relation("SellerDeals")
-  savedDeals    SavedDeal[]
+  dealsAsseller         Deal[]    @relation("SellerDeals")
+  savedDeals            SavedDeal[]
+  messages              Message[] @relation("MessageAuthor")
+  receivedMessages      Message[] @relation("MessageRecipient")
+  notifications         Notification[]
+  brokerDelegations     BrokerDelegation[] @relation("DelegatingUser")
+  delegatedDeals        BrokerDelegation[] @relation("BrokerUser")
+  dataRoomAccess        DataRoomAccess[]
+  dataRoomsAsOwner      DataRoom[]
+  enquiries             Enquiry[]
+  seriousnessScores     BuyerSeriousness[]
+  heatMapData           DealHeat[]
+  progressionHistory    DealProgressionHistory[]
+  transactions          Transaction[] @relation("TransactionInitiator")
+  brokerTransactions    Transaction[] @relation("BrokerUser")
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  lastLoginAt           DateTime?
 
   @@index([email])
+  @@index([role])
+  @@index([kycStatus])
+  @@index([verificationStatus])
+  @@index([riskLevel])
+}
+
+// ==================== KYC & VERIFICATION ====================
+
+model KYCDocument {
+  id                    String    @id @default(cuid())
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+
+  documentType          KYCDocumentType
+  documentUrl           String    @db.Text // S3 URL
+  documentName          String
+
+  verificationStatus    VerificationStatus @default(PENDING)
+  verifiedAt            DateTime?
+  rejectionReason       String?   @db.Text
+
+  expiresAt             DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([verificationStatus])
+}
+
+model KYCSubmission {
+  id                    String    @id @default(cuid())
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+
+  submissionData        String    @db.Text // JSON: answers to KYC questions
+  status                KYCStatus @default(PENDING)
+
+  submittedAt           DateTime  @default(now())
+  reviewedAt            DateTime?
+  reviewNotes           String?   @db.Text
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model RiskAssessment {
+  id                    String    @id @default(cuid())
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+
+  riskLevel             RiskLevel
+  riskScore             Int       // 0-100
+
+  factors               String    @db.Text // JSON: array of risk factors
+  notes                 String?   @db.Text
+
+  assessedAt            DateTime  @default(now())
+  expiresAt             DateTime?
+
+  @@index([userId])
+  @@index([riskLevel])
+}
+
+model FraudFlag {
+  id                    String    @id @default(cuid())
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+
+  flagType              String    // e.g., "duplicate_email", "suspicious_pattern", "payment_issue"
+  severity              RiskLevel
+  description           String    @db.Text
+
+  isResolved            Boolean   @default(false)
+  resolvedAt            DateTime?
+  resolutionNotes       String?   @db.Text
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([severity])
+  @@index([isResolved])
 }
 
 // ==================== DEALS ====================
 
 model Deal {
-  id                String    @id @default(cuid())
-  title             String
-  description       String?   @db.Text
+  id                    String    @id @default(cuid())
 
-  // Seller info
-  seller            User      @relation("SellerDeals", fields: [sellerId], references: [id], onDelete: Cascade)
-  sellerId          String
+  // Basic Information
+  title                 String
+  description           String?   @db.Text
+  slug                  String?   // For SEO
 
-  // Basic info
-  status            DealStatus @default(PUBLISHED)
-  industry          IndustryType
+  // Seller
+  seller                User      @relation("SellerDeals", fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId              String
 
-  // Location
-  country           String
-  city              String?
+  // Deal Status
+  status                DealStatus @default(DRAFT)
+  publishedAt           DateTime?
 
-  // Financial metrics
-  revenue           BigInt?   // In cents (e.g., 1000000 = $10,000)
-  ebitda            BigInt?
-  askingPrice       BigInt?
-  employees         Int?
-  yearsInOperation  Int?
+  // Industry & Geography
+  industry              IndustryType
+  subIndustry           String?
+  country               String
+  city                  String?
+  stateProvince         String?
 
-  // Deal characteristics
-  reasonForSale     String?
-  inventoryIncluded Boolean   @default(false)
-  realEstateIncluded Boolean  @default(false)
-  isFranchise       Boolean   @default(false)
+  // Financial Information
+  revenue               BigInt?   // LTM revenue in cents
+  ebitda                BigInt?   // LTM EBITDA in cents
+  grossMargin           Float?    // Percentage: 0-100
+  ebitdaMargin          Float?    // Percentage: 0-100
+  askingPrice           BigInt?   // In cents
+  pricingMultiple       Float?    // Price / Revenue or Price / EBITDA
 
-  // Engagement metrics
-  views             Int       @default(0)
-  uniqueVisitors    Int       @default(0)
-  returningVisitors Int       @default(0)
-  inquiries         Int       @default(0)
+  // Company Details
+  employees             Int?
+  yearsInOperation      Int?
+  foundedYear           Int?
 
-  // Dates
-  publishedAt       DateTime  @default(now())
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  // Business Characteristics
+  reasonForSale         String?
+  businessModel         String?   // e.g., "B2B", "B2C", "B2B2C"
+  customerConcentration String?   // e.g., "Top 3 customers = 40% revenue"
+
+  // Inclusions
+  inventoryIncluded     Boolean   @default(false)
+  realEstateIncluded    Boolean   @default(false)
+  equipmentIncluded     Boolean   @default(false)
+  isFranchise           Boolean   @default(false)
+
+  // Deal Characteristics
+  keyStrengths          String?   @db.Text // JSON array
+  growthOpportunities   String?   @db.Text // JSON array
+  riskFactors           String?   @db.Text // JSON array
+
+  // Engagement Metrics
+  views                 Int       @default(0)
+  uniqueVisitors        Int       @default(0)
+  returningVisitors     Int       @default(0)
+  inquiries             Int       @default(0)
+
+  // Intelligence Moat
+  heatScore             Int?      // 0-100, proprietary heat map score
+  predictedCloseProb    Float?    // 0-100, M&A probability prediction
+  dealQualityScore      Int?      // 0-100, deal quality assessment
 
   // Relationships
-  pipeline          DealPipeline?
-  saved             SavedDeal[]
+  pipeline              DealPipeline?
+  savedBy               SavedDeal[]
+  messages              Message[] @relation("DealMessages")
+  dataRoom              DataRoom?
+  enquiries             Enquiry[]
+  seriousnessScores     BuyerSeriousness[]
+  heatMap               DealHeat?
+  comparables           DealComparable[]
+  progressionHistory    DealProgressionHistory[]
+  transactions          Transaction[]
+  milestones            DealMilestone[]
+  documents             DealDocument[]
+
+  // Dates
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  closedAt              DateTime?
 
   @@index([sellerId])
   @@index([status])
   @@index([industry])
   @@index([country])
+  @@index([heatScore])
+  @@index([predictedCloseProb])
+  @@index([title])
 }
 
-// ==================== DEAL PIPELINE ====================
+model DealDocument {
+  id                    String    @id @default(cuid())
+  deal                  Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId                String
+
+  title                 String
+  description           String?
+  documentUrl           String    @db.Text // S3 URL
+  documentType          String    // e.g., "teaser", "executive_summary", "financial_statements"
+  fileSize              BigInt
+
+  uploadedAt            DateTime  @default(now())
+  expiresAt             DateTime?
+
+  @@index([dealId])
+}
+
+// ==================== DEAL PIPELINE & PROGRESSION ====================
 
 model DealPipeline {
-  id                  String    @id @default(cuid())
-  deal                Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  dealId              String    @unique
+  id                    String    @id @default(cuid())
+  deal                  Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId                String    @unique
 
-  currentStage        DealPipelineStage @default(INTEREST)
-  progressPercent     Int       @default(0)
+  currentStage          DealPipelineStage @default(INTEREST)
+  progressPercent       Int       @default(0)
 
-  stageStartedAt      DateTime  @default(now())
-  estimatedClosingDate DateTime?
+  stageStartedAt        DateTime  @default(now())
+  estimatedClosingDate  DateTime?
+  actualClosingDate     DateTime?
 
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  daysInCurrentStage    Int       @default(0)
+  totalDaysToClose      Int?
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   @@index([dealId])
   @@index([currentStage])
 }
 
-// ==================== SAVED DEALS ====================
+model DealProgressionHistory {
+  id                    String    @id @default(cuid())
+  deal                  Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId                String
+
+  fromStage             DealPipelineStage
+  toStage               DealPipelineStage
+
+  changedBy             User?     @relation(fields: [changedById], references: [id], onDelete: SetNull)
+  changedById           String?
+
+  reason                String?   @db.Text
+  notes                 String?   @db.Text
+
+  createdAt             DateTime  @default(now())
+
+  @@index([dealId])
+  @@index([toStage])
+  @@index([changedById])
+}
+
+model DealMilestone {
+  id                    String    @id @default(cuid())
+  deal                  Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId                String
+
+  title                 String
+  description           String?   @db.Text
+
+  dueDate               DateTime
+  completedAt           DateTime?
+  isCompleted           Boolean   @default(false)
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([dealId])
+  @@index([isCompleted])
+}
+
+// ==================== INTELLIGENCE MOAT ====================
+
+model DealHeat {
+  id                    String    @id @default(cuid())
+  deal                  Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId                String    @unique
+  user                  User?     @relation(fields: [updatedBy], references: [id], onDelete: SetNull)
+  updatedBy             String?
+
+  // Heat Score Components
+  viewsLastWeek         Int       @default(0)
+  inquiriesLastWeek     Int       @default(0)
+  buyerCompetition      Int       @default(0) // Number of competing buyers
+  urgencyLevel          Int       @default(0) // 0-10
+  brokerActivity        Int       @default(0) // 0-10
+
+  // Overall Score (0-100)
+  heatScore             Int
+  trend                 String    @default("stable") // "rising", "stable", "falling"
+
+  // Real-time signals
+  recentActivityCount   Int       @default(0)
+  lastActivityAt        DateTime?
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([dealId])
+  @@index([heatScore])
+}
+
+model DealComparable {
+  id                    String    @id @default(cuid())
+  deal                  Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId                String
+
+  comparableName        String
+  comparableIndustry    IndustryType
+
+  // Comparable Metrics
+  comparableRevenue     BigInt?
+  comparableEbitda      BigInt?
+  comparableValuation   BigInt?
+  comparableMultiple    Float?    // Valuation / Revenue or EBITDA
+
+  // Comparison
+  revenueVsTarget       Float?    // Percentage difference
+  ebitdaVsTarget        Float?
+  multipleVsTarget      Float?
+
+  source                String?   // e.g., "public_company", "recent_transaction", "market_data"
+  notes                 String?   @db.Text
+
+  createdAt             DateTime  @default(now())
+
+  @@index([dealId])
+}
+
+model BuyerSeriousness {
+  id                    String    @id @default(cuid())
+  deal                  Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId                String
+  buyer                 User      @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  buyerId               String
+
+  seriousnessScore      Int       // 0-100
+  confidenceLevel       Int       // 0-100, confidence in the score
+
+  signals               String    @db.Text // JSON: engagement signals, document requests, etc.
+  lastEngagementAt      DateTime?
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([dealId, buyerId])
+  @@index([dealId])
+  @@index([buyerId])
+  @@index([seriousnessScore])
+}
+
+// ==================== SAVED DEALS & WATCHLISTS ====================
 
 model SavedDeal {
-  id        String   @id @default(cuid())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  deal      Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  dealId    String
+  id                    String    @id @default(cuid())
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+  deal                  Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId                String
 
-  savedAt   DateTime @default(now())
+  savedAt               DateTime  @default(now())
+  notes                 String?   @db.Text
 
   @@unique([userId, dealId])
   @@index([userId])
   @@index([dealId])
+}
+
+// ==================== DATA ROOMS ====================
+
+model DataRoom {
+  id                    String    @id @default(cuid())
+  deal                  Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId                String    @unique
+  seller                User      @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId              String
+
+  title                 String
+  description           String?   @db.Text
+
+  accessLevel           DocumentAccessLevel @default(INITIAL_INFO)
+  ndaRequired           Boolean   @default(true)
+  passwordProtected     Boolean   @default(false)
+
+  documentsCount        Int       @default(0)
+  accessRequests        DataRoomAccess[]
+  ndaSignatures         NDASignature[]
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([dealId])
+  @@index([sellerId])
+}
+
+model DataRoomAccess {
+  id                    String    @id @default(cuid())
+  dataRoom              DataRoom  @relation(fields: [dataRoomId], references: [id], onDelete: Cascade)
+  dataRoomId            String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+
+  accessLevel           DocumentAccessLevel
+  approvedAt            DateTime?
+  expiresAt             DateTime?
+
+  ndaSigned             Boolean   @default(false)
+  ndaSignedAt           DateTime?
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([dataRoomId, userId])
+  @@index([dataRoomId])
+  @@index([userId])
+}
+
+model NDASignature {
+  id                    String    @id @default(cuid())
+  dataRoom              DataRoom  @relation(fields: [dataRoomId], references: [id], onDelete: Cascade)
+  dataRoomId            String
+
+  signerName            String
+  signerEmail           String
+  signerCompany         String?
+
+  signatureUrl          String    @db.Text // S3 URL to signed NDA
+  ipAddress             String?
+
+  signedAt              DateTime
+  createdAt             DateTime  @default(now())
+
+  @@index([dataRoomId])
+}
+
+// ==================== MESSAGING ====================
+
+model Message {
+  id                    String    @id @default(cuid())
+
+  author                User      @relation("MessageAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId              String
+  recipient             User      @relation("MessageRecipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  recipientId           String
+
+  deal                  Deal?     @relation("DealMessages", fields: [dealId], references: [id], onDelete: SetNull)
+  dealId                String?
+
+  messageType           MessageType @default(DIRECT_MESSAGE)
+  subject               String?
+  content               String    @db.Text
+
+  isRead                Boolean   @default(false)
+  readAt                DateTime?
+  isArchived            Boolean   @default(false)
+
+  attachments           String?   @db.Text // JSON: array of URLs
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([authorId])
+  @@index([recipientId])
+  @@index([dealId])
+  @@index([isRead])
+}
+
+model Notification {
+  id                    String    @id @default(cuid())
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+
+  title                 String
+  message               String    @db.Text
+  notificationType      String    // e.g., "deal_inquiry", "message", "update"
+
+  isRead                Boolean   @default(false)
+  readAt                DateTime?
+
+  actionUrl             String?
+
+  createdAt             DateTime  @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+// ==================== BROKER & DELEGATION ====================
+
+model BrokerDelegation {
+  id                    String    @id @default(cuid())
+  delegatingUser        User      @relation("DelegatingUser", fields: [delegatingUserId], references: [id], onDelete: Cascade)
+  delegatingUserId      String
+
+  broker                User      @relation("BrokerUser", fields: [brokerId], references: [id], onDelete: Cascade)
+  brokerId              String
+
+  dealIds               String    @db.Text // JSON: array of deal IDs
+  commissionPercent     Float     // 0-100
+
+  isActive              Boolean   @default(true)
+  startDate             DateTime  @default(now())
+  endDate               DateTime?
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([delegatingUserId, brokerId])
+  @@index([delegatingUserId])
+  @@index([brokerId])
+}
+
+// ==================== ENQUIRIES & ENGAGEMENT ====================
+
+model Enquiry {
+  id                    String    @id @default(cuid())
+  deal                  Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId                String
+
+  inquirer              User      @relation(fields: [inquirerId], references: [id], onDelete: Cascade)
+  inquirerId            String
+
+  inquiryType           String    // e.g., "general", "data_room_access", "meeting_request"
+  message               String    @db.Text
+
+  status                String    @default("pending") // "pending", "responded", "closed"
+  respondedAt           DateTime?
+  response              String?   @db.Text
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([dealId])
+  @@index([inquirerId])
+  @@index([status])
+}
+
+// ==================== TRANSACTIONS & COMMISSION ====================
+
+model Transaction {
+  id                    String    @id @default(cuid())
+
+  deal                  Deal?     @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  dealId                String?
+
+  initiator             User?     @relation("TransactionInitiator", fields: [initiatorId], references: [id], onDelete: SetNull)
+  initiatorId           String?
+
+  broker                User?     @relation("BrokerUser", fields: [brokerId], references: [id], onDelete: SetNull)
+  brokerId              String?
+
+  transactionType       TransactionType
+
+  amount                BigInt    // In cents
+  currency              String    @default("AED")
+
+  description           String?   @db.Text
+  referenceId           String?   // External reference
+
+  status                String    @default("pending") // "pending", "completed", "failed"
+  completedAt           DateTime?
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([dealId])
+  @@index([initiatorId])
+  @@index([brokerId])
+  @@index([status])
+}
+
+// ==================== AUDIT & COMPLIANCE ====================
+
+model AuditLog {
+  id                    String    @id @default(cuid())
+
+  userId                String?
+  action                String
+  resourceType          String    // e.g., "deal", "user", "data_room"
+  resourceId            String?
+
+  changes               String?   @db.Text // JSON: before/after
+  ipAddress             String?
+  userAgent             String?
+
+  createdAt             DateTime  @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([resourceType])
+  @@index([createdAt])
+}
+
+// ==================== SYSTEM & CONFIGURATION ====================
+
+model SystemConfig {
+  id                    String    @id @default(cuid())
+
+  key                   String    @unique
+  value                 String    @db.Text // JSON if needed
+
+  updatedAt             DateTime  @updatedAt
 }
