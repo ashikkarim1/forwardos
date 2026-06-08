@@ -1,18 +1,4 @@
-import type { Metadata } from 'next'
 import '@/styles/globals.css'
-
-export const metadata: Metadata = {
-  title: 'Forward OS - Corporate Transactions Operating System',
-  description: 'The operating system for corporate transactions and strategic outcomes.',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
-  icons: {
-    icon: '/FOS.jpg',
-  },
-}
 
 export default function RootLayout({
   children,
@@ -23,7 +9,9 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#FF8C00" />
+        <link rel="icon" href="/FOS.jpg" type="image/jpeg" />
       </head>
       <body className="bg-white text-[#1A1A1A] font-sans antialiased">
         <main id="main-content">{children}</main>
