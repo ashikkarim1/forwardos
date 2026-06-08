@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     maximumScale: 5,
   },
   icons: {
-    icon: '/fox.jpg',
+    icon: '/FOS.jpg',
   },
 }
 
