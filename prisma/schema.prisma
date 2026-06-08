@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ==================== USERS & AUTHENTICATION ====================
+// ==================== ENUMS ====================
 
 enum UserRole {
   SELLER
@@ -26,6 +26,41 @@ enum KYCStatus {
   EXPIRED
 }
 
+enum DealStatus {
+  DRAFT
+  PUBLISHED
+  ACTIVE
+  CLOSED
+  WITHDRAWN
+}
+
+enum IndustryType {
+  SAAS
+  HEALTHCARE
+  RETAIL
+  ECOMMERCE
+  MANUFACTURING
+  FINTECH
+  SERVICES
+  HOSPITALITY
+  EDUCATION
+  OTHER
+}
+
+enum DealPipelineStage {
+  INTEREST
+  QUALIFICATION
+  DUE_DILIGENCE
+  LOI
+  OFFERS
+  NEGOTIATION
+  FINAL_AGREEMENT
+  CLOSING
+  CLOSED
+}
+
+// ==================== USERS & AUTHENTICATION ====================
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -40,597 +75,101 @@ model User {
   kycVerifiedAt DateTime?
   kycExpireAt   DateTime?
 
-  // Profile
-  profileImage  String?
-  bio           String?
-  investmentCriteria String? // JSON for buyer preferences
-
-  // Seller specific
-  dealsSelling  Deal[]    @relation("SellerDeals")
-  dataRooms     DataRoom[] @relation("SellerDataRooms")
-  brokerDelegations BrokerDelegation[] @relation("SellerDelegations")
-
-  // Buyer specific
-  dataRoomRequests DataRoomRequest[] @relation("BuyerRequests")
+  // Relationships
+  deals         Deal[]    @relation("SellerDeals")
   savedDeals    SavedDeal[]
-
-  // Broker specific
-  sellerClients   User[]  @relation("BrokerToSeller")
-  brokerOf        User?   @relation("BrokerToSeller", fields: [brokerId], references: [id])
-  brokerId        String?
-
-  // Messaging
-  sentMessages    Message[] @relation("SenderMessages")
-  receivedMessages Message[] @relation("ReceiverMessages")
-
-  // Notifications
-  notifications Notification[]
-
-  // Engagement tracking
-  dataRoomViews DataRoomView[]
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  @@index([email])
 }
 
-// ==================== DEALS & LISTINGS ====================
-
-enum DealStatus {
-  DRAFT
-  KYC_PENDING
-  KYC_COMPLETE
-  PUBLISHED
-  UNDER_NDA
-  NEGOTIATING
-  CLOSED
-  WITHDRAWN
-}
-
-enum IndustryType {
-  SAAS
-  HEALTHCARE
-  FINTECH
-  RETAIL
-  MANUFACTURING
-  ECOMMERCE
-  SERVICES
-  HOSPITALITY
-  OTHER
-}
+// ==================== DEALS ====================
 
 model Deal {
-  id              String    @id @default(cuid())
-  title           String
-  description     String?
-  status          DealStatus @default(DRAFT)
+  id                String    @id @default(cuid())
+  title             String
+  description       String?   @db.Text
 
-  // Seller
-  seller          User      @relation("SellerDeals", fields: [sellerId], references: [id], onDelete: Cascade)
-  sellerId        String
+  // Seller info
+  seller            User      @relation("SellerDeals", fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId          String
 
-  // Business Details
-  industry        IndustryType
-  revenue         Int       // in AED
-  ebitda          Int       // in AED
-  askingPrice     Int?      // in AED
-  employees       Int?
-  yearsInOperation Int?
-  reasonForSale   String?
+  // Basic info
+  status            DealStatus @default(PUBLISHED)
+  industry          IndustryType
 
   // Location
-  country         String
-  city            String
+  country           String
+  city              String?
 
-  // Features
-  inventoryIncluded Boolean @default(false)
-  realEstateIncluded Boolean @default(false)
-  isFranchise     Boolean @default(false)
+  // Financial metrics
+  revenue           BigInt?   // In cents (e.g., 1000000 = $10,000)
+  ebitda            BigInt?
+  askingPrice       BigInt?
+  employees         Int?
+  yearsInOperation  Int?
 
-  // KYC Progress (for draft deals)
-  kycIdentityVerified Boolean @default(false)
-  kycDocumentsVerified Boolean @default(false)
-  kycAIVerified       Boolean @default(false)
+  // Deal characteristics
+  reasonForSale     String?
+  inventoryIncluded Boolean   @default(false)
+  realEstateIncluded Boolean  @default(false)
+  isFranchise       Boolean   @default(false)
 
-  // Engagement
-  views           Int       @default(0)
-  uniqueVisitors  Int       @default(0)
-  returningVisitors Int     @default(0)
-  inquiries       Int       @default(0)
+  // Engagement metrics
+  views             Int       @default(0)
+  uniqueVisitors    Int       @default(0)
+  returningVisitors Int       @default(0)
+  inquiries         Int       @default(0)
 
-  // Data Room
-  dataRoom        DataRoom? @relation("DealDataRoom")
-
-  // Requests & Buyers
-  dataRoomRequests DataRoomRequest[]
-  savedByBuyers   SavedDeal[]
-
-  // Notifications
-  notifications   Notification[]
-
-  // Pipeline & Progression
-  pipeline        DealPipeline? @relation("DealPipeline")
-  progressionHistory DealProgressionHistory[] @relation("DealProgressionHistory")
-
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  publishedAt     DateTime?
-}
-
-model SavedDeal {
-  id        String  @id @default(cuid())
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  deal      Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  dealId    String
-
-  createdAt DateTime @default(now())
-
-  @@unique([userId, dealId])
-}
-
-// ==================== DATA ROOM ====================
-
-enum DataRoomRequestStatus {
-  PENDING
-  INFO_REQUESTED
-  APPROVED
-  DECLINED
-  EXPIRED
-}
-
-enum NDStatus {
-  NOT_SENT
-  PENDING_SIGNATURE
-  SIGNED
-  EXPIRED
-}
-
-model DataRoom {
-  id          String  @id @default(cuid())
-  deal        Deal    @relation("DealDataRoom", fields: [dealId], references: [id], onDelete: Cascade)
-  dealId      String  @unique
-
-  seller      User    @relation("SellerDataRooms", fields: [sellerId], references: [id])
-  sellerId    String
-
-  // Documents
-  documents   DataRoomDocument[]
-
-  // Access requests
-  requests    DataRoomRequest[]
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model DataRoomDocument {
-  id              String  @id @default(cuid())
-  dataRoom        DataRoom @relation(fields: [dataRoomId], references: [id], onDelete: Cascade)
-  dataRoomId      String
-
-  name            String
-  category        String  // Financial, Legal, Operational, Technical
-  size            Int     // in bytes
-  url             String  // S3 or file storage URL
-  uploadedAt      DateTime @default(now())
-  stage           Int     @default(1) // 1, 2, or 3 for disclosure framework
-  required        Boolean @default(true)
-
-  views           DataRoomDocumentView[]
-
-  createdAt       DateTime @default(now())
-}
-
-model DataRoomRequest {
-  id                String    @id @default(cuid())
-  dataRoom          DataRoom  @relation(fields: [dataRoomId], references: [id], onDelete: Cascade)
-  dataRoomId        String
-
-  buyer             User      @relation("BuyerRequests", fields: [buyerId], references: [id], onDelete: Cascade)
-  buyerId           String
-
-  deal              Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  dealId            String
-
-  status            DataRoomRequestStatus @default(PENDING)
-
-  // NDA
-  nda               NDA?
-
-  // Approval details
-  requestedAt       DateTime  @default(now())
-  approvedAt        DateTime?
-  declinedAt        DateTime?
-  declineReason     String?
-
-  // Access window
-  expiresAt         DateTime?
-  extensionRequests DataRoomExtension[]
-
-  // Engagement
-  views             DataRoomView[]
-
+  // Dates
+  publishedAt       DateTime  @default(now())
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+
+  // Relationships
+  pipeline          DealPipeline?
+  saved             SavedDeal[]
+
+  @@index([sellerId])
+  @@index([status])
+  @@index([industry])
+  @@index([country])
 }
 
-model NDA {
-  id                String  @id @default(cuid())
-  request           DataRoomRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  requestId         String  @unique
-
-  status            NDStatus @default(NOT_SENT)
-  sentAt            DateTime?
-  signedAt          DateTime?
-  signatureUrl      String?
-
-  template          String  // NDA template as HTML/text
-  expiresAt         DateTime?
-
-  createdAt         DateTime @default(now())
-}
-
-model DataRoomExtension {
-  id                String  @id @default(cuid())
-  request           DataRoomRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  requestId         String
-
-  requestedDays     Int
-  requestedAt       DateTime @default(now())
-  approvedAt        DateTime?
-  deniedAt          DateTime?
-
-  createdAt         DateTime @default(now())
-}
-
-// ==================== DATA ROOM ENGAGEMENT TRACKING ====================
-
-model DataRoomView {
-  id                String  @id @default(cuid())
-
-  request           DataRoomRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  requestId         String
-
-  viewer            User    @relation(fields: [viewerId], references: [id], onDelete: Cascade)
-  viewerId          String
-
-  // Session details
-  sessionStarted    DateTime @default(now())
-  sessionEnded      DateTime?
-  totalTimeMinutes  Int     @default(0)
-
-  // Page details
-  currentPage       Int     @default(1)
-  pagesViewed       Int[]   // Array of page numbers viewed
-  pageTimeSpent     String? // JSON: { "page1": 120, "page2": 45 }
-
-  // Analytics
-  scrollDepth       Int     @default(0) // 0-100%
-  documentsOpened   String[] // Array of document IDs
-
-  // Seriousness signals
-  infoRequested     Boolean @default(false)
-
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-}
-
-model DataRoomDocumentView {
-  id                String  @id @default(cuid())
-  document          DataRoomDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  documentId        String
-
-  viewedAt          DateTime @default(now())
-  timeSpentSeconds  Int     @default(0)
-  pageCount         Int     @default(0)
-
-  createdAt         DateTime @default(now())
-}
-
-// ==================== MESSAGING ====================
-
-model Message {
-  id            String  @id @default(cuid())
-
-  sender        User    @relation("SenderMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  senderId      String
-
-  receiver      User    @relation("ReceiverMessages", fields: [receiverId], references: [id], onDelete: Cascade)
-  receiverId    String
-
-  content       String
-
-  // References
-  deal          Deal?   @relation(fields: [dealId], references: [id], onDelete: SetNull)
-  dealId        String?
-
-  // Status
-  isRead        Boolean @default(false)
-  readAt        DateTime?
-
-  // Attachments
-  attachmentUrl String?
-
-  createdAt     DateTime @default(now())
-
-  @@index([senderId])
-  @@index([receiverId])
-  @@index([dealId])
-}
-
-// ==================== NOTIFICATIONS ====================
-
-enum NotificationType {
-  INQUIRY
-  MESSAGE
-  LISTING
-  MILESTONE
-  SYSTEM
-  DATA_ROOM_REQUEST
-  APPROVAL_DECISION
-  NDA_SIGNATURE
-  INFORMATION_REQUEST
-}
-
-model Notification {
-  id            String    @id @default(cuid())
-
-  recipient     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId        String
-
-  type          NotificationType
-  title         String
-  description   String
-
-  // References
-  deal          Deal?     @relation(fields: [dealId], references: [id], onDelete: SetNull)
-  dealId        String?
-
-  message       Message?  @relation(fields: [messageId], references: [id], onDelete: SetNull)
-  messageId     String?
-
-  // Status
-  isRead        Boolean   @default(false)
-  readAt        DateTime?
-  isArchived    Boolean   @default(false)
-
-  // Action
-  actionUrl     String?
-  actionLabel   String?
-
-  createdAt     DateTime  @default(now())
-
-  @@index([userId])
-}
-
-// ==================== BROKER DELEGATION ====================
-
-model BrokerDelegation {
-  id            String  @id @default(cuid())
-
-  seller        User    @relation("SellerDelegations", fields: [sellerId], references: [id], onDelete: Cascade)
-  sellerId      String
-
-  broker        User    @relation(fields: [brokerId], references: [id], onDelete: Cascade)
-  brokerId      String
-
-  // Permissions
-  canApproveDataRoom  Boolean @default(true)
-  canManageListings   Boolean @default(false)
-  canAccessMessages   Boolean @default(true)
-
-  // Commission
-  commissionPercent   Float   @default(5.0)
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@unique([sellerId, brokerId])
-}
-
-// ==================== ANALYTICS & SCORING ====================
-
-model DealHeat {
-  id            String  @id @default(cuid())
-  deal          Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  dealId        String  @unique
-
-  // Heat calculation
-  temperature   Float   @default(0) // 0-100
-  label         String  @default("Cold")
-  trend         String? // "+5", "-3", "flat"
-
-  // Metrics
-  viewsScore    Float   @default(0)
-  inquiriesScore Float  @default(0)
-  messagesScore Float   @default(0)
-  industryMultiplier Float @default(1.0)
-
-  // Buyer breakdown
-  strategicBuyers Int   @default(0)
-  peFirms         Int   @default(0)
-  familyOffices   Int   @default(0)
-  competitors     Int   @default(0)
-
-  timeToCloseEstimate String? // "4-6 weeks"
-
-  updatedAt     DateTime @updatedAt
-  createdAt     DateTime @default(now())
-}
-
-model BuyerSeriousness {
-  id            String  @id @default(cuid())
-
-  buyer         User    @relation(fields: [buyerId], references: [id], onDelete: Cascade)
-  buyerId       String
-
-  deal          Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  dealId        String
-
-  // Score (0-100)
-  score         Float   @default(0)
-
-  // Signals
-  viewedPages   Int     @default(0)
-  totalPages    Int     @default(0)
-  timeSpentMinutes Int @default(0)
-  documentRequests Int @default(0)
-  infoRequests  Int     @default(0)
-  messagesSent  Int     @default(0)
-  responseTime  Int?    // in hours
-
-  // Assessment
-  assessment    String? // "High", "Medium", "Low"
-
-  updatedAt     DateTime @updatedAt
-  createdAt     DateTime @default(now())
-
-  @@unique([buyerId, dealId])
-}
-
-// ==================== DEAL PROGRESS ====================
-
-enum MilestoneStatus {
-  NOT_STARTED
-  IN_PROGRESS
-  COMPLETED
-  AT_RISK
-  BLOCKED
-}
-
-model Milestone {
-  id            String  @id @default(cuid())
-  deal          Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
-  dealId        String
-
-  title         String
-  description   String?
-  status        MilestoneStatus @default(NOT_STARTED)
-  progress      Int     @default(0) // 0-100%
-
-  dueDate       DateTime?
-  completedAt   DateTime?
-
-  owner         String? // User name
-
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-// ==================== DEAL PIPELINE & PROGRESSION ====================
-
-enum DealPipelineStage {
-  INTEREST
-  QUALIFICATION
-  DUE_DILIGENCE
-  LOI
-  OFFERS
-  NEGOTIATION
-  FINAL_AGREEMENT
-  CLOSING
-  CLOSED
-  WITHDRAWN
-}
+// ==================== DEAL PIPELINE ====================
 
 model DealPipeline {
-  id              String  @id @default(cuid())
+  id                  String    @id @default(cuid())
+  deal                Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId              String    @unique
 
-  deal            Deal    @relation("DealPipeline", fields: [dealId], references: [id], onDelete: Cascade)
-  dealId          String  @unique
+  currentStage        DealPipelineStage @default(INTEREST)
+  progressPercent     Int       @default(0)
 
-  // Current stage
-  currentStage    DealPipelineStage @default(INTEREST)
-
-  // Progress tracking
-  progressPercent Int     @default(0) // 0-100
-
-  // Timeline
-  stageStartedAt  DateTime @default(now())
+  stageStartedAt      DateTime  @default(now())
   estimatedClosingDate DateTime?
 
-  // Visibility
-  visibleToSeller Boolean @default(true)
-  visibleToBuyer  Boolean @default(false)
-  visibleToBroker Boolean @default(false)
-
-  // Notes
-  internalNotes   String? // JSON array of notes
-
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
-model DealProgressionHistory {
-  id              String  @id @default(cuid())
-
-  deal            Deal    @relation("DealProgressionHistory", fields: [dealId], references: [id], onDelete: Cascade)
-  dealId          String
-
-  fromStage       DealPipelineStage
-  toStage         DealPipelineStage
-
-  changedBy       User    @relation(fields: [changedById], references: [id], onDelete: SetNull)
-  changedById     String?
-
-  reason          String? // Why did it progress?
-  notes           String? // Additional context
-
-  createdAt       DateTime @default(now())
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   @@index([dealId])
-  @@index([changedById])
+  @@index([currentStage])
 }
 
-// ==================== TRANSACTIONS & COMMISSION ====================
+// ==================== SAVED DEALS ====================
 
-enum TransactionType {
-  DEAL_CLOSED
-  COMMISSION_EARNED
-  COMMISSION_PAID
-  REFUND
-}
+model SavedDeal {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  deal      Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId    String
 
-model Transaction {
-  id              String  @id @default(cuid())
+  savedAt   DateTime @default(now())
 
-  deal            Deal?   @relation(fields: [dealId], references: [id], onDelete: SetNull)
-  dealId          String?
-
-  broker          User?   @relation(fields: [brokerId], references: [id], onDelete: SetNull)
-  brokerId        String?
-
-  type            TransactionType
-  amount          Int     // in AED
-  currency        String  @default("AED")
-
-  description     String?
-
-  // Commission details
-  dealValue       Int?    // in AED
-  commissionRate  Float?  // percentage
-
-  status          String  @default("pending") // pending, completed, failed
-
-  createdAt       DateTime @default(now())
-  completedAt     DateTime?
-}
-
-// ==================== AUDIT & LOGS ====================
-
-model AuditLog {
-  id            String  @id @default(cuid())
-
-  userId        String?
-  action        String
-  resourceType  String
-  resourceId    String?
-  details       String? // JSON
-
-  ipAddress     String?
-  userAgent     String?
-
-  createdAt     DateTime @default(now())
-
+  @@unique([userId, dealId])
   @@index([userId])
-  @@index([createdAt])
+  @@index([dealId])
 }
