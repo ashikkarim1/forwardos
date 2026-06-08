@@ -5,12 +5,11 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   ArrowRight, CheckCircle2, Zap, TrendingUp, Eye, Flame, BarChart3,
-  Globe, Shield, Brain, Check
+  Globe, Shield, Brain
 } from 'lucide-react'
 import { PublicHeader } from '@/components/Navigation'
 import { RoleSelectorButton } from '@/components/RoleSelectorButton'
-import { ComparablesIcon, DealIcon, PipelineIcon, FeatureIcon } from '@/components/Icons/FeatureIcons'
-import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_TEXT_TERTIARY, COLOR_SURFACE_SUCCESS, COLOR_SURFACE_WARM, COLOR_BORDER } from '@/styles/forward-colors'
+import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_TEXT_TERTIARY, COLOR_BORDER } from '@/styles/forward-colors'
 
 const features = [
   {
