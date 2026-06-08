@@ -168,7 +168,7 @@ const mockDeals: Deal[] = [
 ]
 
 export default function SellerDashboardV2() {
-  const [activeTab, setActiveTab] = useState<'inbox' | 'deals' | 'analytics' | 'settings'>('inbox')
+  const [activeTab, setActiveTab] = useState<'inbox' | 'deals' | 'analytics' | 'settings' | 'pipeline'>('inbox')
   const [expandedRequest, setExpandedRequest] = useState<string | null>(null)
   const [showApprovalModal, setShowApprovalModal] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<DataRoomRequest | null>(null)

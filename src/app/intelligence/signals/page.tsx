@@ -26,14 +26,14 @@ export default function SignalsPage() {
     fetch()
   }, [])
 
-  const stats = data?.stats || {
+  const stats = (data as any)?.stats || {
     critical: 0,
     high: 0,
     medium: 0,
     low: 0,
   }
 
-  const signals = data?.signals || []
+  const signals = (data as any)?.signals || []
 
   const severityConfig = {
     critical: { color: COLOR_ACCENT, icon: '🔴', label: 'Critical' },

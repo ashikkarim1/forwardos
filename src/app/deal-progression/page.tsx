@@ -46,20 +46,21 @@ export default function DealProgressionPage() {
         const response = await fetch(`/api/deals/pipeline?view=${view}`)
         const data = await response.json()
 
+        let allDeals: any[] = []
         if (view === 'kanban') {
           // Flatten kanban data
-          const allDeals: any[] = []
-          Object.values(data.kanban).forEach((stageDeal: any) => {
-            allDeals.push(...stageDeal)
+          Object.values(data.kanban || {}).forEach((stageDeal: any) => {
+            allDeals.push(...(Array.isArray(stageDeal) ? stageDeal : []))
           })
           setDeals(allDeals)
         } else {
-          setDeals(data.timeline || data.deals || [])
+          allDeals = data.timeline || data.deals || []
+          setDeals(allDeals)
         }
 
         // Calculate stats
         const totalDeals = data.totalDeals || 0
-        const closed = allDeals?.filter((d) => d.currentStage === 'CLOSED').length || 0
+        const closed = allDeals?.filter((d: any) => d.currentStage === 'CLOSED').length || 0
         const inProgress = totalDeals - closed
         const totalValue = allDeals?.reduce((sum: number, d: any) => sum + (d.valuation || 0), 0) || 0
 

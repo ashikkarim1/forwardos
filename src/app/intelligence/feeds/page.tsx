@@ -26,14 +26,14 @@ export default function FeedsPage() {
     fetch()
   }, [])
 
-  const feeds = data?.feeds || []
-  const stats = data?.feedStats || {
+  const feeds = (data as any)?.feeds || []
+  const stats = (data as any)?.feedStats || {
     totalSources: 0,
     activeFeeds: 0,
     avgLatency: '0',
     coverage: '0',
   }
-  const comparables = data?.comparables || []
+  const comparables = (data as any)?.comparables || []
 
   const feedTypeIcons: Record<string, React.ComponentType<any>> = {
     sec_edgar: FileText,

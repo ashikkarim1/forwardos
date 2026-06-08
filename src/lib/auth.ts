@@ -8,10 +8,11 @@ export interface JWTPayload {
   email: string
   role: 'SELLER' | 'BUYER' | 'BROKER'
   kycStatus: 'NOT_STARTED' | 'PENDING' | 'VERIFIED' | 'REJECTED' | 'EXPIRED'
+  [key: string]: any
 }
 
 export async function signToken(payload: JWTPayload): Promise<string> {
-  const token = await new SignJWT(payload)
+  const token = await new SignJWT(payload as Record<string, any>)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
@@ -23,7 +24,12 @@ export async function signToken(payload: JWTPayload): Promise<string> {
 export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
     const verified = await jwtVerify(token, secret)
-    return verified.payload as JWTPayload
+    return {
+      userId: verified.payload.userId as string,
+      email: verified.payload.email as string,
+      role: verified.payload.role as any,
+      kycStatus: verified.payload.kycStatus as any,
+    } as JWTPayload
   } catch (err) {
     return null
   }

@@ -26,14 +26,14 @@ export default function PredictionsPage() {
     fetch()
   }, [])
 
-  const stats = data?.stats || {
+  const stats = (data as any)?.stats || {
     totalPredictions: 0,
     avgCloseProbability: 0,
     highProbability: 0,
     avgConfidence: '0',
   }
 
-  const predictions = data?.predictions || []
+  const predictions = (data as any)?.predictions || []
 
   return (
     <motion.div

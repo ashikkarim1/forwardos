@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   Send, Mail, MessageSquare, FileText, CheckCircle2, Clock, AlertCircle,
-  Plus, Filter, Search, MoreVertical, Share2, Copy, Eye, Zap, TrendingUp
+  Plus, Filter, Search, MoreVertical, Share2, Copy, Eye, Zap, TrendingUp, Users
 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 

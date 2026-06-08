@@ -235,7 +235,7 @@ export default function ListingDetailPage() {
                 <strong>Valuation:</strong> This business is valued at AED {(listing.askingPrice / 1000000).toFixed(1)}M based on {multiple}x EBITDA multiple typical for {listing.industry.toLowerCase()} businesses.
               </p>
               <p>
-                <strong>Profitability:</strong> {margin}% EBITDA margin indicates a {'profitable' in margin ? 'healthy' : 'developing'} business with {listing.ebitda > 1000000 ? 'strong' : 'moderate'} cash generation.
+                <strong>Profitability:</strong> {margin}% EBITDA margin indicates a {margin > 15 ? 'healthy' : 'developing'} business with {listing.ebitda > 1000000 ? 'strong' : 'moderate'} cash generation.
               </p>
               <p>
                 <strong>Buyer Types:</strong> Likely acquirers include strategic buyers in the {listing.industry} sector, private equity firms seeking sustainable cash flows, and corporate expansion candidates.
