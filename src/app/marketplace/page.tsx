@@ -423,7 +423,7 @@ const motivationFilters = [
   { id: 'growth', label: '📈 Growth Mode', icon: TrendingUp },
 ]
 
-const ITEMS_PER_PAGE = 12
+const ITEMS_PER_PAGE = 20
 
 export default function MarketplacePage() {
   const [searchQuery, setSearchQuery] = useState('')
