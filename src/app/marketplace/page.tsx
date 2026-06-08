@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import {
   Search, Flame, TrendingUp, Filter, Star, Eye, Brain, BarChart3,
   ChevronRight, Grid, List, Clock, Users, DollarSign, Zap, Globe,
-  AlertCircle, ArrowUp, Target
+  AlertCircle, ArrowUp, Target, Shield
 } from 'lucide-react'
 import { PublicHeader } from '@/components/Navigation'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
