@@ -140,6 +140,8 @@ const businessesData = [
   },
 ]
 
+const Heart = ({ size = 24 }) => <Users size={size} />
+
 const categories = [
   { id: 'all', label: '🔥 All Hot Deals', icon: Flame },
   { id: 'ai', label: '🤖 AI & Machine Learning', icon: Brain },
@@ -148,8 +150,6 @@ const categories = [
   { id: 'cybersecurity', label: '🔒 Cybersecurity', icon: Shield },
   { id: 'emerging', label: '📈 Emerging Sectors', icon: TrendingUp },
 ]
-
-const Heart = ({ size = 24 }) => <Users size={size} />
 
 export default function MarketplacePage() {
   const [searchQuery, setSearchQuery] = useState('')
