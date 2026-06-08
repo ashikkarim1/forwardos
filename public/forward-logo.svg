@@ -1,0 +1,18 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle (optional, can be removed) -->
+  <!-- <circle cx="60" cy="60" r="58" fill="none" stroke="#f59e0b" stroke-width="4"/> -->
+
+  <!-- "F" letter -->
+  <text x="15" y="85" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="72" font-weight="700" fill="#f59e0b">F</text>
+
+  <!-- "o" letter -->
+  <text x="55" y="85" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="72" font-weight="700" fill="#f59e0b">o</text>
+
+  <!-- Arrow pointing right -->
+  <g transform="translate(95, 50)">
+    <!-- Arrow shaft -->
+    <line x1="0" y1="0" x2="20" y2="0" stroke="#ea580c" stroke-width="4" stroke-linecap="round"/>
+    <!-- Arrow head -->
+    <polygon points="20,0 14,-5 14,5" fill="#ea580c"/>
+  </g>
+</svg>
