@@ -41,7 +41,7 @@ const MARKETPLACE_DEALS = [
     sellerMotivation: 'Growth Capital',
   },
   {
-    id: '2',
+    id: 'deal-2',
     title: 'CloudFirst Analytics',
     location: 'Toronto',
     country: 'Canada',
@@ -72,7 +72,7 @@ const MARKETPLACE_DEALS = [
     sellerMotivation: 'Portfolio Optimization',
   },
   {
-    id: '3',
+    id: 'deal-3',
     title: 'Emirates Franchise Network',
     location: 'Dubai',
     country: 'UAE',
@@ -103,7 +103,7 @@ const MARKETPLACE_DEALS = [
     sellerMotivation: 'Succession',
   },
   {
-    id: '4',
+    id: 'deal-4',
     title: 'HealthTech Clinic Network',
     location: 'Boston',
     country: 'USA',
@@ -134,7 +134,7 @@ const MARKETPLACE_DEALS = [
     sellerMotivation: 'Distressed',
   },
   {
-    id: '5',
+    id: 'deal-5',
     title: 'Digital Marketing Agency',
     location: 'Austin',
     country: 'USA',
@@ -165,7 +165,7 @@ const MARKETPLACE_DEALS = [
     sellerMotivation: 'Growth Capital',
   },
   {
-    id: '6',
+    id: 'deal-6',
     title: 'LogisticsPro Hub',
     location: 'Atlanta',
     country: 'USA',
@@ -196,7 +196,7 @@ const MARKETPLACE_DEALS = [
     sellerMotivation: 'Succession',
   },
   {
-    id: '7',
+    id: 'deal-7',
     title: 'E-Learning Platform',
     location: 'Seattle',
     country: 'USA',
@@ -227,7 +227,7 @@ const MARKETPLACE_DEALS = [
     sellerMotivation: 'Growth Capital',
   },
   {
-    id: '8',
+    id: 'deal-8',
     title: 'Fintech Lending Platform',
     location: 'New York',
     country: 'USA',
@@ -259,7 +259,7 @@ const MARKETPLACE_DEALS = [
     upcomingAuction: true,
   },
   {
-    id: '9',
+    id: 'deal-9',
     title: 'Cybersecurity Solutions',
     location: 'Austin',
     country: 'USA',
@@ -290,7 +290,7 @@ const MARKETPLACE_DEALS = [
     sellerMotivation: 'Growth Capital',
   },
   {
-    id: '10',
+    id: 'deal-10',
     title: 'Green Energy Solutions',
     location: 'Denver',
     country: 'USA',
