@@ -547,8 +547,8 @@ export default function BrowsePage() {
                 className="w-full pl-10 pr-4 py-3 rounded-lg border bg-white focus:outline-none focus:ring-2"
                 style={{
                   borderColor: COLOR_BORDER,
-                  '--tw-ring-color': COLOR_ACCENT,
-                } as any}
+                  outlineColor: COLOR_ACCENT,
+                } as React.CSSProperties}
               />
             </div>
             <button

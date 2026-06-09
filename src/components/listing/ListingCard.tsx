@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Heart, TrendingUp, Zap, ArrowRight, ChevronRight } from 'lucide-react'
+import { Heart, Zap, ArrowRight, ChevronRight } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 interface ListingCardProps {
