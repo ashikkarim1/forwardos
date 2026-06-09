@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Search, Clock, AlertCircle, MessageCircle, CheckCircle, Eye } from 'lucide-react'
-import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BACKGROUND } from '@/styles/forward-colors'
+import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 const TICKETS_DATA = [
   {
@@ -226,7 +226,7 @@ export default function AdminSupportPage() {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="p-6 border-t"
-                    style={{ background: COLOR_BACKGROUND, borderColor: COLOR_BORDER }}
+                    style={{ background: COLOR_BG_PRIMARY, borderColor: COLOR_BORDER }}
                   >
                     <div className="space-y-4">
                       <div>

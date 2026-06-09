@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Mail, TrendingUp, Eye, Send, Repeat2, Archive } from 'lucide-react'
-import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BACKGROUND } from '@/styles/forward-colors'
+import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 const CAMPAIGNS_DATA = [
   {
@@ -178,7 +178,7 @@ export default function AdminEmailPage() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="p-6 border-t"
-                style={{ background: COLOR_BACKGROUND, borderColor: COLOR_BORDER }}
+                style={{ background: COLOR_BG_PRIMARY, borderColor: COLOR_BORDER }}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                   {[
@@ -239,7 +239,7 @@ export default function AdminEmailPage() {
             { name: 'Seller Performance Update', variants: 18, type: 'Seller' },
             { name: 'Premium Upgrade Offer', variants: 15, type: 'All Users' },
           ].map((template, idx) => (
-            <div key={idx} className="flex items-center justify-between p-4 rounded-lg" style={{ background: COLOR_BACKGROUND }}>
+            <div key={idx} className="flex items-center justify-between p-4 rounded-lg" style={{ background: COLOR_BG_PRIMARY }}>
               <div>
                 <p className="font-bold" style={{ color: COLOR_PRIMARY }}>
                   {template.name}

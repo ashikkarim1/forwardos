@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Shield, Bell, CreditCard, Lock, Globe, Users } from 'lucide-react'
-import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BACKGROUND } from '@/styles/forward-colors'
+import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 export default function AdminSettingsPage() {
   return (
@@ -42,7 +42,7 @@ export default function AdminSettingsPage() {
               <div
                 key={idx}
                 className="flex items-center justify-between p-4 rounded-lg"
-                style={{ background: COLOR_BACKGROUND }}
+                style={{ background: COLOR_BG_PRIMARY }}
               >
                 <div>
                   <p className="font-bold" style={{ color: COLOR_PRIMARY }}>
@@ -217,7 +217,7 @@ export default function AdminSettingsPage() {
           </div>
 
           <div className="space-y-4">
-            <div className="p-4 rounded-lg" style={{ background: COLOR_BACKGROUND }}>
+            <div className="p-4 rounded-lg" style={{ background: COLOR_BG_PRIMARY }}>
               <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
                 Stripe Integration
               </p>

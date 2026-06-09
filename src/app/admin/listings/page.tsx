@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Search, Filter, Download, Eye, Flag, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
-import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BACKGROUND } from '@/styles/forward-colors'
+import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 const LISTINGS_DATA = [
   {
@@ -163,7 +163,7 @@ export default function AdminListingsPage() {
                 }}
                 className="px-4 py-2 rounded-lg font-semibold text-sm transition-all"
                 style={{
-                  background: selectedStatus.includes(status) ? STATUS_COLORS[status as keyof typeof STATUS_COLORS].bg : COLOR_BACKGROUND,
+                  background: selectedStatus.includes(status) ? STATUS_COLORS[status as keyof typeof STATUS_COLORS].bg : COLOR_BG_PRIMARY,
                   color: selectedStatus.includes(status) ? 'white' : COLOR_PRIMARY,
                   border: `2px solid ${selectedStatus.includes(status) ? STATUS_COLORS[status as keyof typeof STATUS_COLORS].bg : COLOR_BORDER}`,
                 }}
@@ -196,7 +196,7 @@ export default function AdminListingsPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: COLOR_BACKGROUND, borderBottom: `1px solid ${COLOR_BORDER}` }}>
+              <tr style={{ background: COLOR_BG_PRIMARY, borderBottom: `1px solid ${COLOR_BORDER}` }}>
                 <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wide" style={{ color: COLOR_TEXT_SECONDARY }}>
                   Listing
                 </th>
@@ -220,7 +220,7 @@ export default function AdminListingsPage() {
                   <tr
                     style={{
                       borderBottom: `1px solid ${COLOR_BORDER}`,
-                      background: expandedId === listing.id ? COLOR_BACKGROUND : 'white',
+                      background: expandedId === listing.id ? COLOR_BG_PRIMARY : 'white',
                     }}
                   >
                     <td className="px-6 py-4">
@@ -293,7 +293,7 @@ export default function AdminListingsPage() {
                     </td>
                   </tr>
                   {expandedId === listing.id && (
-                    <tr style={{ background: COLOR_BACKGROUND }}>
+                    <tr style={{ background: COLOR_BG_PRIMARY }}>
                       <td colSpan={5} className="px-6 py-6">
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}

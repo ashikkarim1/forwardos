@@ -13,7 +13,7 @@ import {
   CheckCircle2,
   XCircle,
 } from 'lucide-react'
-import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BACKGROUND } from '@/styles/forward-colors'
+import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 const METRICS = [
   {
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
               className="p-6 rounded-lg border"
               style={{
                 borderColor: isCritical ? metric.color : COLOR_BORDER,
-                background: isCritical ? metric.color + '08' : COLOR_BACKGROUND,
+                background: isCritical ? metric.color + '08' : COLOR_BG_PRIMARY,
               }}
             >
               <div className="flex items-start justify-between mb-4">
@@ -308,7 +308,7 @@ export default function AdminDashboard() {
               <div
                 key={idx}
                 className="flex items-start gap-4 p-4 rounded-lg"
-                style={{ background: COLOR_BACKGROUND }}
+                style={{ background: COLOR_BG_PRIMARY }}
               >
                 <Icon size={20} style={{ color: severityColor, flexShrink: 0, marginTop: '2px' }} />
                 <div>

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Search, Filter, Download, Eye, Shield, Ban, Mail } from 'lucide-react'
-import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BACKGROUND } from '@/styles/forward-colors'
+import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 const USERS_DATA = [
   {
@@ -174,7 +174,7 @@ export default function AdminUsersPage() {
                   }}
                   className="px-4 py-2 rounded-lg font-semibold text-sm transition-all text-white"
                   style={{
-                    background: selectedType.includes(type) ? USER_TYPE_COLORS[type as keyof typeof USER_TYPE_COLORS] : COLOR_BACKGROUND,
+                    background: selectedType.includes(type) ? USER_TYPE_COLORS[type as keyof typeof USER_TYPE_COLORS] : COLOR_BG_PRIMARY,
                     color: selectedType.includes(type) ? 'white' : COLOR_PRIMARY,
                   }}
                 >
@@ -202,7 +202,7 @@ export default function AdminUsersPage() {
                   }}
                   className="px-4 py-2 rounded-lg font-semibold text-sm transition-all"
                   style={{
-                    background: selectedStatus.includes(status) ? STATUS_COLORS[status as keyof typeof STATUS_COLORS] : COLOR_BACKGROUND,
+                    background: selectedStatus.includes(status) ? STATUS_COLORS[status as keyof typeof STATUS_COLORS] : COLOR_BG_PRIMARY,
                     color: selectedStatus.includes(status) ? 'white' : COLOR_PRIMARY,
                   }}
                 >
@@ -235,7 +235,7 @@ export default function AdminUsersPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ background: COLOR_BACKGROUND, borderBottom: `1px solid ${COLOR_BORDER}` }}>
+              <tr style={{ background: COLOR_BG_PRIMARY, borderBottom: `1px solid ${COLOR_BORDER}` }}>
                 <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wide" style={{ color: COLOR_TEXT_SECONDARY }}>
                   User
                 </th>
@@ -262,7 +262,7 @@ export default function AdminUsersPage() {
                   <tr
                     style={{
                       borderBottom: `1px solid ${COLOR_BORDER}`,
-                      background: expandedId === user.id ? COLOR_BACKGROUND : 'white',
+                      background: expandedId === user.id ? COLOR_BG_PRIMARY : 'white',
                     }}
                   >
                     <td className="px-6 py-4">
@@ -344,7 +344,7 @@ export default function AdminUsersPage() {
                     </td>
                   </tr>
                   {expandedId === user.id && (
-                    <tr style={{ background: COLOR_BACKGROUND }}>
+                    <tr style={{ background: COLOR_BG_PRIMARY }}>
                       <td colSpan={6} className="px-6 py-6">
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}

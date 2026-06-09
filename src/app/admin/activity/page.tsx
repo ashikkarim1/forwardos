@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Search, Filter, Download, Eye, Save, Share2, FileDown, MessageSquare } from 'lucide-react'
-import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BACKGROUND } from '@/styles/forward-colors'
+import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 const ACTIVITY_TYPES = {
   login: { icon: '🔐', color: '#3B82F6', label: 'Login' },
