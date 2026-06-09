@@ -32,6 +32,11 @@ const MOCK_LISTINGS = [
     category: 'BUSINESS',
     dealType: 'SALE' as const,
     employeeCount: 8,
+    sellerVerified: true,
+    sellerTrustScore: 92,
+    marketTrend: 'up' as const,
+    marketPosition: 'underpriced' as const,
+    daysOnMarket: 8,
   },
   {
     id: '2',
@@ -472,12 +477,30 @@ const MOCK_LISTINGS = [
   },
 ]
 
+// Add gap-filling data to all listings (seller verification, market trends, etc.)
+const addMarketData = (listings: typeof MOCK_LISTINGS) => {
+  return listings.map((item, idx) => ({
+    ...item,
+    sellerVerified: true,
+    sellerTrustScore: 80 + Math.floor(Math.random() * 20), // 80-100
+    marketTrend: ['up', 'down', 'stable'][idx % 3] as const,
+    marketPosition: ['underpriced', 'fair', 'premium'][idx % 3] as const,
+    daysOnMarket: 5 + Math.floor(Math.random() * 40), // 5-45 days
+    upcomingAuction: idx % 9 === 0, // 1 in 9 chance of auction
+  }))
+}
+
+const ENHANCED_LISTINGS = addMarketData(MOCK_LISTINGS)
+
 // Duplicate for testing pagination (40 total)
-const EXTENDED_LISTINGS = [...MOCK_LISTINGS, ...MOCK_LISTINGS.slice(0, 20).map((item, idx) => ({
-  ...item,
-  id: `dup-${idx}`,
-  title: `${item.title} (2)`,
-}))]
+const EXTENDED_LISTINGS = [
+  ...ENHANCED_LISTINGS,
+  ...addMarketData(MOCK_LISTINGS.slice(0, 20).map((item, idx) => ({
+    ...item,
+    id: `dup-${idx}`,
+    title: `${item.title} (2)`,
+  }))),
+]
 
 const containerVariants = {
   hidden: { opacity: 0 },
