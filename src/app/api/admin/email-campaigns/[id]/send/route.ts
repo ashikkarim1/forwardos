@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let resend: Resend | null = null
+
+function getResend() {
+  if (!resend) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY environment variable is not set')
+    }
+    resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  return resend
+}
 
 interface SendEmailRequest {
   campaignId: string
@@ -28,8 +38,15 @@ export async function POST(
       )
     }
 
+    const resendClient = getResend()
+
     // Example: Send with Resend using different templates
-    const results: Array<{batch: number; status: string; message: string; sentCount: number}> = []
+    const results: Array<{
+      batch: number
+      status: string
+      message: string
+      sentCount: number
+    }> = []
     const batchSize = 100 // Resend recommends batching
 
     for (let i = 0; i < recipients.length; i += batchSize) {
@@ -39,7 +56,7 @@ export async function POST(
       const resendTemplateId = getResendTemplate(templateId)
 
       try {
-        const response = await resend.emails.send({
+        const response = await resendClient.emails.send({
           from: 'Forward OS <notifications@forwardos.com>',
           to: batch,
           subject: subject,
