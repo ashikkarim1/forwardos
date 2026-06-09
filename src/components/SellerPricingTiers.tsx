@@ -1,20 +1,22 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { Check, ArrowRight, Star, TrendingUp, Mail, BarChart3, Target } from 'lucide-react'
+import { Check, ArrowRight, Crown } from 'lucide-react'
 import { useLocale } from '@/context/LocaleContext'
-import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
+import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 export function SellerPricingTiers() {
   const { locale, currency, isRTL } = useLocale()
+  const router = useRouter()
 
   const getPrice = (basePrice: number): { display: string; amount: number } => {
     let display = ''
     if (currency === 'CAD') {
       display = `C$${Math.round(basePrice * 1.35)}`
     } else if (currency === 'AED') {
-      display = `د.إ${Math.round(basePrice * 1.1)}`
+      display = `د.إ${Math.round(basePrice * 3.67)}`
     } else {
       display = `$${Math.round(basePrice)}`
     }
@@ -22,45 +24,52 @@ export function SellerPricingTiers() {
     return { display, amount: basePrice }
   }
 
+  const handleSelectPlan = (plan: 'freemium' | 'premium') => {
+    router.push(`/seller/register?plan=${plan}`)
+  }
+
   const sellerTiers = [
     {
-      id: 'free',
-      name: 'Free Listing',
-      description: 'Get started with a basic listing',
+      id: 'freemium',
+      name: 'Freemium',
+      description: 'Perfect for getting started',
       basePrice: 0,
+      period: '',
       features: [
-        'One business listing',
-        'Up to 3 photos',
-        'Basic business information',
-        'Listing duration: 90 days',
-        'Limited visibility',
+        'Listed on marketplace',
+        'Searchable by buyers',
+        'Buyer messaging',
+        'Basic analytics',
+        'Photo gallery (5)',
+        'Document upload',
+        '6-month listing',
         'Email support',
       ],
-      cta: 'Create Free Listing',
+      cta: 'Get Started Free',
       highlighted: false,
+      ctaAction: () => handleSelectPlan('freemium'),
     },
     {
       id: 'premium',
-      name: 'Premium Listing',
-      description: 'Maximum visibility to find the right buyer',
-      basePrice: 499,
+      name: 'Premium',
+      description: 'Maximum visibility & buyer trust',
+      basePrice: 99,
+      period: '/month',
       features: [
-        'Unlimited business listings',
-        'Professional photography (up to 20 photos)',
-        'Weekly featured newsletter',
-        'Featured on landing page',
-        'Seller + Broker get visibility email',
-        'Enhanced CIM hosting & security',
-        'Broker network matching',
-        'Real-time analytics dashboard',
-        'Priority email support',
-        'Listing duration: 365 days',
-        'SEO optimization',
-        'Social media promotion',
+        '⭐ Featured on homepage',
+        '📊 Financial data visible',
+        '🔐 Secure data room',
+        '📈 Advanced analytics',
+        '💎 Premium seller badge',
+        '🎯 Priority buyer matching',
+        '24/7 priority support',
+        'Unlimited photos',
       ],
-      cta: 'Start Premium Listing',
+      cta: 'Choose Premium',
       highlighted: true,
       premium: true,
+      ctaAction: () => handleSelectPlan('premium'),
+      note: 'Free trial after approval',
     },
   ]
 
@@ -115,23 +124,20 @@ export function SellerPricingTiers() {
                           {getPrice(tier.basePrice).display}
                         </p>
                         <span style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-                          /year
+                          {tier.period}
                         </span>
                       </div>
                       <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-2">
-                        ~{getPrice(Math.round(tier.basePrice / 12)).display}/month
-                      </p>
-                      <p style={{ color: COLOR_ACCENT }} className="text-xs font-bold mt-3">
-                        ✓ 30-day money-back guarantee
+                        {tier.note && `✓ ${tier.note}`}
                       </p>
                     </>
                   ) : (
                     <>
-                      <p className="text-3xl font-black" style={{ color: COLOR_PRIMARY }}>
-                        Free
+                      <p className="text-4xl font-black" style={{ color: COLOR_ACCENT }}>
+                        FREE
                       </p>
                       <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm mt-2">
-                        Upgrade anytime
+                        No credit card required
                       </p>
                     </>
                   )}
@@ -149,9 +155,9 @@ export function SellerPricingTiers() {
                 </div>
               </div>
 
-              <Link
-                href={tier.id === 'free' ? '/auth/signup-seller' : '/pricing'}
-                className={`w-full block text-center px-6 py-3 rounded-lg font-bold transition-all ${
+              <button
+                onClick={tier.ctaAction}
+                className={`w-full px-6 py-3 rounded-lg font-bold transition-all hover:opacity-90 flex items-center justify-center gap-2 ${
                   tier.highlighted ? 'text-white' : ''
                 }`}
                 style={{
@@ -159,78 +165,59 @@ export function SellerPricingTiers() {
                   color: tier.highlighted ? 'white' : COLOR_ACCENT,
                 }}
               >
-                {tier.cta} <ArrowRight className="inline ml-2" size={16} />
-              </Link>
+                {tier.cta}
+                {tier.highlighted && <Crown size={16} />}
+              </button>
             </motion.div>
           ))}
         </div>
 
-        {/* Why Premium Matters */}
+        {/* Why Complete Listings Matter */}
         <div className="bg-white rounded-lg border p-12" style={{ borderColor: COLOR_BORDER }}>
           <h3 className="text-2xl font-black mb-8 text-center" style={{ color: COLOR_PRIMARY }}>
-            Why Premium Sellers Sell Faster
+            Completeness = Better Outcomes
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="p-3 rounded-lg" style={{ background: COLOR_ACCENT + '15' }}>
-                  <TrendingUp size={32} style={{ color: COLOR_ACCENT }} />
-                </div>
+              <div className="flex justify-center mb-4 text-4xl">
+                📊
               </div>
               <p className="font-semibold mb-2" style={{ color: COLOR_PRIMARY }}>
-                3x More Inquiries
+                5x More Interest
               </p>
               <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-                With featured newsletter exposure
+                80%+ complete listings get 5x more buyer inquiries
               </p>
             </div>
 
             <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="p-3 rounded-lg" style={{ background: COLOR_ACCENT + '15' }}>
-                  <Mail size={32} style={{ color: COLOR_ACCENT }} />
-                </div>
+              <div className="flex justify-center mb-4 text-4xl">
+                ⭐
               </div>
               <p className="font-semibold mb-2" style={{ color: COLOR_PRIMARY }}>
-                Weekly Updates
+                Featured Placement
               </p>
               <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-                Seller + broker excitement email every week
+                Premium tier shows on homepage for maximum visibility
               </p>
             </div>
 
             <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="p-3 rounded-lg" style={{ background: COLOR_ACCENT + '15' }}>
-                  <BarChart3 size={32} style={{ color: COLOR_ACCENT }} />
-                </div>
+              <div className="flex justify-center mb-4 text-4xl">
+                🔐
               </div>
               <p className="font-semibold mb-2" style={{ color: COLOR_PRIMARY }}>
-                Real-Time Analytics
+                Secure Data Room
               </p>
               <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-                Track buyer interest and engagement
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="p-3 rounded-lg" style={{ background: COLOR_ACCENT + '15' }}>
-                  <Target size={32} style={{ color: COLOR_ACCENT }} />
-                </div>
-              </div>
-              <p className="font-semibold mb-2" style={{ color: COLOR_PRIMARY }}>
-                Expert Matching
-              </p>
-              <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-                Matched with qualified brokers in your industry
+                Premium sellers get NDA-protected buyer access
               </p>
             </div>
           </div>
         </div>
 
-        {/* Newsletter Details */}
+        {/* How Completeness Works */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -239,16 +226,31 @@ export function SellerPricingTiers() {
           style={{ borderColor: COLOR_BORDER }}
         >
           <div className="flex gap-4 items-start">
-            <Star size={28} style={{ color: COLOR_ACCENT, flexShrink: 0 }} fill={COLOR_ACCENT} />
+            <div className="text-3xl flex-shrink-0">📈</div>
             <div>
               <h4 className="text-xl font-bold mb-4" style={{ color: COLOR_PRIMARY }}>
-                Weekly Featured Newsletter
+                Your Completeness Score Matters
               </h4>
               <p style={{ color: COLOR_TEXT_SECONDARY }} className="mb-4">
-                Every Monday, we feature 3 premium listings to {'>'}5,000 verified buyers, investment professionals, and brokers across North America and the Middle East.
+                When you submit business information, we calculate a completeness score (0-100%). The more details you provide—especially financial summaries and supporting documents—the higher your visibility to qualified buyers.
               </p>
 
-              <p style={{ color: COLOR_PRIMARY }} className="font-bold mb-3">
+              <div className="grid grid-cols-3 gap-4 mt-4">
+                <div>
+                  <p className="font-bold mb-1" style={{ color: COLOR_PRIMARY }}>25%+</p>
+                  <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs">📋 Listed</p>
+                </div>
+                <div>
+                  <p className="font-bold mb-1" style={{ color: COLOR_PRIMARY }}>50%+</p>
+                  <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs">⭐ Featured</p>
+                </div>
+                <div>
+                  <p className="font-bold mb-1" style={{ color: COLOR_PRIMARY }}>80%+</p>
+                  <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs">🔓 Full Access</p>
+                </div>
+              </div>
+
+              <p style={{ color: COLOR_PRIMARY }} className="font-bold mb-3 mt-4">
                 What happens when you're featured:
               </p>
 
