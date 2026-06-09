@@ -11,6 +11,7 @@ export default function PendingApprovalPage() {
   const searchParams = useSearchParams()
   const userId = searchParams.get('userId')
   const [userEmail, setUserEmail] = useState('')
+  const [userPlan, setUserPlan] = useState<'FREEMIUM' | 'PREMIUM'>('FREEMIUM')
   const [status, setStatus] = useState<'email_verified' | 'approved' | 'checking'>('checking')
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export default function PendingApprovalPage() {
         const response = await fetch(`/api/seller/status?userId=${userId}`)
         const data = await response.json()
         setUserEmail(data.email)
+        setUserPlan(data.sellerPlanTier || 'FREEMIUM')
         setStatus(data.approved ? 'approved' : 'email_verified')
       } catch (error) {
         console.error('Status check failed:', error)
@@ -75,9 +77,22 @@ export default function PendingApprovalPage() {
             Account Under Review ⏳
           </h1>
 
-          <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-lg mb-8">
+          <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-lg mb-2">
             Your account has been created and email verified. We're reviewing your details.
           </p>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg mb-8" style={{ background: userPlan === 'PREMIUM' ? 'rgba(245, 158, 11, 0.15)' : COLOR_BG_PRIMARY }}>
+            {userPlan === 'PREMIUM' ? (
+              <>
+                <span style={{ color: '#F59E0B' }}>👑</span>
+                <span className="text-xs font-bold" style={{ color: '#F59E0B' }}>Premium Plan</span>
+              </>
+            ) : (
+              <>
+                <span>✓</span>
+                <span className="text-xs font-bold" style={{ color: COLOR_ACCENT }}>Freemium Plan</span>
+              </>
+            )}
+          </div>
 
           {/* Timeline */}
           <div className="bg-white rounded-lg border p-6 mb-8 text-left space-y-6" style={{ borderColor: COLOR_BORDER }}>

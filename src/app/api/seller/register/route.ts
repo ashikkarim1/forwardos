@@ -9,6 +9,7 @@ interface RegisterRequest {
   email: string
   companyName: string
   password: string
+  planTier?: 'freemium' | 'premium'
 }
 
 export async function POST(request: NextRequest) {
@@ -54,6 +55,7 @@ export async function POST(request: NextRequest) {
         role: 'SELLER',
         company: body.companyName,
         onboardingStatus: 'ACCOUNT_CREATED',
+        sellerPlanTier: body.planTier === 'premium' ? 'PREMIUM' : 'FREEMIUM',
       },
     })
 

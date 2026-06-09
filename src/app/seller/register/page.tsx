@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Mail, Lock, Building2, User, AlertCircle, Loader, CheckCircle2, ArrowRight } from 'lucide-react'
+import { Mail, Lock, Building2, User, AlertCircle, Loader, CheckCircle2, ArrowRight, Crown } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 interface FormData {
@@ -19,6 +19,9 @@ interface FormData {
 
 export default function SellerRegisterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const selectedPlan = (searchParams.get('plan') as 'freemium' | 'premium' | null) || 'freemium'
+
   const [step, setStep] = useState<'form' | 'verification' | 'success'>('form')
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -76,6 +79,7 @@ export default function SellerRegisterPage() {
           email: formData.email,
           companyName: formData.companyName,
           password: formData.password,
+          planTier: selectedPlan,
         }),
       })
 
@@ -116,9 +120,28 @@ export default function SellerRegisterPage() {
             <h1 className="text-2xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>
               Create Your Seller Account
             </h1>
-            <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
+            <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm mb-4">
               List your business and find the right buyer
             </p>
+
+            {/* Plan Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg" style={{ background: selectedPlan === 'premium' ? 'rgba(245, 158, 11, 0.15)' : COLOR_BG_PRIMARY }}>
+              {selectedPlan === 'premium' ? (
+                <>
+                  <Crown size={16} style={{ color: '#F59E0B' }} />
+                  <span className="text-xs font-bold" style={{ color: '#F59E0B' }}>
+                    Premium Plan Selected
+                  </span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 size={16} style={{ color: COLOR_ACCENT }} />
+                  <span className="text-xs font-bold" style={{ color: COLOR_ACCENT }}>
+                    Freemium Plan Selected
+                  </span>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Form */}

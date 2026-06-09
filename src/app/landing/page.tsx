@@ -40,9 +40,9 @@ export default function LandingPage() {
             <button className="text-sm font-bold" style={{ color: COLOR_TEXT_SECONDARY }}>
               How It Works
             </button>
-            <button className="text-sm font-bold" style={{ color: COLOR_TEXT_SECONDARY }}>
+            <Link href="/pricing" className="text-sm font-bold" style={{ color: COLOR_TEXT_SECONDARY }}>
               Pricing
-            </button>
+            </Link>
             <Link href="/marketplace" className="text-sm font-bold" style={{ color: COLOR_TEXT_SECONDARY }}>
               Marketplace
             </Link>

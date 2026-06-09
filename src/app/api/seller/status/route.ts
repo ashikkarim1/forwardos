@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
         name: true,
         onboardingStatus: true,
         listingApprovalStatus: true,
+        sellerPlanTier: true,
       },
     })
 
@@ -38,6 +39,7 @@ export async function GET(request: NextRequest) {
         email: user.email,
         name: user.name,
         onboardingStatus: user.onboardingStatus,
+        sellerPlanTier: user.sellerPlanTier,
         approved: user.onboardingStatus === 'APPROVED',
       },
       { status: 200 }
