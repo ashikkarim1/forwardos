@@ -706,8 +706,7 @@ export default function BrowsePage() {
                       <ListingCard
                         {...listing}
                         onSave={() => console.log('Saved:', listing.id)}
-                        onViewSimilar={() => console.log('View similar to:', listing.id)}
-                        onContact={() => console.log('Contact for:', listing.id)}
+                        onViewPhotos={() => console.log('View photos for:', listing.id)}
                       />
                     </motion.div>
                   ))}
