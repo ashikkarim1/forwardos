@@ -36,7 +36,7 @@ export async function sendEmailCampaign(payload: EmailCampaignPayload) {
 
     // Batch send to avoid rate limits
     const batchSize = 100
-    const results = []
+    const results: Array<{batchIndex: number; batchSize: number; success: boolean; emailId?: string; error?: string}> = []
 
     for (let i = 0; i < recipients.length; i += batchSize) {
       const batch = recipients.slice(i, i + batchSize)
