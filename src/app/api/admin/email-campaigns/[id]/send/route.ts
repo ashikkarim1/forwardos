@@ -43,8 +43,10 @@ export async function POST(
           from: 'Forward OS <notifications@forwardos.com>',
           to: batch,
           subject: subject,
-          template: resendTemplateId,
-          react: undefined, // Using template ID instead of React component
+          template: {
+            id: resendTemplateId,
+            variables: variables,
+          },
           tags: [
             {
               name: 'campaign_id',
@@ -55,7 +57,7 @@ export async function POST(
               value: templateId,
             },
           ],
-        })
+        } as any)
 
         results.push({
           batch: Math.floor(i / batchSize) + 1,

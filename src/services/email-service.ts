@@ -45,9 +45,12 @@ export async function sendEmailCampaign(payload: EmailCampaignPayload) {
         from: 'Forward OS <notifications@forwardos.com>',
         to: batch,
         subject,
-        template, // Resend template ID
+        template: {
+          id: template,
+          variables: variables,
+        },
         tags: campaignTags,
-      })
+      } as any)
 
       results.push({
         batchIndex: Math.floor(i / batchSize),
@@ -84,12 +87,15 @@ export async function sendTestEmail(
       from: 'Forward OS <notifications@forwardos.com>',
       to,
       subject: `[TEST] ${subject}`,
-      template,
+      template: {
+        id: template,
+        variables: variables,
+      },
       tags: [
         { name: 'email_type', value: 'test' },
         { name: 'template', value: template },
       ],
-    })
+    } as any)
 
     return {
       success: !result.error,
@@ -235,9 +241,11 @@ export async function validateTemplate(templateId: string) {
     const result = await resend.emails.send({
       from: 'Forward OS <notifications@forwardos.com>',
       to: 'test@example.com',
-      template: templateId,
+      template: {
+        id: templateId,
+      },
       subject: '[VALIDATION TEST]',
-    })
+    } as any)
 
     // For validation, we just want to verify it exists
     // The email will bounce to test@example.com but that's fine
