@@ -121,6 +121,20 @@ enum TransactionType {
   BROKER_FEE
 }
 
+enum PlanTier {
+  STARTER
+  PROFESSIONAL
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  CANCELLED
+  EXPIRED
+  PAYMENT_FAILED
+}
+
 // ==================== USERS & AUTHENTICATION ====================
 
 model User {
@@ -183,6 +197,9 @@ model User {
   progressionHistory    DealProgressionHistory[]
   transactions          Transaction[] @relation("TransactionInitiator")
   brokerTransactions    Transaction[] @relation("BrokerUser")
+
+  // Billing & Subscriptions
+  subscription          Subscription? @relation("UserSubscription")
 
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
@@ -748,6 +765,104 @@ model Transaction {
   @@index([initiatorId])
   @@index([brokerId])
   @@index([status])
+}
+
+// ==================== BILLING & SUBSCRIPTIONS ====================
+
+model Subscription {
+  id                    String    @id @default(cuid())
+  user                  User      @relation("UserSubscription", fields: [userId], references: [id], onDelete: Cascade)
+  userId                String    @unique
+
+  planTier              PlanTier  @default(STARTER)
+  status                SubscriptionStatus @default(TRIALING)
+
+  // Billing Cycle
+  startDate             DateTime  @default(now())
+  endDate               DateTime? // Next billing date or expiration date
+  trialEndsAt           DateTime? // 14-day free trial
+
+  // Cancellation
+  cancelledAt           DateTime?
+  cancellationReason    String?
+  expiresAt             DateTime? // Date when access ends (next day after endDate if cancelled)
+
+  // Payment & Stripe
+  stripeCustomerId      String?
+  stripeSubscriptionId  String?
+  stripePriceId         String?
+
+  // Pricing
+  billingCurrency       String    @default("USD")
+  monthlyPrice          Int       // In cents
+  annualPrice           Int?      // In cents, if billed annually
+
+  // Preferences
+  billingCycle          String    @default("monthly") // "monthly" or "annual"
+  autoRenew             Boolean   @default(true)
+
+  // Usage Tracking
+  apiCallsUsed          Int       @default(0)
+  apiCallsLimit         Int       @default(0) // 0 = unlimited
+
+  // Relationships
+  events                SubscriptionEvent[]
+  invoices              Invoice[]
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([planTier])
+  @@index([expiresAt])
+}
+
+model SubscriptionEvent {
+  id                    String    @id @default(cuid())
+  subscription          Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  subscriptionId        String
+
+  eventType             String    // "upgrade", "downgrade", "renewal", "cancellation", "expiration"
+  previousPlan          PlanTier?
+  newPlan               PlanTier?
+
+  amount                Int?      // In cents
+  stripeEventId         String?
+
+  description           String?   @db.Text
+
+  createdAt             DateTime  @default(now())
+
+  @@index([subscriptionId])
+  @@index([eventType])
+}
+
+model Invoice {
+  id                    String    @id @default(cuid())
+  subscription          Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  subscriptionId        String
+
+  invoiceNumber         String    @unique
+  stripeInvoiceId       String?
+
+  amount                Int       // In cents
+  currency              String    @default("USD")
+  status                String    @default("draft") // "draft", "sent", "paid", "failed"
+
+  billingPeriodStart    DateTime
+  billingPeriodEnd      DateTime
+  dueDate               DateTime
+  paidAt                DateTime?
+
+  description           String?   @db.Text
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([subscriptionId])
+  @@index([status])
+  @@index([dueDate])
 }
 
 // ==================== AUDIT & COMPLIANCE ====================

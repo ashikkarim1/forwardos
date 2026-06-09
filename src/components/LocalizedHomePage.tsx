@@ -3,14 +3,21 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Zap, Briefcase, TrendingUp, Users, ArrowRight, BarChart3, Network, Sparkles } from 'lucide-react'
+import { useState } from 'react'
 import { useLocale } from '@/context/LocaleContext'
 import { t } from '@/lib/translations'
 import { formatCurrency, getDefaultCurrency } from '@/lib/currency'
 import { LocaleSelector } from './LocaleSelector'
+import { SeeInActionSection } from './SeeInActionSection'
+import { FeaturedListingsSection } from './FeaturedListingsSection'
+import { HelpContactWidget } from './HelpContactWidget'
+import { WorldClassFooter } from './WorldClassFooter'
+import { UserTypeSelector } from './UserTypeSelector'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
 function LocalizedHomePageContent() {
   const { locale, currency, isRTL } = useLocale()
+  const [showUserTypeModal, setShowUserTypeModal] = useState(false)
 
   // Stat values to display
   const stats = [
@@ -34,13 +41,20 @@ function LocalizedHomePageContent() {
               {t('nav.brand', locale)}
             </span>
           </div>
-          <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+          <div className={`flex items-center gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <Link
               href="/marketplace"
               className="font-bold hover:opacity-80"
               style={{ color: COLOR_PRIMARY }}
             >
               {t('nav.browseDeals', locale)}
+            </Link>
+            <Link
+              href="/pricing"
+              className="font-bold hover:opacity-80"
+              style={{ color: COLOR_PRIMARY }}
+            >
+              {t('cta.pricing', locale)}
             </Link>
             <LocaleSelector />
             <Link
@@ -71,14 +85,14 @@ function LocalizedHomePageContent() {
             </p>
 
             <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-12 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
-              <Link
-                href="/auth/signup"
+              <button
+                onClick={() => setShowUserTypeModal(true)}
                 className="px-8 py-4 rounded-lg font-bold text-white text-center hover:opacity-90 transition-all flex items-center justify-center gap-2"
                 style={{ background: COLOR_ACCENT }}
               >
                 {t('hero.cta1', locale)}
                 <ArrowRight size={20} style={{ transform: isRTL ? 'scaleX(-1)' : 'none' }} />
-              </Link>
+              </button>
               <Link
                 href="/marketplace"
                 className="px-8 py-4 rounded-lg font-bold border text-center hover:bg-gray-50 transition-all"
@@ -198,11 +212,11 @@ function LocalizedHomePageContent() {
                   {t(`users.${user.key}.desc`, locale)}
                 </p>
                 <Link
-                  href={user.href}
+                  href={user.key === 'sellers' ? '/auth/signup-seller' : user.href}
                   className="inline-block px-4 py-2 rounded-lg font-bold transition-all hover:opacity-90"
                   style={{ background: COLOR_ACCENT + '20', color: COLOR_ACCENT }}
                 >
-                  {t(`users.${user.key}.cta`, locale)} →
+                  {user.key === 'sellers' ? t('cta.listBusiness', locale) : t(`users.${user.key}.cta`, locale) + ' →'}
                 </Link>
               </motion.div>
             ))}
@@ -214,7 +228,7 @@ function LocalizedHomePageContent() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 border-t" style={{ borderColor: COLOR_BORDER }}>
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-black text-center mb-12" style={{ color: COLOR_PRIMARY }}>
-            💰 ROI That Speaks for Itself
+            {t('roi.title', locale)}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
@@ -229,10 +243,10 @@ function LocalizedHomePageContent() {
                 $685
               </p>
               <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-                saved per deal vs BFS.com
+                {t('roi.savings', locale)}
               </p>
               <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-3">
-                At 10 deals/year = $6,850 savings
+                {t('roi.savingsNote', locale)}
               </p>
             </motion.div>
 
@@ -247,10 +261,10 @@ function LocalizedHomePageContent() {
                 180+
               </p>
               <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-                hours saved per analyst per year
+                {t('roi.hours', locale)}
               </p>
               <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-3">
-                From 3-4 hours to 16 minutes per deal
+                {t('roi.hoursNote', locale)}
               </p>
             </motion.div>
 
@@ -265,24 +279,34 @@ function LocalizedHomePageContent() {
                 1 Deal
               </p>
               <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-                breaks even on annual subscription
+                {t('roi.breakeven', locale)}
               </p>
               <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-3">
-                Subscription cost = ROI on first deal
+                {t('roi.breakEvenNote', locale)}
               </p>
             </motion.div>
           </div>
 
           <div className="p-8 rounded-lg border-2 text-center" style={{ borderColor: COLOR_ACCENT, background: COLOR_ACCENT + '08' }}>
             <p style={{ color: COLOR_TEXT_SECONDARY }} className="mb-2">
-              Built for emerging fund managers, PE firms, and professional deal buyers
+              {t('roi.description', locale)}
             </p>
             <p className="font-semibold" style={{ color: COLOR_PRIMARY }}>
-              14-day free trial. No credit card required.
+              {t('roi.trial', locale)}
             </p>
           </div>
         </div>
       </section>
+
+
+      {/* Featured Listings Section */}
+      <FeaturedListingsSection />
+
+      {/* See in Action Section */}
+      <SeeInActionSection />
+
+      {/* Help Contact Widget */}
+      <HelpContactWidget />
 
       {/* CTA Section */}
       <section
@@ -297,13 +321,13 @@ function LocalizedHomePageContent() {
             {t('cta.subtitle', locale)}
           </p>
           <div className={`flex flex-col sm:flex-row gap-4 justify-center ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
-            <Link
-              href="/auth/signup"
+            <button
+              onClick={() => setShowUserTypeModal(true)}
               className="px-8 py-4 rounded-lg font-bold text-white hover:opacity-90 transition-all"
               style={{ background: COLOR_ACCENT }}
             >
               {t('cta.button1', locale)}
-            </Link>
+            </button>
             <Link
               href="/contact-sales"
               className="px-8 py-4 rounded-lg font-bold border hover:bg-gray-50 transition-all"
@@ -315,8 +339,18 @@ function LocalizedHomePageContent() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t py-12 px-4 sm:px-6 lg:px-8" style={{ borderColor: COLOR_BORDER }}>
+      {/* World Class Footer */}
+      <WorldClassFooter />
+
+      {/* User Type Selector Modal */}
+      <UserTypeSelector
+        isOpen={showUserTypeModal}
+        onClose={() => setShowUserTypeModal(false)}
+        redirectAfterSelection={true}
+      />
+
+      {/* Legacy Footer - Replaced by WorldClassFooter */}
+      <footer className="hidden border-t py-12 px-4 sm:px-6 lg:px-8" style={{ borderColor: COLOR_BORDER }}>
         <div className="max-w-7xl mx-auto">
           <div className={`grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 ${isRTL ? 'text-right' : ''}`}>
             <div>

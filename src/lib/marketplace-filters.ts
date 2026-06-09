@@ -22,6 +22,17 @@ export interface FilterCategory {
 // Available filter categories
 export const filterCategories: FilterCategory[] = [
   {
+    id: 'franchiseType',
+    label: 'Franchise Type',
+    type: 'multi-select',
+    icon: '🏢',
+    options: [
+      { id: 'franchise-new', label: 'New Franchise Opportunity', value: 'franchise-new', count: 18 },
+      { id: 'franchise-existing', label: 'Existing Franchise (Buy-In)', value: 'franchise-existing', count: 12 },
+      { id: 'non-franchise', label: 'Independent Business', value: 'non-franchise', count: 17 },
+    ],
+  },
+  {
     id: 'industry',
     label: 'Industry',
     type: 'multi-select',

@@ -2,13 +2,12 @@
 
 import { useState, useCallback } from 'react'
 import { useLocale } from '@/context/LocaleContext'
-import { t } from '@/lib/translations'
 import {
   filterCategories,
   sortOptions,
   type SavedSearch,
 } from '@/lib/marketplace-filters'
-import { Search, Filter, ChevronDown, Save, Sliders } from 'lucide-react'
+import { Search, Filter, ChevronDown, Save, Sliders, X } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
 interface SearchFilters {
@@ -55,7 +54,6 @@ export function MarketplaceSearch({
 
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([])
-  const [showSavedSearches, setShowSavedSearches] = useState(false)
 
   const handleFilterChange = useCallback(
     (newFilters: Partial<SearchFilters>) => {
@@ -86,7 +84,7 @@ export function MarketplaceSearch({
 
   const activeFilterCount = Object.values(filters).filter(
     (v) => Array.isArray(v) ? v.length > 0 : v !== ''
-  ).length - 1 // Subtract 1 for sort field
+  ).length - 1
 
   return (
     <div className="space-y-4" style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
@@ -105,10 +103,10 @@ export function MarketplaceSearch({
           />
           <input
             type="text"
-            placeholder="Search by company, industry, or keyword..."
+            placeholder="Search by company, industry..."
             value={filters.query}
             onChange={(e) => handleFilterChange({ query: e.target.value })}
-            className="w-full pl-10 pr-4 py-3 rounded-lg border focus:outline-none focus:ring-2"
+            className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2"
             style={{
               borderColor: COLOR_BORDER,
               paddingLeft: isRTL ? '16px' : '40px',
@@ -119,31 +117,31 @@ export function MarketplaceSearch({
 
         <button
           onClick={() => setIsFilterOpen(!isFilterOpen)}
-          className={`flex items-center gap-2 px-4 py-3 rounded-lg border font-semibold transition-all ${
+          className={`flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all whitespace-nowrap ${
             activeFilterCount > 0 ? 'text-white' : ''
           }`}
           style={{
             borderColor: COLOR_BORDER,
-            background: activeFilterCount > 0 ? COLOR_ACCENT : 'transparent',
+            background: activeFilterCount > 0 ? COLOR_ACCENT : 'white',
             color: activeFilterCount > 0 ? 'white' : COLOR_PRIMARY,
+            border: activeFilterCount === 0 ? `1px solid ${COLOR_BORDER}` : 'none',
           }}
         >
           <Sliders size={18} />
           Filters
           {activeFilterCount > 0 && (
-            <span className="ml-1 px-2 py-1 rounded-full text-xs bg-white/20">
+            <span className="px-2 py-1 rounded-full text-xs bg-white/20 font-bold">
               {activeFilterCount}
             </span>
           )}
         </button>
 
         <button
-          onClick={() => setShowSavedSearches(!showSavedSearches)}
-          className="flex items-center gap-2 px-4 py-3 rounded-lg border font-semibold hover:bg-gray-50 transition-colors"
+          onClick={saveSearch}
+          className="flex items-center gap-2 px-4 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors border"
           style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
         >
           <Save size={18} />
-          Save
         </button>
       </div>
 
@@ -165,20 +163,20 @@ export function MarketplaceSearch({
         <div className="flex-1"></div>
 
         <span style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm font-semibold">
-          Showing {dealCount} deals
+          {dealCount} deals found
         </span>
       </div>
 
       {/* Expandable Filter Panel */}
       {isFilterOpen && (
         <div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4 rounded-lg border"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6 rounded-lg border"
           style={{ borderColor: COLOR_BORDER, background: COLOR_PRIMARY + '02' }}
         >
           {filterCategories.map((category) => (
-            <div key={category.id}>
+            <div key={category.id} className="space-y-3">
               <label
-                className="block text-sm font-semibold mb-2"
+                className="block text-sm font-bold"
                 style={{ color: COLOR_PRIMARY }}
               >
                 {category.icon} {category.label}
@@ -187,7 +185,7 @@ export function MarketplaceSearch({
               {category.type === 'multi-select' && category.options && (
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {category.options.map((option) => (
-                    <label key={option.id} className="flex items-center gap-2 cursor-pointer">
+                    <label key={option.id} className="flex items-center gap-2 cursor-pointer hover:opacity-80">
                       <input
                         type="checkbox"
                         checked={
@@ -202,13 +200,13 @@ export function MarketplaceSearch({
                             [category.id]: updated,
                           } as any)
                         }}
-                        className="w-4 h-4 rounded"
+                        className="w-4 h-4 rounded accent-blue-500"
                       />
                       <span style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
                         {option.label}
                       </span>
                       {option.count && (
-                        <span style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs ml-auto">
+                        <span style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs ml-auto opacity-60">
                           ({option.count})
                         </span>
                       )}
@@ -224,7 +222,7 @@ export function MarketplaceSearch({
                     min={category.min}
                     max={category.max}
                     step={category.step}
-                    className="w-full"
+                    className="w-full accent-blue-500"
                   />
                   <div className="flex justify-between text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
                     <span>
@@ -238,37 +236,41 @@ export function MarketplaceSearch({
               )}
             </div>
           ))}
+
+          {/* Clear Filters */}
+          {activeFilterCount > 0 && (
+            <div className="md:col-span-2 lg:col-span-3 pt-4 border-t" style={{ borderColor: COLOR_BORDER }}>
+              <button
+                onClick={() => setFilters({
+                  query: '',
+                  industry: [],
+                  valuation: [100000, 100000000],
+                  revenue: [100000, 50000000],
+                  ebitda: [5, 80],
+                  location: [],
+                  growth: [-20, 100],
+                  sellerType: [],
+                  sellerMotivation: [],
+                  heatScore: [0, 100],
+                  successProbability: [0, 100],
+                  sort: 'relevance',
+                })}
+                className="text-sm font-semibold hover:opacity-75"
+                style={{ color: COLOR_ACCENT }}
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
         </div>
       )}
 
       {/* Results Info */}
-      <div className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-        {activeFilterCount > 0 && (
-          <p>
-            Showing {dealCount} deals matching your criteria.{' '}
-            <button
-              onClick={() => setFilters({
-                query: '',
-                industry: [],
-                valuation: [100000, 100000000],
-                revenue: [100000, 50000000],
-                ebitda: [5, 80],
-                location: [],
-                growth: [-20, 100],
-                sellerType: [],
-                sellerMotivation: [],
-                heatScore: [0, 100],
-                successProbability: [0, 100],
-                sort: 'relevance',
-              })}
-              className="underline font-semibold hover:opacity-75"
-              style={{ color: COLOR_ACCENT }}
-            >
-              Clear filters
-            </button>
-          </p>
-        )}
-      </div>
+      {activeFilterCount > 0 && (
+        <div className="text-sm p-3 rounded-lg" style={{ background: COLOR_ACCENT + '10', color: COLOR_TEXT_SECONDARY }}>
+          Showing {dealCount} deals matching your criteria
+        </div>
+      )}
     </div>
   )
 }
@@ -276,6 +278,10 @@ export function MarketplaceSearch({
 // Comparison Tool
 export function DealComparison({ selectedDeals }: { selectedDeals: any[] }) {
   const { isRTL } = useLocale()
+
+  if (!selectedDeals || selectedDeals.length === 0) {
+    return <div style={{ color: COLOR_TEXT_SECONDARY }}>No deals selected for comparison</div>
+  }
 
   return (
     <div
@@ -296,14 +302,14 @@ export function DealComparison({ selectedDeals }: { selectedDeals: any[] }) {
           </tr>
         </thead>
         <tbody>
-          {['valuation', 'revenue', 'ebitda', 'ebitda-margin', 'growth-rate'].map((metric) => (
+          {['valuation', 'revenue', 'ebitdaMargin', 'growthRate', 'successProbability', 'heatScore', 'maaProbability', 'riskScore'].map((metric) => (
             <tr key={metric} style={{ borderBottom: `1px solid ${COLOR_BORDER}` }}>
               <td className="p-3 font-semibold" style={{ color: COLOR_PRIMARY }}>
-                {metric.charAt(0).toUpperCase() + metric.slice(1).replace(/-/g, ' ')}
+                {metric.replace(/([A-Z])/g, ' $1').trim()}
               </td>
               {selectedDeals.map((deal) => (
                 <td key={deal.id} className="p-3" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  {deal[metric] || '—'}
+                  {metric === 'valuation' || metric === 'revenue' ? `$${(deal[metric] / 1000000).toFixed(2)}M` : `${deal[metric]}${['Margin', 'growthRate', 'successProbability', 'maaProbability', 'riskScore'].includes(metric) ? '%' : ''}`}
                 </td>
               ))}
             </tr>

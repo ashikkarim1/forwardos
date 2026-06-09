@@ -146,7 +146,7 @@ export function SignupContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className={`rounded-lg p-8 border transition-all relative ${
+                className={`rounded-lg p-8 border transition-all relative flex flex-col ${
                   plan.recommended ? 'ring-2 md:scale-105' : ''
                 }`}
                 style={{
@@ -163,30 +163,41 @@ export function SignupContent() {
                   </div>
                 )}
 
-                <h3 className="text-2xl font-bold mb-2" style={{ color: COLOR_PRIMARY }}>
-                  {plan.name}
-                </h3>
-                <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm mb-6">
-                  {plan.description}
-                </p>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold mb-2" style={{ color: COLOR_PRIMARY }}>
+                    {plan.name}
+                  </h3>
+                  <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm mb-6">
+                    {plan.description}
+                  </p>
 
-                <div className="mb-6">
-                  {plan.basePrice > 0 ? (
-                    <>
-                      <p className="text-4xl font-black" style={{ color: COLOR_ACCENT }}>
-                        ${plan.basePrice}
-                      </p>
-                      <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-1">
-                        per month
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="text-2xl font-bold" style={{ color: COLOR_PRIMARY }}>
-                        Custom Pricing
-                      </p>
-                    </>
-                  )}
+                  <div className="mb-6">
+                    {plan.basePrice > 0 ? (
+                      <>
+                        <p className="text-4xl font-black" style={{ color: COLOR_ACCENT }}>
+                          ${plan.basePrice}
+                        </p>
+                        <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-1">
+                          per month
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-2xl font-bold" style={{ color: COLOR_PRIMARY }}>
+                          Custom Pricing
+                        </p>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="space-y-3 mb-6">
+                    {plan.features.map((feature, fidx) => (
+                      <div key={fidx} className="flex gap-3 text-sm">
+                        <span style={{ color: COLOR_ACCENT }}>✓</span>
+                        <span style={{ color: COLOR_TEXT_SECONDARY }}>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <button
@@ -194,7 +205,7 @@ export function SignupContent() {
                     setSelectedPlan(plan.id)
                     setStep('checkout')
                   }}
-                  className={`w-full px-6 py-3 rounded-lg font-bold transition-all mb-6 ${
+                  className={`w-full px-6 py-3 rounded-lg font-bold transition-all ${
                     plan.recommended ? 'text-white' : ''
                   }`}
                   style={{
@@ -204,15 +215,6 @@ export function SignupContent() {
                 >
                   {plan.id === 'enterprise' ? 'Contact Sales' : 'Start Free Trial'}
                 </button>
-
-                <div className="space-y-3">
-                  {plan.features.map((feature, fidx) => (
-                    <div key={fidx} className="flex gap-3 text-sm">
-                      <span style={{ color: COLOR_ACCENT }}>✓</span>
-                      <span style={{ color: COLOR_TEXT_SECONDARY }}>{feature}</span>
-                    </div>
-                  ))}
-                </div>
               </motion.div>
             ))}
           </div>
