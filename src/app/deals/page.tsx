@@ -478,13 +478,16 @@ const MOCK_LISTINGS = [
 ]
 
 // Add gap-filling data to all listings (seller verification, market trends, etc.)
+const MARKET_TRENDS = ['up', 'down', 'stable'] as const
+const MARKET_POSITIONS = ['underpriced', 'fair', 'premium'] as const
+
 const addMarketData = (listings: typeof MOCK_LISTINGS) => {
   return listings.map((item, idx) => ({
     ...item,
     sellerVerified: true,
     sellerTrustScore: 80 + Math.floor(Math.random() * 20), // 80-100
-    marketTrend: ['up', 'down', 'stable'][idx % 3] as const,
-    marketPosition: ['underpriced', 'fair', 'premium'][idx % 3] as const,
+    marketTrend: MARKET_TRENDS[idx % 3],
+    marketPosition: MARKET_POSITIONS[idx % 3],
     daysOnMarket: 5 + Math.floor(Math.random() * 40), // 5-45 days
     upcomingAuction: idx % 9 === 0, // 1 in 9 chance of auction
   }))
