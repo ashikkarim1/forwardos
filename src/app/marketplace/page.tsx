@@ -553,10 +553,10 @@ export default function MarketplacePage() {
             animate={{ opacity: 1, x: 0 }}
             className="lg:col-span-1"
           >
-            <div className="sticky top-24 space-y-4">
+            <div className="sticky top-24 space-y-3">
               {/* Search */}
               <div className="relative">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: COLOR_TEXT_SECONDARY }} />
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: COLOR_TEXT_SECONDARY }} />
                 <input
                   type="text"
                   placeholder="Search businesses..."
@@ -565,7 +565,7 @@ export default function MarketplacePage() {
                     setSearchTerm(e.target.value)
                     setCurrentPage(1)
                   }}
-                  className="w-full pl-10 pr-4 py-3 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
                   style={{
                     borderColor: COLOR_BORDER,
                     outlineColor: COLOR_ACCENT,
@@ -581,7 +581,7 @@ export default function MarketplacePage() {
                     setSortBy(e.target.value)
                     setCurrentPage(1)
                   }}
-                  className="w-full px-4 py-3 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
+                  className="w-full px-3 py-2.5 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2 font-semibold"
                   style={{
                     borderColor: COLOR_BORDER,
                     outlineColor: COLOR_ACCENT,
@@ -599,19 +599,17 @@ export default function MarketplacePage() {
 
               {/* Active Filters Badge */}
               {activeFiltersCount > 0 && (
-                <div className="p-3 rounded-lg border" style={{ background: '#FEF3C7', borderColor: '#FCD34D' }}>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold" style={{ color: '#92400E' }}>
-                      {activeFiltersCount} active filters
-                    </span>
-                    <button
-                      onClick={clearAllFilters}
-                      className="text-xs font-bold"
-                      style={{ color: COLOR_ACCENT }}
-                    >
-                      Clear All
-                    </button>
-                  </div>
+                <div className="p-3 rounded-lg border-2 flex items-center justify-between" style={{ background: '#FEF3C7', borderColor: COLOR_ACCENT }}>
+                  <span className="text-xs font-semibold" style={{ color: COLOR_PRIMARY }}>
+                    {activeFiltersCount} active filters
+                  </span>
+                  <button
+                    onClick={clearAllFilters}
+                    className="text-xs font-bold hover:opacity-70 transition-opacity"
+                    style={{ color: COLOR_ACCENT }}
+                  >
+                    Clear All
+                  </button>
                 </div>
               )}
 
@@ -626,22 +624,21 @@ export default function MarketplacePage() {
                 return (
                   <motion.div
                     key={section.id}
-                    className="rounded-lg border overflow-hidden"
+                    className="rounded-lg border overflow-hidden hover:shadow-sm transition-shadow bg-white"
                     style={{ borderColor: COLOR_BORDER }}
                   >
                     <button
                       onClick={() => toggleFilter(section.id)}
-                      className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50"
-                      style={{ background: section.color }}
+                      className="w-full px-3 py-3 flex items-center justify-between hover:opacity-80 transition-opacity"
                     >
-                      <div className="flex items-center gap-3">
-                        <Icon size={24} style={{ color: COLOR_PRIMARY }} />
-                        <span className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                      <div className="flex items-center gap-2">
+                        <Icon size={20} style={{ color: COLOR_ACCENT }} />
+                        <span className="font-semibold text-sm" style={{ color: COLOR_PRIMARY }}>
                           {section.label}
                         </span>
                       </div>
                       <ChevronDown
-                        size={18}
+                        size={16}
                         style={{
                           color: COLOR_PRIMARY,
                           transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
@@ -651,9 +648,9 @@ export default function MarketplacePage() {
                     </button>
 
                     {isExpanded && (
-                      <div className="p-4 space-y-2" style={{ background: 'white' }}>
+                      <div className="p-3 space-y-2 border-t" style={{ borderColor: COLOR_BORDER, background: COLOR_BG_PRIMARY }}>
                         {values.map(value => (
-                          <label key={value} className="flex items-center gap-3 cursor-pointer">
+                          <label key={value} className="flex items-center gap-2.5 cursor-pointer hover:opacity-70 transition-opacity">
                             <input
                               type="checkbox"
                               checked={selected.includes(value)}
@@ -664,7 +661,7 @@ export default function MarketplacePage() {
                                 setSelected(newSelected)
                                 setCurrentPage(1)
                               }}
-                              className="w-4 h-4"
+                              className="w-3.5 h-3.5 rounded cursor-pointer"
                             />
                             <span className="text-sm" style={{ color: COLOR_PRIMARY }}>
                               {value}
@@ -678,23 +675,19 @@ export default function MarketplacePage() {
               })}
 
               {/* VALUE RANGES */}
-              <div>
-                <h3 className="text-sm font-bold mb-4" style={{ color: COLOR_PRIMARY }}>
-                  VALUE RANGES
-                </h3>
-
+              <div className="space-y-3 pt-1">
                 {/* Valuation Slider */}
                 <motion.div
-                  className="rounded-lg border p-4 mb-3"
+                  className="rounded-lg border p-3 hover:shadow-sm transition-shadow bg-white"
                   style={{ borderColor: COLOR_BORDER }}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <DollarSign size={20} style={{ color: '#10B981' }} />
-                    <span className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <DollarSign size={18} style={{ color: COLOR_ACCENT }} />
+                    <span className="font-semibold text-sm" style={{ color: COLOR_PRIMARY }}>
                       Valuation
                     </span>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div>
                       <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
                         Min: ${valuation.min.toFixed(1)}M
@@ -728,16 +721,16 @@ export default function MarketplacePage() {
 
                 {/* Revenue Slider */}
                 <motion.div
-                  className="rounded-lg border p-4 mb-3"
+                  className="rounded-lg border p-3 hover:shadow-sm transition-shadow bg-white"
                   style={{ borderColor: COLOR_BORDER }}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <TrendingUp size={20} style={{ color: '#3B82F6' }} />
-                    <span className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp size={18} style={{ color: COLOR_ACCENT }} />
+                    <span className="font-semibold text-sm" style={{ color: COLOR_PRIMARY }}>
                       Annual Revenue
                     </span>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div>
                       <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
                         Min: ${revenue.min.toFixed(1)}K
@@ -771,16 +764,16 @@ export default function MarketplacePage() {
 
                 {/* Heat Score Slider */}
                 <motion.div
-                  className="rounded-lg border p-4 mb-3"
+                  className="rounded-lg border p-3 hover:shadow-sm transition-shadow bg-white"
                   style={{ borderColor: COLOR_BORDER }}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <Zap size={20} style={{ color: '#DC2626' }} />
-                    <span className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Zap size={18} style={{ color: COLOR_ACCENT }} />
+                    <span className="font-semibold text-sm" style={{ color: COLOR_PRIMARY }}>
                       Deal Heat Score
                     </span>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div>
                       <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
                         Min: {heatScore.min}°
@@ -812,16 +805,16 @@ export default function MarketplacePage() {
 
                 {/* Success Probability Slider */}
                 <motion.div
-                  className="rounded-lg border p-4"
+                  className="rounded-lg border p-3 hover:shadow-sm transition-shadow bg-white"
                   style={{ borderColor: COLOR_BORDER }}
                 >
-                  <div className="flex items-center gap-3 mb-3">
-                    <CheckCircle2 size={20} style={{ color: '#10B981' }} />
-                    <span className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle2 size={18} style={{ color: COLOR_ACCENT }} />
+                    <span className="font-semibold text-sm" style={{ color: COLOR_PRIMARY }}>
                       Success Probability
                     </span>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div>
                       <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
                         Min: {successProb.min}%
