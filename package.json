@@ -12,9 +12,13 @@
     "test:watch": "jest --watch",
     "db:seed": "npx ts-node --project tsconfig.json prisma/seed.ts",
     "db:migrate": "npx prisma migrate dev",
-    "db:reset": "npx prisma migrate reset"
+    "db:reset": "npx prisma migrate reset",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@aws-sdk/client-rekognition": "^3.1064.0",
+    "@aws-sdk/client-s3": "^3.1064.0",
+    "@aws-sdk/s3-request-presigner": "^3.1064.0",
     "@heroicons/react": "^2.0.18",
     "@prisma/client": "^5.8.0",
     "bcryptjs": "^3.0.3",
