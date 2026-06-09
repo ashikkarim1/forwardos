@@ -328,8 +328,8 @@ export default function LandingPage() {
                   '📈 Weekly seriousness analytics',
                   '🎯 Scenario modeling for negotiation',
                 ],
-                cta: 'Start Selling',
-                link: '/dashboard/seller',
+                cta: 'Get Started for Free',
+                link: '/seller/onboarding',
               },
               {
                 icon: BuyerIcon,
@@ -473,8 +473,8 @@ export default function LandingPage() {
 
           {/* Buttons - All in one row, no wrap */}
           <div className="flex items-center justify-center gap-6 flex-nowrap overflow-x-auto sm:overflow-visible pb-4 sm:pb-0">
-            <Link href="/dashboard/seller" className="px-8 py-4 rounded-lg font-bold text-white text-lg transition-all hover:opacity-90 flex items-center gap-2 whitespace-nowrap flex-shrink-0" style={{ background: COLOR_ACCENT }}>
-              Start as Seller <ArrowRight className="w-5 h-5" />
+            <Link href="/seller/onboarding" className="px-8 py-4 rounded-lg font-bold text-white text-lg transition-all hover:opacity-90 flex items-center gap-2 whitespace-nowrap flex-shrink-0" style={{ background: COLOR_ACCENT }}>
+              Get Started for Free <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/dashboard/buyer" className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90 border-2 whitespace-nowrap flex-shrink-0" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
               Browse as Buyer

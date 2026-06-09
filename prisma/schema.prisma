@@ -135,6 +135,32 @@ enum SubscriptionStatus {
   PAYMENT_FAILED
 }
 
+enum OnboardingStatus {
+  NOT_STARTED
+  ACCOUNT_CREATED
+  EMAIL_VERIFIED
+  BUSINESS_DATA_SUBMITTED
+  PHOTOS_UPLOADED
+  PLAN_SELECTED
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+}
+
+enum SellerPlanTier {
+  FREEMIUM
+  PREMIUM
+}
+
+enum ListingApprovalStatus {
+  DRAFT
+  PENDING_VERIFICATION
+  VERIFIED
+  APPROVED
+  REJECTED
+  ACTIVE
+}
+
 // ==================== USERS & AUTHENTICATION ====================
 
 model User {
@@ -181,6 +207,14 @@ model User {
   mobileVerified        Boolean   @default(false)
   twoFactorEnabled      Boolean   @default(false)
 
+  // Seller Onboarding (only for SELLER role)
+  onboardingStatus      OnboardingStatus? @default(NOT_STARTED)
+  sellerPlanTier        SellerPlanTier?
+  onboardingCompletedAt DateTime?
+  listingApprovalStatus ListingApprovalStatus? @default(DRAFT)
+  listingApprovedAt     DateTime?
+  approvalNotes         String?   @db.Text
+
   // Relationships
   dealsAsseller         Deal[]    @relation("SellerDeals")
   savedDeals            SavedDeal[]
@@ -197,6 +231,8 @@ model User {
   progressionHistory    DealProgressionHistory[]
   transactions          Transaction[] @relation("TransactionInitiator")
   brokerTransactions    Transaction[] @relation("BrokerUser")
+  emailVerificationTokens EmailVerificationToken[]
+  businessPhotos        BusinessPhoto[] @relation("SellerPhotos")
 
   // Billing & Subscriptions
   subscription          Subscription? @relation("UserSubscription")
@@ -210,6 +246,44 @@ model User {
   @@index([kycStatus])
   @@index([verificationStatus])
   @@index([riskLevel])
+}
+
+// ==================== EMAIL VERIFICATION ====================
+
+model EmailVerificationToken {
+  id                    String    @id @default(cuid())
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+
+  token                 String    @unique
+  expiresAt             DateTime
+
+  createdAt             DateTime  @default(now())
+
+  @@index([userId])
+  @@index([token])
+}
+
+// ==================== BUSINESS PHOTOS ====================
+
+model BusinessPhoto {
+  id                    String    @id @default(cuid())
+  seller                User      @relation("SellerPhotos", fields: [sellerId], references: [id], onDelete: Cascade)
+  sellerId              String
+
+  photoUrl              String    @db.Text // S3 URL
+  photoName             String
+  photoCaption          String?
+
+  isFeatured            Boolean   @default(false) // One featured photo per seller
+  displayOrder          Int       @default(0)
+
+  uploadedAt            DateTime  @default(now())
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([sellerId])
+  @@index([isFeatured])
 }
 
 // ==================== KYC & VERIFICATION ====================
