@@ -74,18 +74,6 @@ export default function LandingPage() {
             From capital raising to M&A, IPOs, roll-ups, and exits—Forward OS helps companies and their advisors navigate strategic transactions from start to close.
           </motion.p>
 
-          {/* CTA Buttons */}
-          <motion.div className="flex items-center justify-center gap-4 mb-16 flex-wrap" variants={itemVariants}>
-            <Link href="/dashboard/seller" className="px-8 py-4 rounded-lg font-bold text-white text-lg transition-all hover:opacity-90 flex items-center gap-2" style={{ background: COLOR_ACCENT }}>
-              Start as Seller <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link href="/dashboard/buyer" className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90 border-2" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
-              Browse as Buyer
-            </Link>
-            <Link href="/dashboard/broker" className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90 border-2" style={{ borderColor: COLOR_BORDER, color: COLOR_TEXT_SECONDARY }}>
-              Facilitate as Broker
-            </Link>
-          </motion.div>
 
           {/* Trust Badges */}
           <motion.div className="flex items-center justify-center gap-8 flex-wrap" variants={itemVariants}>
@@ -473,22 +461,26 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* ==================== CTA ==================== */}
-      <motion.section className="px-8 py-20" variants={itemVariants}>
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-black mb-6" style={{ color: COLOR_PRIMARY }}>
+      {/* ==================== BOTTOM CTA SECTION ==================== */}
+      <motion.section className="px-8 py-16 border-t" style={{ borderColor: COLOR_BORDER, background: 'white' }} variants={itemVariants}>
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-4xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>
             Ready to Move Forward?
           </h2>
-          <p className="text-xl mb-12" style={{ color: COLOR_TEXT_SECONDARY }}>
+          <p className="text-lg mb-10" style={{ color: COLOR_TEXT_SECONDARY }}>
             Join the first verified, intelligence-driven ecosystem for strategic transactions.
           </p>
 
-          <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Link href="/dashboard/seller" className="px-8 py-4 rounded-lg font-bold text-white text-lg transition-all hover:opacity-90 flex items-center gap-2" style={{ background: COLOR_ACCENT }}>
+          {/* Buttons - All in one row, no wrap */}
+          <div className="flex items-center justify-center gap-6 flex-nowrap overflow-x-auto sm:overflow-visible pb-4 sm:pb-0">
+            <Link href="/dashboard/seller" className="px-8 py-4 rounded-lg font-bold text-white text-lg transition-all hover:opacity-90 flex items-center gap-2 whitespace-nowrap flex-shrink-0" style={{ background: COLOR_ACCENT }}>
               Start as Seller <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/dashboard/buyer" className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90 border-2" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
+            <Link href="/dashboard/buyer" className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90 border-2 whitespace-nowrap flex-shrink-0" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
               Browse as Buyer
+            </Link>
+            <Link href="/dashboard/broker" className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90 border-2 whitespace-nowrap flex-shrink-0" style={{ borderColor: COLOR_BORDER, color: COLOR_TEXT_SECONDARY }}>
+              Facilitate as Broker
             </Link>
           </div>
         </div>
