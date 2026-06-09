@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Heart, Zap, ArrowRight, ChevronRight, TrendingUp, TrendingDown, Award, CheckCircle2 } from 'lucide-react'
+import { Heart, Zap, ArrowRight, TrendingUp, TrendingDown, Award, CheckCircle2 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 interface ListingCardProps {
@@ -30,7 +30,7 @@ interface ListingCardProps {
   employeeCount?: number
   isSaved?: boolean
   onSave?: () => void
-  onViewSimilar?: () => void
+  onViewPhotos?: () => void
   onContact?: () => void
 
   // Gap-filling data (moat features)
@@ -144,11 +144,14 @@ export default function ListingCard({
       style={{ borderColor: COLOR_BORDER }}
     >
       {/* IMAGE + STATUS BADGES */}
-      <Link href={`/deal/${id}`} className="relative h-40 overflow-hidden bg-gray-200 flex-shrink-0 block">
+      <button
+        onClick={onViewPhotos}
+        className="relative h-40 overflow-hidden bg-gray-200 flex-shrink-0 w-full text-left cursor-pointer group"
+      >
         <img
           src={image}
           alt={title}
-          className="w-full h-full object-cover hover:scale-105 transition-transform"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
         />
 
         {/* Status Badges - Top Left */}
@@ -206,7 +209,10 @@ export default function ListingCard({
 
         {/* Save Button */}
         <button
-          onClick={handleSave}
+          onClick={(e) => {
+            e.stopPropagation()
+            handleSave()
+          }}
           className="absolute bottom-2 right-2 p-2 rounded-full bg-white shadow-md hover:shadow-lg transition-all z-10"
         >
           <Heart
@@ -215,7 +221,7 @@ export default function ListingCard({
             style={{ color: saved ? COLOR_ACCENT : COLOR_TEXT_SECONDARY }}
           />
         </button>
-      </Link>
+      </button>
 
       {/* MAIN CONTENT */}
       <div className="p-3 space-y-3 flex flex-col flex-grow">
@@ -389,26 +395,15 @@ export default function ListingCard({
           </div>
         </div>
 
-        {/* CALL-TO-ACTION BUTTONS */}
-        <div className="grid grid-cols-2 gap-2 pt-1 flex-shrink-0">
-          <Link
-            href={`/deal/${id}?tab=similar`}
-            className="px-2 py-1.5 rounded-lg border text-xs font-semibold transition-all hover:bg-gray-50 flex items-center justify-center gap-1"
-            style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
-          >
-            <ChevronRight size={12} />
-            Similar
-          </Link>
-
-          <Link
-            href={`/deal/${id}`}
-            className="px-2 py-1.5 rounded-lg text-xs font-semibold text-white transition-all hover:opacity-90 flex items-center justify-center gap-1"
-            style={{ background: COLOR_ACCENT }}
-          >
-            Contact
-            <ArrowRight size={12} />
-          </Link>
-        </div>
+        {/* CALL-TO-ACTION BUTTON */}
+        <Link
+          href={`/deal/${id}`}
+          className="w-full px-3 py-2 rounded-lg text-xs font-semibold text-white transition-all hover:opacity-90 flex items-center justify-center gap-1"
+          style={{ background: COLOR_ACCENT }}
+        >
+          View Details
+          <ArrowRight size={12} />
+        </Link>
       </div>
     </motion.div>
   )

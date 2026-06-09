@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Search, ChevronLeft, ChevronRight, X, ChevronDown, Building2, MapPin, Users, Target, DollarSign, TrendingUp, Zap, CheckCircle2 } from 'lucide-react'
 import ListingCard from '@/components/listing/ListingCard'
+import { BusinessPhotoGallery } from '@/components/BusinessPhotoGallery'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 // Marketplace deal data (same as before)
@@ -356,6 +357,8 @@ export default function MarketplacePage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState('premium')
   const [expandedFilters, setExpandedFilters] = useState<string[]>(['industry'])
+  const [photoModalOpen, setPhotoModalOpen] = useState(false)
+  const [selectedDealPhotos, setSelectedDealPhotos] = useState<string[]>([])
 
   // Range filters
   const [valuation, setValuation] = useState({ min: 0.1, max: 100 })
@@ -862,8 +865,11 @@ export default function MarketplacePage() {
                       <ListingCard
                         {...listing}
                         onSave={() => console.log('Saved:', listing.id)}
-                        onViewSimilar={() => console.log('Similar:', listing.id)}
-                        onContact={() => console.log('Contact:', listing.id)}
+                        onViewPhotos={() => {
+                          // For now, show the main image. In production, fetch all photos for this deal
+                          setSelectedDealPhotos([listing.image])
+                          setPhotoModalOpen(true)
+                        }}
                       />
                     </motion.div>
                   ))}
@@ -943,6 +949,14 @@ export default function MarketplacePage() {
           </div>
         </div>
       </div>
+
+      {/* Photo Gallery Modal */}
+      <BusinessPhotoGallery
+        isOpen={photoModalOpen}
+        onClose={() => setPhotoModalOpen(false)}
+        photos={selectedDealPhotos}
+        businessType="Business"
+      />
     </div>
   )
 }
