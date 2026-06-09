@@ -12,7 +12,7 @@ export default function RootLayout({
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#FF8C00" />
-        <link rel="icon" href="/FOS.jpg" type="image/jpeg" />
+        <link rel="icon" href="/forward-logo.svg" type="image/svg+xml" />
       </head>
       <body className="bg-white text-[#1A1A1A] font-sans antialiased">
         <LocaleProvider>
