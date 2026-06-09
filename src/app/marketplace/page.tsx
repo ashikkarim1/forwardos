@@ -475,7 +475,7 @@ export default function MarketplacePage() {
     })
   }, [searchTerm, minValuation, maxValuation, minGrowth, selectedCategory])
 
-  const CARDS_PER_PAGE = 15
+  const CARDS_PER_PAGE = 20
   const totalPages = Math.ceil(filteredListings.length / CARDS_PER_PAGE)
   const startIdx = (currentPage - 1) * CARDS_PER_PAGE
   const endIdx = startIdx + CARDS_PER_PAGE
@@ -660,7 +660,7 @@ export default function MarketplacePage() {
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
                 >
                   {currentListings.map((listing) => (
                     <motion.div key={listing.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>

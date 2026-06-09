@@ -504,7 +504,7 @@ export default function BrowsePage() {
   }, [searchTerm, minPrice, maxPrice, minROI, selectedCategory])
 
   // Calculate pagination
-  const CARDS_PER_PAGE_NEW = 15 // 3 columns x 5 rows
+  const CARDS_PER_PAGE_NEW = 20 // 2 columns x 10 rows
   const totalPages = Math.ceil(filteredListings.length / CARDS_PER_PAGE_NEW)
   const startIdx = (currentPage - 1) * CARDS_PER_PAGE_NEW
   const endIdx = startIdx + CARDS_PER_PAGE_NEW
@@ -699,7 +699,7 @@ export default function BrowsePage() {
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
                 >
                   {currentListings.map((listing) => (
                     <motion.div key={listing.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
