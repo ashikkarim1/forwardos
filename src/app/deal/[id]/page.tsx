@@ -417,20 +417,36 @@ export default function DealPage() {
 
   return (
     <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header with Back Button */}
+      {/* Header with Home & Back Button */}
       <div
         className="border-b sticky top-0 z-40 bg-white"
         style={{ borderColor: COLOR_BORDER }}
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <Link
-            href="/marketplace"
-            className="flex items-center gap-2 font-bold hover:opacity-80 transition-opacity"
-            style={{ color: COLOR_PRIMARY }}
-          >
-            <ArrowLeft size={20} />
-            Back to Marketplace
-          </Link>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="hover:opacity-80 transition-opacity -ml-1 -mr-1"
+              title="Back to Home"
+            >
+              <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" className="w-7 h-7">
+                <text x="15" y="85" fontFamily="system-ui, -apple-system, 'Segoe UI', sans-serif" fontSize="72" fontWeight="700" fill="#f59e0b">F</text>
+                <text x="55" y="85" fontFamily="system-ui, -apple-system, 'Segoe UI', sans-serif" fontSize="72" fontWeight="700" fill="#f59e0b">o</text>
+                <g transform="translate(95, 50)">
+                  <line x1="0" y1="0" x2="20" y2="0" stroke="#ea580c" strokeWidth="4" strokeLinecap="round"/>
+                  <polygon points="20,0 14,-5 14,5" fill="#ea580c"/>
+                </g>
+              </svg>
+            </Link>
+            <Link
+              href="/marketplace"
+              className="flex items-center gap-2 font-bold hover:opacity-80 transition-opacity"
+              style={{ color: COLOR_PRIMARY }}
+            >
+              <ArrowLeft size={20} />
+              Back to Marketplace
+            </Link>
+          </div>
 
           <div className="flex items-center gap-3">
             <button
