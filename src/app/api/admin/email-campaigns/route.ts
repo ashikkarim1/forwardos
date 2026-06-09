@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Resend } from 'resend'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 interface EmailCampaign {
   id: string
@@ -39,7 +36,7 @@ export async function GET(request: NextRequest) {
         type: 'buyers',
         subject: 'Your perfect match: SaaS Platform +45% growth',
         templateId: 'weekly-deal-spotlight',
-        recipients: [], // Would be populated from database
+        recipients: [],
         status: 'completed',
         sentAt: new Date('2026-03-08T09:00:00'),
         metrics: {
