@@ -26,6 +26,7 @@ import {
   Download,
   BarChart3,
   Target,
+  Sparkles,
 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
@@ -426,17 +427,10 @@ export default function DealPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="hover:opacity-80 transition-opacity -ml-1 -mr-1"
+              className="hover:opacity-80 transition-opacity"
               title="Back to Home"
             >
-              <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" className="w-7 h-7">
-                <text x="15" y="85" fontFamily="system-ui, -apple-system, 'Segoe UI', sans-serif" fontSize="72" fontWeight="700" fill="#f59e0b">F</text>
-                <text x="55" y="85" fontFamily="system-ui, -apple-system, 'Segoe UI', sans-serif" fontSize="72" fontWeight="700" fill="#f59e0b">o</text>
-                <g transform="translate(95, 50)">
-                  <line x1="0" y1="0" x2="20" y2="0" stroke="#ea580c" strokeWidth="4" strokeLinecap="round"/>
-                  <polygon points="20,0 14,-5 14,5" fill="#ea580c"/>
-                </g>
-              </svg>
+              <Sparkles size={28} style={{ color: COLOR_ACCENT }} />
             </Link>
             <Link
               href="/marketplace"
