@@ -496,6 +496,36 @@ export default function MarketplacePage() {
   }
 
   const categories = ['all', 'SAAS', 'HEALTHCARE', 'SERVICES', 'LOGISTICS', 'FINTECH', 'AI', 'PROPTECH']
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([])
+
+  // Hot deals - top 4 by heat index
+  const hotDeals = useMemo(() => {
+    return EXTENDED_MARKETPLACE
+      .sort((a, b) => b.heatIndex - a.heatIndex)
+      .slice(0, 4)
+  }, [])
+
+  // Update filter to include industry multi-select
+  const filteredWithIndustry = useMemo(() => {
+    return filteredListings.filter(listing => {
+      if (selectedIndustries.length === 0) return true
+      return selectedIndustries.includes(listing.category)
+    })
+  }, [filteredListings, selectedIndustries])
+
+  const totalPages2 = Math.ceil(filteredWithIndustry.length / CARDS_PER_PAGE)
+  const startIdx2 = (currentPage - 1) * CARDS_PER_PAGE
+  const endIdx2 = startIdx2 + CARDS_PER_PAGE
+  const currentListings2 = filteredWithIndustry.slice(startIdx2, endIdx2)
+
+  const handleIndustryToggle = (industry: string) => {
+    setSelectedIndustries(prev =>
+      prev.includes(industry)
+        ? prev.filter(i => i !== industry)
+        : [...prev, industry]
+    )
+    setCurrentPage(1)
+  }
 
   return (
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
@@ -511,10 +541,67 @@ export default function MarketplacePage() {
             Global Marketplace
           </h1>
           <p style={{ color: COLOR_TEXT_SECONDARY }}>
-            {filteredListings.length} premium investment opportunities
+            {filteredWithIndustry.length} premium investment opportunities
           </p>
         </div>
       </motion.div>
+
+      {/* 🔥 TRENDING HOT DEALS CAROUSEL */}
+      <motion.section
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="border-b"
+        style={{ borderColor: COLOR_BORDER, background: 'white' }}
+      >
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+          <div className="flex items-center gap-2 mb-6">
+            <span className="text-2xl">🔥</span>
+            <h2 className="text-2xl font-black" style={{ color: COLOR_PRIMARY }}>
+              Trending Deals Right Now
+            </h2>
+            <span className="text-xs font-bold px-3 py-1 rounded-full text-white" style={{ background: '#DC2626' }}>
+              HOTTEST
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            {hotDeals.map((deal) => (
+              <motion.div
+                key={deal.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 rounded-lg border-2 hover:shadow-md transition-shadow cursor-pointer"
+                style={{ borderColor: COLOR_ACCENT }}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1">
+                    <h3 className="font-bold text-sm line-clamp-1" style={{ color: COLOR_PRIMARY }}>
+                      {deal.title}
+                    </h3>
+                    <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+                      {deal.location}
+                    </p>
+                  </div>
+                  <div
+                    className="px-2 py-1 rounded text-xs font-bold text-white flex-shrink-0"
+                    style={{ background: '#DC2626' }}
+                  >
+                    {deal.heatIndex}🔥
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span style={{ color: COLOR_TEXT_SECONDARY }}>
+                    ${(deal.askingPrice / 1000000).toFixed(1)}M
+                  </span>
+                  <span style={{ color: '#10B981', fontWeight: 'bold' }}>
+                    {deal.growthRate}% growth
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
 
       {/* MAIN LAYOUT: SIDEBAR + GRID */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
@@ -550,30 +637,37 @@ export default function MarketplacePage() {
                 </div>
               </div>
 
-              {/* CATEGORY FILTER */}
+              {/* INDUSTRY MULTI-SELECT FILTER */}
               <div>
                 <label className="block text-sm font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
-                  Category
+                  Industries
                 </label>
                 <div className="space-y-2">
-                  {categories.map((cat) => (
-                    <label key={cat} className="flex items-center gap-3 cursor-pointer">
+                  {categories.filter(c => c !== 'all').map((industry) => (
+                    <label key={industry} className="flex items-center gap-3 cursor-pointer">
                       <input
-                        type="radio"
-                        name="category"
-                        checked={selectedCategory === cat}
-                        onChange={() => {
-                          setSelectedCategory(cat)
-                          setCurrentPage(1)
-                        }}
+                        type="checkbox"
+                        checked={selectedIndustries.includes(industry)}
+                        onChange={() => handleIndustryToggle(industry)}
                         className="w-4 h-4"
                       />
                       <span className="text-sm" style={{ color: COLOR_PRIMARY }}>
-                        {cat === 'all' ? 'All Categories' : cat}
+                        {industry}
                       </span>
                     </label>
                   ))}
                 </div>
+                {selectedIndustries.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setSelectedIndustries([])
+                      setCurrentPage(1)
+                    }}
+                    className="text-xs mt-2 text-blue-600 hover:underline"
+                  >
+                    Clear all industries
+                  </button>
+                )}
               </div>
 
               {/* VALUATION RANGE */}
@@ -654,7 +748,7 @@ export default function MarketplacePage() {
 
           {/* MAIN CONTENT - GRID */}
           <div className="lg:col-span-3">
-            {currentListings.length > 0 ? (
+            {currentListings2.length > 0 ? (
               <>
                 <motion.div
                   variants={containerVariants}
@@ -662,7 +756,7 @@ export default function MarketplacePage() {
                   animate="visible"
                   className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
                 >
-                  {currentListings.map((listing) => (
+                  {currentListings2.map((listing) => (
                     <motion.div key={listing.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                       <ListingCard
                         {...listing}
@@ -675,7 +769,7 @@ export default function MarketplacePage() {
                 </motion.div>
 
                 {/* PAGINATION */}
-                {totalPages > 1 && (
+                {totalPages2 > 1 && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -690,14 +784,14 @@ export default function MarketplacePage() {
                       <ChevronLeft size={20} />
                     </button>
 
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    {Array.from({ length: Math.min(5, totalPages2) }, (_, i) => {
                       let pageNum
-                      if (totalPages <= 5) {
+                      if (totalPages2 <= 5) {
                         pageNum = i + 1
                       } else if (currentPage <= 3) {
                         pageNum = i + 1
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i
+                      } else if (currentPage >= totalPages2 - 2) {
+                        pageNum = totalPages2 - 4 + i
                       } else {
                         pageNum = currentPage - 2 + i
                       }
@@ -721,7 +815,7 @@ export default function MarketplacePage() {
 
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
+                      disabled={currentPage === totalPages2}
                       className="p-2 rounded-lg border transition-all hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
                     >
@@ -729,7 +823,7 @@ export default function MarketplacePage() {
                     </button>
 
                     <span className="ml-4 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-                      Page {currentPage} of {totalPages}
+                      Page {currentPage} of {totalPages2}
                     </span>
                   </motion.div>
                 )}
