@@ -354,7 +354,7 @@ const FILTER_SECTIONS = [
 export default function MarketplacePage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
-  const [sortBy, setSortBy] = useState('relevant')
+  const [sortBy, setSortBy] = useState('premium')
   const [expandedFilters, setExpandedFilters] = useState<string[]>(['industry'])
 
   // Range filters
@@ -391,11 +391,37 @@ export default function MarketplacePage() {
       return matchesSearch && matchesIndustry && matchesLocation && matchesSellerType && matchesMotivation && matchesValuation && matchesRevenue && matchesHeat && matchesSuccess
     })
 
-    // Sort
-    if (sortBy === 'heat') results.sort((a, b) => b.heatIndex - a.heatIndex)
-    else if (sortBy === 'roi') results.sort((a, b) => b.roiProjection - a.roiProjection)
-    else if (sortBy === 'valuation') results.sort((a, b) => a.askingPrice - b.askingPrice)
-    else results.sort((a, b) => b.dealQualityScore - a.dealQualityScore) // relevant
+    // Sort - Premium (FEATURED) first, then apply secondary sort
+    const featured = results.filter(d => d.status === 'FEATURED')
+    const nonFeatured = results.filter(d => d.status !== 'FEATURED')
+
+    // Apply secondary sort based on sortBy
+    const sortResults = (arr: typeof results) => {
+      if (sortBy === 'premium') {
+        // Premium already handled, sort non-featured by newest (lower daysOnMarket = newer)
+        return arr.sort((a, b) => (a.daysOnMarket || 999) - (b.daysOnMarket || 999))
+      } else if (sortBy === 'newest') {
+        return arr.sort((a, b) => (a.daysOnMarket || 999) - (b.daysOnMarket || 999))
+      } else if (sortBy === 'oldest') {
+        return arr.sort((a, b) => (b.daysOnMarket || 0) - (a.daysOnMarket || 0))
+      } else if (sortBy === 'heat') {
+        return arr.sort((a, b) => b.heatIndex - a.heatIndex)
+      } else if (sortBy === 'roi') {
+        return arr.sort((a, b) => b.roiProjection - a.roiProjection)
+      } else if (sortBy === 'valuation') {
+        return arr.sort((a, b) => a.askingPrice - b.askingPrice)
+      } else {
+        return arr.sort((a, b) => b.dealQualityScore - a.dealQualityScore)
+      }
+    }
+
+    if (sortBy === 'premium') {
+      // Featured first (sorted by newest), then non-featured (sorted by newest)
+      return [...sortResults(featured), ...sortResults(nonFeatured)]
+    } else {
+      // Apply sort to all results equally
+      return sortResults(results)
+    }
 
     return results
   }, [searchTerm, selectedIndustries, selectedLocations, selectedSellerTypes, selectedMotivations, valuation, revenue, heatScore, successProb, sortBy])
@@ -430,7 +456,7 @@ export default function MarketplacePage() {
 
   const clearAllFilters = () => {
     setSearchTerm('')
-    setSortBy('relevant')
+    setSortBy('premium')
     setSelectedIndustries([])
     setSelectedLocations([])
     setSelectedSellerTypes([])
@@ -561,10 +587,13 @@ export default function MarketplacePage() {
                     outlineColor: COLOR_ACCENT,
                   } as React.CSSProperties}
                 >
-                  <option value="relevant">Most Relevant</option>
+                  <option value="premium">⭐ Premium First</option>
+                  <option value="newest">✨ Newest First</option>
+                  <option value="oldest">📅 Oldest First</option>
                   <option value="heat">🔥 Hottest First</option>
                   <option value="roi">💰 Highest ROI</option>
                   <option value="valuation">💵 Lowest Price</option>
+                  <option value="relevant">Most Relevant</option>
                 </select>
               </div>
 
