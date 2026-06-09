@@ -7,6 +7,8 @@ import { motion } from 'framer-motion'
 import { ChevronLeft, Flame, CheckCircle2, AlertCircle } from 'lucide-react'
 import ComparableAnalyzer from '@/components/ComparableAnalyzer'
 import MarketIntelligenceDashboard from '@/components/MarketIntelligenceDashboard'
+import PredictiveIntelligence from '@/components/PredictiveIntelligence'
+import RecommendationEngine from '@/components/RecommendationEngine'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
 const businessesData = [
@@ -36,7 +38,7 @@ const businessesData = [
 
 const getBusiness = (id: number) => businessesData.find(b => b.id === id)
 
-type TabType = 'overview' | 'comparables' | 'intelligence' | 'scenarios'
+type TabType = 'overview' | 'comparables' | 'intelligence' | 'predictions' | 'recommendations' | 'scenarios'
 
 export default function DealDetailPageV2() {
   const params = useParams()
@@ -92,6 +94,8 @@ export default function DealDetailPageV2() {
     { id: 'overview', label: '📋 Overview', icon: 'overview' },
     { id: 'comparables', label: '📊 Comparables', icon: 'comparables' },
     { id: 'intelligence', label: '🔮 Market Intelligence', icon: 'intelligence' },
+    { id: 'predictions', label: '🤖 AI Predictions', icon: 'predictions' },
+    { id: 'recommendations', label: '💡 Recommendations', icon: 'recommendations' },
     { id: 'scenarios', label: '📈 Scenarios', icon: 'scenarios' },
   ]
 
@@ -250,6 +254,14 @@ export default function DealDetailPageV2() {
 
           {activeTab === 'intelligence' && (
             <MarketIntelligenceDashboard business={business} />
+          )}
+
+          {activeTab === 'predictions' && (
+            <PredictiveIntelligence business={business} />
+          )}
+
+          {activeTab === 'recommendations' && (
+            <RecommendationEngine business={business} />
           )}
 
           {activeTab === 'scenarios' && (
