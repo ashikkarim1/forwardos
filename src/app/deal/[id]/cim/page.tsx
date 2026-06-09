@@ -13,11 +13,14 @@ import { CIMCharts } from '@/components/cim/CIMCharts'
 import { CIMAIInsights } from '@/components/cim/CIMAIInsights'
 import { CIMMetricsTable } from '@/components/cim/CIMMetricsTable'
 
+type CIMTab = 'charts' | 'insights' | 'metrics' | 'documents'
+
 export default function CIMDashboardPage() {
   const params = useParams()
   const dealId = (params?.id || '') as string
   const { locale, isRTL } = useLocale()
   const t = useTranslation()
+  const [activeTab, setActiveTab] = useState<CIMTab>('charts')
 
   // Sample deal data - in production, this would come from your API
   const deal = {
@@ -73,13 +76,11 @@ export default function CIMDashboardPage() {
 
   const handleDownloadSelected = () => {
     console.log('Downloading selected:', selectedDocuments)
-    // In production, this would trigger a ZIP download with selected files
     alert(`Downloading ${selectedDocuments.length} selected documents...`)
   }
 
   const handleDownloadAll = () => {
     console.log('Downloading all documents')
-    // In production, this would trigger a complete ZIP download
     alert('Downloading complete CIM package...')
   }
 
@@ -103,24 +104,44 @@ export default function CIMDashboardPage() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 text-xs md:text-sm"
           style={{ color: COLOR_ACCENT }}
         >
-          <Sparkles size={20} />
-          <span className="text-sm font-bold">AI-Powered Dashboard</span>
+          <Sparkles size={16} className="md:w-5 md:h-5" />
+          <span className="font-bold hidden sm:inline">AI-Powered Dashboard</span>
         </motion.div>
       </PageHeader>
 
+      {/* Mobile Tab Navigation */}
+      <div className="lg:hidden sticky top-16 z-30 border-b bg-white overflow-x-auto" style={{ borderColor: COLOR_BORDER }}>
+        <div className="px-4 sm:px-6 flex gap-1">
+          {(['charts', 'insights', 'metrics', 'documents'] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className="px-3 md:px-4 py-3 font-bold text-xs md:text-sm border-b-2 transition-all whitespace-nowrap flex-shrink-0"
+              style={{
+                borderColor: activeTab === tab ? COLOR_ACCENT : 'transparent',
+                background: activeTab === tab ? COLOR_ACCENT : 'transparent',
+                color: activeTab === tab ? 'white' : COLOR_TEXT_SECONDARY,
+              }}
+            >
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Analytics & Charts */}
-          <div className="lg:col-span-2 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 lg:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+          {/* Left Column - Charts, Insights, Metrics (Hidden on mobile unless tab is active) */}
+          <div className={`lg:col-span-2 space-y-6 md:space-y-8 ${activeTab === 'documents' ? 'hidden' : 'hidden lg:block'}`}>
             {/* Key Metrics Grid */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4"
             >
               {[
                 { label: 'Annual Revenue', value: `$${(deal.revenue / 1000).toFixed(0)}K`, icon: TrendingUp },
@@ -132,7 +153,7 @@ export default function CIMDashboardPage() {
                 return (
                   <div
                     key={idx}
-                    className="p-6 rounded-lg border"
+                    className="p-4 md:p-6 rounded-lg border"
                     style={{ borderColor: COLOR_BORDER, background: COLOR_PRIMARY + '02' }}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -141,7 +162,7 @@ export default function CIMDashboardPage() {
                       </span>
                       <Icon size={18} style={{ color: COLOR_ACCENT }} />
                     </div>
-                    <p className="text-2xl font-black" style={{ color: COLOR_PRIMARY }}>
+                    <p className="text-xl md:text-2xl font-black" style={{ color: COLOR_PRIMARY }}>
                       {metric.value}
                     </p>
                   </div>
@@ -149,47 +170,54 @@ export default function CIMDashboardPage() {
               })}
             </motion.div>
 
-            {/* Charts Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <CIMCharts deal={deal} />
-            </motion.div>
+            {/* Charts Section (Show on "charts" tab or desktop) */}
+            {(activeTab === 'charts' || activeTab !== 'documents') && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className={activeTab === 'insights' || activeTab === 'metrics' ? 'hidden lg:block' : ''}
+                >
+                  <CIMCharts deal={deal} />
+                </motion.div>
 
-            {/* AI Insights */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <CIMAIInsights deal={deal} />
-            </motion.div>
+                {/* AI Insights (Show on "insights" tab or desktop) */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className={activeTab === 'charts' || activeTab === 'metrics' ? 'hidden lg:block' : ''}
+                >
+                  <CIMAIInsights deal={deal} />
+                </motion.div>
 
-            {/* Detailed Metrics Table */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              <CIMMetricsTable deal={deal} />
-            </motion.div>
+                {/* Detailed Metrics Table (Show on "metrics" tab or desktop) */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className={activeTab === 'charts' || activeTab === 'insights' ? 'hidden lg:block' : ''}
+                >
+                  <CIMMetricsTable deal={deal} />
+                </motion.div>
+              </>
+            )}
           </div>
 
-          {/* Right Column - Document Selector & Downloads */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-32 space-y-6">
+          {/* Right Column - Document Selector & Downloads (Full width on mobile when documents tab is active) */}
+          <div className={`${activeTab === 'documents' ? 'col-span-1 lg:col-span-3' : 'lg:col-span-1'}`}>
+            <div className={`sticky top-24 lg:top-32 space-y-4 md:space-y-6 ${activeTab === 'documents' ? 'lg:grid lg:grid-cols-2 lg:gap-6' : ''}`}>
               {/* Download Actions */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="space-y-3"
+                className="space-y-2 md:space-y-3"
               >
                 <button
                   onClick={handleDownloadAll}
-                  className="w-full py-3 px-4 rounded-lg font-bold text-white flex items-center justify-center gap-2 hover:opacity-90 transition-all"
-                  style={{ background: COLOR_ACCENT }}
+                  className="w-full py-3 md:py-4 px-4 rounded-lg font-bold text-white text-sm md:text-base flex items-center justify-center gap-2 hover:opacity-90 transition-all"
+                  style={{ background: COLOR_ACCENT, minHeight: '44px' }}
                 >
                   <Download size={18} />
                   Download All (ZIP)
@@ -198,10 +226,11 @@ export default function CIMDashboardPage() {
                 <button
                   onClick={handleDownloadSelected}
                   disabled={selectedDocuments.length === 0}
-                  className="w-full py-3 px-4 rounded-lg font-bold border flex items-center justify-center gap-2 hover:bg-gray-50 transition-all disabled:opacity-50"
+                  className="w-full py-3 md:py-4 px-4 rounded-lg font-bold border text-sm md:text-base flex items-center justify-center gap-2 hover:bg-gray-50 transition-all disabled:opacity-50"
                   style={{
                     borderColor: COLOR_BORDER,
                     color: selectedDocuments.length === 0 ? COLOR_TEXT_SECONDARY : COLOR_PRIMARY,
+                    minHeight: '44px',
                   }}
                 >
                   <Archive size={18} />
@@ -219,11 +248,11 @@ export default function CIMDashboardPage() {
               >
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                    <h3 className="font-bold text-sm md:text-base" style={{ color: COLOR_PRIMARY }}>
                       Documents
                     </h3>
                     <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
-                      Total: {totalSize.toFixed(1)} MB
+                      {totalSize.toFixed(1)} MB
                     </span>
                   </div>
 
@@ -268,7 +297,7 @@ export default function CIMDashboardPage() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className="p-4 rounded-lg border text-xs"
+                className="p-4 rounded-lg border text-xs md:text-sm"
                 style={{ borderColor: COLOR_BORDER, background: COLOR_ACCENT + '08', color: COLOR_TEXT_SECONDARY }}
               >
                 <p className="mb-2 font-semibold" style={{ color: COLOR_PRIMARY }}>

@@ -507,15 +507,15 @@ export default function DealPage() {
 
             {/* Business Title & Type */}
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
-              <h1 className="text-4xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>
                 {deal.name}
               </h1>
-              <p className="text-lg" style={{ color: COLOR_TEXT_SECONDARY }}>
+              <p className="text-sm sm:text-base md:text-lg" style={{ color: COLOR_TEXT_SECONDARY }}>
                 {deal.businessType}
               </p>
 
               {/* Location & Quick Facts */}
-              <div className="flex flex-wrap gap-4 mt-4 text-sm">
+              <div className="flex flex-wrap gap-2 sm:gap-4 mt-4 text-xs sm:text-sm">
                 <div className="flex items-center gap-2" style={{ color: COLOR_TEXT_SECONDARY }}>
                   <MapPin size={16} style={{ color: COLOR_ACCENT }} />
                   {deal.location}
@@ -536,27 +536,27 @@ export default function DealPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="p-6 rounded-xl border"
+              className="p-4 sm:p-6 rounded-xl border"
               style={{ borderColor: COLOR_BORDER, background: COLOR_PRIMARY + '02' }}
             >
-              <h2 className="font-bold text-lg mb-3" style={{ color: COLOR_PRIMARY }}>
+              <h2 className="font-bold text-base sm:text-lg mb-3" style={{ color: COLOR_PRIMARY }}>
                 About This Business
               </h2>
-              <p className="leading-relaxed" style={{ color: COLOR_TEXT_SECONDARY }}>
+              <p className="leading-relaxed text-sm sm:text-base" style={{ color: COLOR_TEXT_SECONDARY }}>
                 {deal.description}
               </p>
             </motion.div>
 
             {/* Key Highlights */}
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-              <h2 className="font-bold text-xl mb-4" style={{ color: COLOR_PRIMARY }}>
+              <h2 className="font-bold text-base sm:text-lg md:text-xl mb-3 sm:mb-4" style={{ color: COLOR_PRIMARY }}>
                 Key Highlights
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
                 {deal.keyHighlights.map((highlight, idx) => (
                   <div key={idx} className="flex items-start gap-3 p-3 rounded-lg border" style={{ borderColor: COLOR_BORDER }}>
-                    <CheckCircle2 size={20} style={{ color: COLOR_ACCENT, flexShrink: 0 }} />
-                    <span style={{ color: COLOR_PRIMARY }} className="text-sm font-medium">
+                    <CheckCircle2 size={18} className="sm:w-5 sm:h-5 flex-shrink-0" style={{ color: COLOR_ACCENT }} />
+                    <span style={{ color: COLOR_PRIMARY }} className="text-xs sm:text-sm font-medium">
                       {highlight}
                     </span>
                   </div>
@@ -566,10 +566,10 @@ export default function DealPage() {
 
             {/* Financial Metrics Grid */}
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
-              <h2 className="font-bold text-xl mb-4" style={{ color: COLOR_PRIMARY }}>
+              <h2 className="font-bold text-base sm:text-lg md:text-xl mb-3 sm:mb-4" style={{ color: COLOR_PRIMARY }}>
                 Financial Overview
               </h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
                 {[
                   { label: 'Valuation', value: `$${(deal.valuation / 1000000).toFixed(1)}M`, icon: DollarSign, color: '#10B981' },
                   { label: 'Annual Revenue', value: `$${(deal.revenue / 1000).toFixed(0)}K`, icon: TrendingUp, color: '#3B82F6' },
@@ -778,34 +778,34 @@ export default function DealPage() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <button
-                className="w-full py-4 rounded-lg font-bold text-white hover:opacity-90 transition-all text-lg"
-                style={{ background: COLOR_ACCENT }}
+                className="w-full py-3 sm:py-4 rounded-lg font-bold text-white hover:opacity-90 transition-all text-sm sm:text-base md:text-lg"
+                style={{ background: COLOR_ACCENT, minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 Schedule Call with Seller
               </button>
               <Link
                 href={`/deal/${dealId}/cim`}
-                className="w-full py-4 rounded-lg font-bold border transition-all flex items-center justify-center gap-2 text-base"
-                style={{ borderColor: COLOR_BORDER, background: COLOR_ACCENT + '10', color: COLOR_PRIMARY }}
+                className="w-full py-3 sm:py-4 rounded-lg font-bold border transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
+                style={{ borderColor: COLOR_BORDER, background: COLOR_ACCENT + '10', color: COLOR_PRIMARY, minHeight: '44px' }}
               >
-                <BarChart3 size={20} />
+                <BarChart3 size={18} className="sm:w-5 sm:h-5" />
                 CIM Dashboard
               </Link>
               <button
-                className="w-full py-4 rounded-lg font-bold border transition-all flex items-center justify-center gap-2 text-base"
-                style={{ borderColor: COLOR_BORDER, background: COLOR_ACCENT + '10', color: COLOR_PRIMARY }}
+                className="w-full py-3 sm:py-4 rounded-lg font-bold border transition-all flex items-center justify-center gap-2 text-sm sm:text-base"
+                style={{ borderColor: COLOR_BORDER, background: COLOR_ACCENT + '10', color: COLOR_PRIMARY, minHeight: '44px' }}
               >
-                <Download size={20} />
+                <Download size={18} className="sm:w-5 sm:h-5" />
                 Download CIM
               </button>
               <Link
                 href={`/my-favourites?view=${dealId}&compare=true`}
-                className="w-full py-4 rounded-lg font-bold border transition-all text-center text-base flex items-center justify-center gap-2"
-                style={{ borderColor: COLOR_BORDER, background: COLOR_ACCENT + '10', color: COLOR_PRIMARY }}
+                className="w-full py-3 sm:py-4 rounded-lg font-bold border transition-all text-center text-sm sm:text-base flex items-center justify-center gap-2"
+                style={{ borderColor: COLOR_BORDER, background: COLOR_ACCENT + '10', color: COLOR_PRIMARY, minHeight: '44px' }}
               >
-                <BarChart3 size={20} />
+                <BarChart3 size={18} className="sm:w-5 sm:h-5" />
                 View in Comparison
               </Link>
             </div>

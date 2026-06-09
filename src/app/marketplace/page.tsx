@@ -444,7 +444,7 @@ export default function MarketplacePage() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 auto-rows-max">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 auto-rows-max">
                   {paginatedDeals.map((deal) => (
                     <motion.div
                       key={deal.id}
@@ -454,8 +454,8 @@ export default function MarketplacePage() {
                       className={`rounded-xl border overflow-hidden hover:shadow-lg transition-all cursor-pointer h-full flex flex-col group ${selectedDeals.includes(deal.id) ? 'ring-2' : ''}`}
                       style={{ borderColor: selectedDeals.includes(deal.id) ? COLOR_ACCENT : COLOR_BORDER, background: selectedDeals.includes(deal.id) ? COLOR_ACCENT + '05' : 'white' }}
                     >
-                      {/* HERO IMAGE - Fixed Height */}
-                      <div className="relative w-full h-40 bg-gray-200 overflow-hidden">
+                      {/* HERO IMAGE - Responsive Height */}
+                      <div className="relative w-full h-32 sm:h-40 bg-gray-200 overflow-hidden">
                         <img
                           src={deal.heroImage}
                           alt={deal.businessType}
@@ -483,17 +483,17 @@ export default function MarketplacePage() {
                       </div>
 
                       {/* Business Info - NO NAME */}
-                      <div style={{ background: COLOR_ACCENT + '05', borderBottom: `1px solid ${COLOR_BORDER}` }} className="p-3">
-                        <h3 className="font-bold text-sm mb-1" style={{ color: COLOR_PRIMARY }}>
+                      <div style={{ background: COLOR_ACCENT + '05', borderBottom: `1px solid ${COLOR_BORDER}` }} className="p-3 md:p-4">
+                        <h3 className="font-bold text-sm md:text-base mb-1" style={{ color: COLOR_PRIMARY }}>
                           {deal.businessType || 'Business Opportunity'}
                         </h3>
-                        <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+                        <p className="text-xs md:text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
                           {deal.city || deal.location?.split(',')[0]} • {deal.employees} employees
                         </p>
                       </div>
 
                       {/* Key Business Metrics */}
-                      <div className="p-3 space-y-2 flex-1 overflow-hidden">
+                      <div className="p-3 md:p-4 space-y-2 flex-1 overflow-hidden">
                         {/* Financial Metrics Grid */}
                         <div className="grid grid-cols-2 gap-2">
                           <div>
@@ -528,17 +528,18 @@ export default function MarketplacePage() {
                       </div>
 
                       {/* Favorite & View Deal Buttons */}
-                      <div className="p-3 border-t space-y-2" style={{ borderColor: COLOR_BORDER }}>
+                      <div className="p-3 md:p-4 border-t space-y-2" style={{ borderColor: COLOR_BORDER }}>
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
                             toggleFavourite(deal.id)
                           }}
-                          className="w-full py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all border"
+                          className="w-full py-3 md:py-2 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all border"
                           style={{
                             borderColor: favourites.includes(deal.id) ? COLOR_ACCENT : COLOR_BORDER,
                             background: favourites.includes(deal.id) ? COLOR_ACCENT + '10' : 'white',
                             color: favourites.includes(deal.id) ? COLOR_ACCENT : COLOR_PRIMARY,
+                            minHeight: '44px',
                           }}
                         >
                           <Star size={16} fill={favourites.includes(deal.id) ? COLOR_ACCENT : 'none'} />
@@ -546,8 +547,8 @@ export default function MarketplacePage() {
                         </button>
                         <Link
                           href={`/deal/${deal.id}`}
-                          className="w-full block text-center py-2 font-bold text-white hover:opacity-90 transition-all rounded-lg text-sm"
-                          style={{ background: COLOR_ACCENT }}
+                          className="w-full block text-center py-3 md:py-2 font-bold text-white hover:opacity-90 transition-all rounded-lg text-sm"
+                          style={{ background: COLOR_ACCENT, minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
                           {t('marketplace.viewDeal')}
                         </Link>
@@ -557,27 +558,32 @@ export default function MarketplacePage() {
                 </div>
 
                 {/* PAGINATION */}
-                <div className="flex items-center justify-center gap-4 py-8">
+                <div className="flex items-center justify-center gap-2 md:gap-4 py-8 px-4 overflow-x-auto">
                   <button
                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 rounded-lg border font-bold disabled:opacity-50"
-                    style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
+                    className="px-4 md:px-4 py-3 md:py-2 rounded-lg border font-bold disabled:opacity-50 flex-shrink-0"
+                    style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY, minHeight: '44px', minWidth: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
                     <ChevronLeft size={20} />
                   </button>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 md:gap-2">
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       const page = i + 1
                       return (
                         <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`px-3 py-2 rounded-lg font-bold transition-all ${currentPage === page ? 'text-white' : ''}`}
+                          className={`px-3 md:px-3 py-3 md:py-2 rounded-lg font-bold transition-all flex-shrink-0 ${currentPage === page ? 'text-white' : ''}`}
                           style={{
                             background: currentPage === page ? COLOR_ACCENT : COLOR_BORDER,
                             color: currentPage === page ? 'white' : COLOR_PRIMARY,
+                            minHeight: '44px',
+                            minWidth: '44px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                           }}
                         >
                           {page}
