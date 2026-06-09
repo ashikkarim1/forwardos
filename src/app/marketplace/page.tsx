@@ -28,6 +28,11 @@ const DEALS: Deal[] = [
 // Duplicate for pagination demo
 const EXTENDED_DEALS = [...DEALS, ...DEALS]
 
+// Format category names: SAAS -> Saas, FINTECH -> Fintech, etc.
+const formatCategoryName = (name: string) => {
+  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+}
+
 const FILTER_SECTIONS = [
   { id: 'industry', label: 'Industry', icon: Building2 },
   { id: 'location', label: 'Location', icon: MapPin },
@@ -206,11 +211,11 @@ export default function MarketplacePage() {
                       <ChevronDown size={16} style={{ color: COLOR_PRIMARY, transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
                     </button>
                     {isExpanded && (
-                      <div className="p-3 space-y-2 border-t" style={{ borderColor: COLOR_BORDER, background: COLOR_BG_PRIMARY }}>
+                      <div className="p-3 space-y-2 border-t max-h-64 overflow-y-auto" style={{ borderColor: COLOR_BORDER, background: COLOR_BG_PRIMARY }}>
                         {values.map(value => (
                           <label key={value} className="flex items-center gap-2.5 cursor-pointer hover:opacity-70 transition-opacity">
                             <input type="checkbox" checked={selected.includes(value)} onChange={() => { const newSelected = selected.includes(value) ? selected.filter(v => v !== value) : [...selected, value]; setSelected(newSelected); setCurrentPage(1) }} className="w-3.5 h-3.5 rounded cursor-pointer" />
-                            <span className="text-sm" style={{ color: COLOR_PRIMARY }}>{value}</span>
+                            <span className="text-sm" style={{ color: COLOR_PRIMARY }}>{formatCategoryName(value)}</span>
                           </label>
                         ))}
                       </div>
