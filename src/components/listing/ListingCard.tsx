@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Heart, Zap, ArrowRight, ChevronRight, TrendingUp, TrendingDown, Award, CheckCircle2 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
@@ -143,7 +144,7 @@ export default function ListingCard({
       style={{ borderColor: COLOR_BORDER }}
     >
       {/* IMAGE + STATUS BADGES */}
-      <div className="relative h-40 overflow-hidden bg-gray-200 flex-shrink-0">
+      <Link href={`/deal/${id}`} className="relative h-40 overflow-hidden bg-gray-200 flex-shrink-0 block">
         <img
           src={image}
           alt={title}
@@ -214,12 +215,12 @@ export default function ListingCard({
             style={{ color: saved ? COLOR_ACCENT : COLOR_TEXT_SECONDARY }}
           />
         </button>
-      </div>
+      </Link>
 
       {/* MAIN CONTENT */}
       <div className="p-3 space-y-3 flex flex-col flex-grow">
         {/* Title + Location */}
-        <div>
+        <Link href={`/deal/${id}`} className="block hover:opacity-80 transition-opacity">
           <h3
             className="font-black text-sm mb-0.5 line-clamp-2"
             style={{ color: COLOR_PRIMARY }}
@@ -229,7 +230,7 @@ export default function ListingCard({
           <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
             📍 {location}, {country}
           </p>
-        </div>
+        </Link>
 
         {/* DEAL TYPE + CATEGORY BADGES */}
         <div className="flex gap-1 flex-wrap">
@@ -390,23 +391,23 @@ export default function ListingCard({
 
         {/* CALL-TO-ACTION BUTTONS */}
         <div className="grid grid-cols-2 gap-2 pt-1 flex-shrink-0">
-          <button
-            onClick={onViewSimilar}
+          <Link
+            href={`/deal/${id}?tab=similar`}
             className="px-2 py-1.5 rounded-lg border text-xs font-semibold transition-all hover:bg-gray-50 flex items-center justify-center gap-1"
             style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
           >
             <ChevronRight size={12} />
             Similar
-          </button>
+          </Link>
 
-          <button
-            onClick={onContact}
+          <Link
+            href={`/deal/${id}`}
             className="px-2 py-1.5 rounded-lg text-xs font-semibold text-white transition-all hover:opacity-90 flex items-center justify-center gap-1"
             style={{ background: COLOR_ACCENT }}
           >
             Contact
             <ArrowRight size={12} />
-          </button>
+          </Link>
         </div>
       </div>
     </motion.div>
