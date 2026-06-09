@@ -7,10 +7,10 @@ import ListingCard from '@/components/listing/ListingCard'
 import { BusinessPhotoGallery } from '@/components/BusinessPhotoGallery'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
-// Marketplace deal data (same as before)
+// 10 Complete Deals with Working Images and Full CIM Data
 const MARKETPLACE_DEALS = [
   {
-    id: '1',
+    id: 'deal-1',
     title: 'TechFlow SaaS Platform',
     location: 'San Francisco',
     country: 'USA',
