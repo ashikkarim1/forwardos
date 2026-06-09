@@ -2,11 +2,11 @@
 
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { Search, ChevronLeft, ChevronRight, X, Flame, TrendingUp, Eye, BarChart3 } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, X, ChevronDown, Building2, MapPin, Users, Target, DollarSign, TrendingUp, Zap, CheckCircle2 } from 'lucide-react'
 import ListingCard from '@/components/listing/ListingCard'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
-// Marketplace deal data with all intelligence metrics
+// Marketplace deal data (same as before)
 const MARKETPLACE_DEALS = [
   {
     id: '1',
@@ -35,6 +35,9 @@ const MARKETPLACE_DEALS = [
     marketTrend: 'up' as const,
     marketPosition: 'underpriced' as const,
     daysOnMarket: 5,
+    location_country: 'USA',
+    sellerType: 'Founder',
+    sellerMotivation: 'Growth Capital',
   },
   {
     id: '2',
@@ -63,6 +66,9 @@ const MARKETPLACE_DEALS = [
     marketTrend: 'up' as const,
     marketPosition: 'fair' as const,
     daysOnMarket: 8,
+    location_country: 'Canada',
+    sellerType: 'PE',
+    sellerMotivation: 'Portfolio Optimization',
   },
   {
     id: '3',
@@ -91,6 +97,9 @@ const MARKETPLACE_DEALS = [
     marketTrend: 'stable' as const,
     marketPosition: 'fair' as const,
     daysOnMarket: 15,
+    location_country: 'UAE',
+    sellerType: 'Family',
+    sellerMotivation: 'Succession',
   },
   {
     id: '4',
@@ -119,6 +128,9 @@ const MARKETPLACE_DEALS = [
     marketTrend: 'up' as const,
     marketPosition: 'underpriced' as const,
     daysOnMarket: 3,
+    location_country: 'USA',
+    sellerType: 'Corporate',
+    sellerMotivation: 'Distressed',
   },
   {
     id: '5',
@@ -147,6 +159,9 @@ const MARKETPLACE_DEALS = [
     marketTrend: 'up' as const,
     marketPosition: 'fair' as const,
     daysOnMarket: 12,
+    location_country: 'USA',
+    sellerType: 'Founder',
+    sellerMotivation: 'Growth Capital',
   },
   {
     id: '6',
@@ -175,6 +190,9 @@ const MARKETPLACE_DEALS = [
     marketTrend: 'up' as const,
     marketPosition: 'fair' as const,
     daysOnMarket: 10,
+    location_country: 'USA',
+    sellerType: 'Family',
+    sellerMotivation: 'Succession',
   },
   {
     id: '7',
@@ -203,6 +221,9 @@ const MARKETPLACE_DEALS = [
     marketTrend: 'up' as const,
     marketPosition: 'fair' as const,
     daysOnMarket: 6,
+    location_country: 'USA',
+    sellerType: 'Founder',
+    sellerMotivation: 'Growth Capital',
   },
   {
     id: '8',
@@ -231,6 +252,9 @@ const MARKETPLACE_DEALS = [
     marketTrend: 'up' as const,
     marketPosition: 'underpriced' as const,
     daysOnMarket: 2,
+    location_country: 'USA',
+    sellerType: 'PE',
+    sellerMotivation: 'Portfolio Optimization',
     upcomingAuction: true,
   },
   {
@@ -260,6 +284,9 @@ const MARKETPLACE_DEALS = [
     marketTrend: 'up' as const,
     marketPosition: 'fair' as const,
     daysOnMarket: 9,
+    location_country: 'USA',
+    sellerType: 'Founder',
+    sellerMotivation: 'Growth Capital',
   },
   {
     id: '10',
@@ -288,158 +315,24 @@ const MARKETPLACE_DEALS = [
     marketTrend: 'up' as const,
     marketPosition: 'fair' as const,
     daysOnMarket: 7,
-  },
-  {
-    id: '11',
-    title: 'AI/ML Startup',
-    location: 'Silicon Valley',
-    country: 'USA',
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&h=400&fit=crop',
-    askingPrice: 8200000,
-    askingPriceCurrency: 'USD',
-    annualRevenue: 3200000,
-    cashFlowMin: 700000,
-    cashFlowMax: 950000,
-    ebitda: 800000,
-    profitMarginPercent: 25,
-    dealQualityScore: 95,
-    heatIndex: 97,
-    roiProjection: 26.8,
-    paybackPeriod: 24,
-    growthRate: 85,
-    status: 'FEATURED' as const,
-    category: 'AI',
-    dealType: 'SALE' as const,
-    employeeCount: 38,
-    sellerVerified: true,
-    sellerTrustScore: 97,
-    marketTrend: 'up' as const,
-    marketPosition: 'premium' as const,
-    daysOnMarket: 4,
-  },
-  {
-    id: '12',
-    title: 'PropTech Platform',
-    location: 'Miami',
-    country: 'USA',
-    image: 'https://images.unsplash.com/photo-1553531088-b29d91df4e84?w=500&h=400&fit=crop',
-    askingPrice: 3800000,
-    askingPriceCurrency: 'USD',
-    annualRevenue: 1250000,
-    cashFlowMin: 250000,
-    cashFlowMax: 400000,
-    ebitda: 313000,
-    profitMarginPercent: 25,
-    dealQualityScore: 83,
-    heatIndex: 79,
-    roiProjection: 20.5,
-    paybackPeriod: 40,
-    growthRate: 42,
-    status: 'STANDARD' as const,
-    category: 'PROPTECH',
-    dealType: 'SALE' as const,
-    employeeCount: 22,
-    sellerVerified: true,
-    sellerTrustScore: 86,
-    marketTrend: 'stable' as const,
-    marketPosition: 'fair' as const,
-    daysOnMarket: 14,
-  },
-  {
-    id: '13',
-    title: 'Supply Chain AI',
-    location: 'Chicago',
-    country: 'USA',
-    image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=400&fit=crop',
-    askingPrice: 4200000,
-    askingPriceCurrency: 'USD',
-    annualRevenue: 1400000,
-    cashFlowMin: 280000,
-    cashFlowMax: 420000,
-    ebitda: 350000,
-    profitMarginPercent: 25,
-    dealQualityScore: 89,
-    heatIndex: 84,
-    roiProjection: 21.5,
-    paybackPeriod: 36,
-    growthRate: 51,
-    status: 'NEW' as const,
-    category: 'LOGISTICS',
-    dealType: 'SALE' as const,
-    employeeCount: 26,
-    sellerVerified: true,
-    sellerTrustScore: 88,
-    marketTrend: 'up' as const,
-    marketPosition: 'underpriced' as const,
-    daysOnMarket: 6,
-  },
-  {
-    id: '14',
-    title: 'Wellness App Platform',
-    location: 'San Diego',
-    country: 'USA',
-    image: 'https://images.unsplash.com/photo-1576091160550-112173f31c77?w=500&h=400&fit=crop',
-    askingPrice: 2200000,
-    askingPriceCurrency: 'USD',
-    annualRevenue: 750000,
-    cashFlowMin: 150000,
-    cashFlowMax: 280000,
-    ebitda: 188000,
-    profitMarginPercent: 25,
-    dealQualityScore: 81,
-    heatIndex: 76,
-    roiProjection: 19.2,
-    paybackPeriod: 44,
-    growthRate: 38,
-    status: 'STANDARD' as const,
-    category: 'HEALTH',
-    dealType: 'SALE' as const,
-    employeeCount: 18,
-    sellerVerified: true,
-    sellerTrustScore: 84,
-    marketTrend: 'up' as const,
-    marketPosition: 'fair' as const,
-    daysOnMarket: 11,
-  },
-  {
-    id: '15',
-    title: 'Marketplace Platform',
-    location: 'Portland',
-    country: 'USA',
-    image: 'https://images.unsplash.com/photo-1460925895917-adf4e565db18?w=500&h=400&fit=crop',
-    askingPrice: 6800000,
-    askingPriceCurrency: 'USD',
-    annualRevenue: 2200000,
-    cashFlowMin: 480000,
-    cashFlowMax: 680000,
-    ebitda: 550000,
-    profitMarginPercent: 25,
-    dealQualityScore: 87,
-    heatIndex: 88,
-    roiProjection: 23.8,
-    paybackPeriod: 29,
-    growthRate: 64,
-    status: 'FEATURED' as const,
-    category: 'MARKETPLACE',
-    dealType: 'SALE' as const,
-    employeeCount: 32,
-    sellerVerified: true,
-    sellerTrustScore: 93,
-    marketTrend: 'up' as const,
-    marketPosition: 'fair' as const,
-    daysOnMarket: 9,
+    location_country: 'USA',
+    sellerType: 'Corporate',
+    sellerMotivation: 'Strategic Exit',
   },
 ]
 
-// Extend to 30+ deals for pagination testing
+// Extend to 30+ deals
 const EXTENDED_MARKETPLACE = [
   ...MARKETPLACE_DEALS,
-  ...MARKETPLACE_DEALS.slice(0, 15).map((item, idx) => ({
+  ...MARKETPLACE_DEALS.slice(0, 10).map((item, idx) => ({
     ...item,
     id: `duplicate-${idx}`,
     title: `${item.title} (2nd Opportunity)`,
   })),
 ]
+
+const MARKET_TRENDS = ['up', 'down', 'stable'] as const
+const MARKET_POSITIONS = ['underpriced', 'fair', 'premium'] as const
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -451,29 +344,68 @@ const containerVariants = {
   },
 }
 
+const FILTER_SECTIONS = [
+  { id: 'industry', label: 'Industry', icon: Building2, color: '#E0E7FF' },
+  { id: 'location', label: 'Location', icon: MapPin, color: '#FCE7F3' },
+  { id: 'sellerType', label: 'Seller Type', icon: Users, color: '#F3E8FF' },
+  { id: 'sellerMotivation', label: 'Seller Motivation', icon: Target, color: '#FEF3C7' },
+]
+
 export default function MarketplacePage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
-  const [minValuation, setMinValuation] = useState<number | ''>(0)
-  const [maxValuation, setMaxValuation] = useState<number | ''>(10000000)
-  const [minGrowth, setMinGrowth] = useState<number | ''>(0)
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [sortBy, setSortBy] = useState('relevant')
+  const [expandedFilters, setExpandedFilters] = useState<string[]>(['industry'])
 
-  // Filter listings
+  // Range filters
+  const [valuation, setValuation] = useState({ min: 0.1, max: 100 })
+  const [revenue, setRevenue] = useState({ min: 0.1, max: 500 })
+  const [heatScore, setHeatScore] = useState({ min: 0, max: 100 })
+  const [successProb, setSuccessProb] = useState({ min: 0, max: 100 })
+
+  // Category filters
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([])
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([])
+  const [selectedSellerTypes, setSelectedSellerTypes] = useState<string[]>([])
+  const [selectedMotivations, setSelectedMotivations] = useState<string[]>([])
+
+  // Get unique values for filters
+  const industries = [...new Set(EXTENDED_MARKETPLACE.map(d => d.category))]
+  const locations = [...new Set(EXTENDED_MARKETPLACE.map(d => d.location_country))]
+  const sellerTypes = [...new Set(EXTENDED_MARKETPLACE.map(d => d.sellerType))]
+  const motivations = [...new Set(EXTENDED_MARKETPLACE.map(d => d.sellerMotivation))]
+
+  // Filter and sort logic
   const filteredListings = useMemo(() => {
-    return EXTENDED_MARKETPLACE.filter(listing => {
-      const matchesSearch =
-        listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        listing.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        listing.category.toLowerCase().includes(searchTerm.toLowerCase())
+    let results = EXTENDED_MARKETPLACE.filter(deal => {
+      const matchesSearch = deal.title.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesIndustry = selectedIndustries.length === 0 || selectedIndustries.includes(deal.category)
+      const matchesLocation = selectedLocations.length === 0 || selectedLocations.includes(deal.location_country)
+      const matchesSellerType = selectedSellerTypes.length === 0 || selectedSellerTypes.includes(deal.sellerType)
+      const matchesMotivation = selectedMotivations.length === 0 || selectedMotivations.includes(deal.sellerMotivation)
+      const matchesValuation = deal.askingPrice >= valuation.min * 1000000 && deal.askingPrice <= valuation.max * 1000000
+      const matchesRevenue = deal.annualRevenue >= revenue.min * 1000 && deal.annualRevenue <= revenue.max * 1000
+      const matchesHeat = deal.heatIndex >= heatScore.min && deal.heatIndex <= heatScore.max
+      const matchesSuccess = deal.dealQualityScore >= successProb.min && deal.dealQualityScore <= successProb.max
 
-      const matchesValuation = listing.askingPrice >= (minValuation as number) && listing.askingPrice <= (maxValuation as number)
-      const matchesGrowth = listing.growthRate >= (minGrowth as number)
-      const matchesCategory = selectedCategory === 'all' || listing.category === selectedCategory
-
-      return matchesSearch && matchesValuation && matchesGrowth && matchesCategory
+      return matchesSearch && matchesIndustry && matchesLocation && matchesSellerType && matchesMotivation && matchesValuation && matchesRevenue && matchesHeat && matchesSuccess
     })
-  }, [searchTerm, minValuation, maxValuation, minGrowth, selectedCategory])
+
+    // Sort
+    if (sortBy === 'heat') results.sort((a, b) => b.heatIndex - a.heatIndex)
+    else if (sortBy === 'roi') results.sort((a, b) => b.roiProjection - a.roiProjection)
+    else if (sortBy === 'valuation') results.sort((a, b) => a.askingPrice - b.askingPrice)
+    else results.sort((a, b) => b.dealQualityScore - a.dealQualityScore) // relevant
+
+    return results
+  }, [searchTerm, selectedIndustries, selectedLocations, selectedSellerTypes, selectedMotivations, valuation, revenue, heatScore, successProb, sortBy])
+
+  // Hot deals
+  const hotDeals = useMemo(() => {
+    return EXTENDED_MARKETPLACE
+      .sort((a, b) => b.heatIndex - a.heatIndex)
+      .slice(0, 4)
+  }, [])
 
   const CARDS_PER_PAGE = 20
   const totalPages = Math.ceil(filteredListings.length / CARDS_PER_PAGE)
@@ -481,49 +413,32 @@ export default function MarketplacePage() {
   const endIdx = startIdx + CARDS_PER_PAGE
   const currentListings = filteredListings.slice(startIdx, endIdx)
 
+  const activeFiltersCount =
+    selectedIndustries.length + selectedLocations.length + selectedSellerTypes.length +
+    selectedMotivations.length + (valuation.min !== 0.1 ? 1 : 0) + (valuation.max !== 100 ? 1 : 0)
+
+  const toggleFilter = (filterId: string) => {
+    setExpandedFilters(prev =>
+      prev.includes(filterId) ? prev.filter(f => f !== filterId) : [...prev, filterId]
+    )
+  }
+
   const handlePageChange = (page: number) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)))
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleResetFilters = () => {
+  const clearAllFilters = () => {
     setSearchTerm('')
-    setMinValuation(0)
-    setMaxValuation(10000000)
-    setMinGrowth(0)
-    setSelectedCategory('all')
-    setCurrentPage(1)
-  }
-
-  const categories = ['all', 'SAAS', 'HEALTHCARE', 'SERVICES', 'LOGISTICS', 'FINTECH', 'AI', 'PROPTECH']
-  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([])
-
-  // Hot deals - top 4 by heat index
-  const hotDeals = useMemo(() => {
-    return EXTENDED_MARKETPLACE
-      .sort((a, b) => b.heatIndex - a.heatIndex)
-      .slice(0, 4)
-  }, [])
-
-  // Update filter to include industry multi-select
-  const filteredWithIndustry = useMemo(() => {
-    return filteredListings.filter(listing => {
-      if (selectedIndustries.length === 0) return true
-      return selectedIndustries.includes(listing.category)
-    })
-  }, [filteredListings, selectedIndustries])
-
-  const totalPages2 = Math.ceil(filteredWithIndustry.length / CARDS_PER_PAGE)
-  const startIdx2 = (currentPage - 1) * CARDS_PER_PAGE
-  const endIdx2 = startIdx2 + CARDS_PER_PAGE
-  const currentListings2 = filteredWithIndustry.slice(startIdx2, endIdx2)
-
-  const handleIndustryToggle = (industry: string) => {
-    setSelectedIndustries(prev =>
-      prev.includes(industry)
-        ? prev.filter(i => i !== industry)
-        : [...prev, industry]
-    )
+    setSortBy('relevant')
+    setSelectedIndustries([])
+    setSelectedLocations([])
+    setSelectedSellerTypes([])
+    setSelectedMotivations([])
+    setValuation({ min: 0.1, max: 100 })
+    setRevenue({ min: 0.1, max: 500 })
+    setHeatScore({ min: 0, max: 100 })
+    setSuccessProb({ min: 0, max: 100 })
     setCurrentPage(1)
   }
 
@@ -541,7 +456,7 @@ export default function MarketplacePage() {
             Global Marketplace
           </h1>
           <p style={{ color: COLOR_TEXT_SECONDARY }}>
-            {filteredWithIndustry.length} premium investment opportunities
+            {filteredListings.length} premium investment opportunities
           </p>
         </div>
       </motion.div>
@@ -603,152 +518,316 @@ export default function MarketplacePage() {
         </div>
       </motion.section>
 
-      {/* MAIN LAYOUT: SIDEBAR + GRID */}
+      {/* MAIN LAYOUT: PREMIUM SIDEBAR + GRID */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* SIDEBAR - FILTERS */}
+          {/* PREMIUM LEFT SIDEBAR */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="lg:col-span-1"
           >
-            <div className="sticky top-24 space-y-6">
-              {/* SEARCH */}
-              <div>
-                <label className="block text-sm font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
-                  Search
-                </label>
-                <div className="relative">
-                  <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: COLOR_TEXT_SECONDARY }} />
-                  <input
-                    type="text"
-                    placeholder="Company, location..."
-                    value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value)
-                      setCurrentPage(1)
-                    }}
-                    className="w-full pl-10 pr-3 py-2.5 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
-                    style={{
-                      borderColor: COLOR_BORDER,
-                      outlineColor: COLOR_ACCENT,
-                    } as React.CSSProperties}
-                  />
-                </div>
+            <div className="sticky top-24 space-y-4">
+              {/* Search */}
+              <div className="relative">
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: COLOR_TEXT_SECONDARY }} />
+                <input
+                  type="text"
+                  placeholder="Search businesses..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value)
+                    setCurrentPage(1)
+                  }}
+                  className="w-full pl-10 pr-4 py-3 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
+                  style={{
+                    borderColor: COLOR_BORDER,
+                    outlineColor: COLOR_ACCENT,
+                  } as React.CSSProperties}
+                />
               </div>
 
-              {/* INDUSTRY MULTI-SELECT FILTER */}
+              {/* Sort Dropdown */}
               <div>
-                <label className="block text-sm font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
-                  Industries
-                </label>
-                <div className="space-y-2">
-                  {categories.filter(c => c !== 'all').map((industry) => (
-                    <label key={industry} className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={selectedIndustries.includes(industry)}
-                        onChange={() => handleIndustryToggle(industry)}
-                        className="w-4 h-4"
-                      />
-                      <span className="text-sm" style={{ color: COLOR_PRIMARY }}>
-                        {industry}
-                      </span>
-                    </label>
-                  ))}
+                <select
+                  value={sortBy}
+                  onChange={(e) => {
+                    setSortBy(e.target.value)
+                    setCurrentPage(1)
+                  }}
+                  className="w-full px-4 py-3 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
+                  style={{
+                    borderColor: COLOR_BORDER,
+                    outlineColor: COLOR_ACCENT,
+                  } as React.CSSProperties}
+                >
+                  <option value="relevant">Most Relevant</option>
+                  <option value="heat">🔥 Hottest First</option>
+                  <option value="roi">💰 Highest ROI</option>
+                  <option value="valuation">💵 Lowest Price</option>
+                </select>
+              </div>
+
+              {/* Active Filters Badge */}
+              {activeFiltersCount > 0 && (
+                <div className="p-3 rounded-lg" style={{ background: '#FEF3C7', borderColor: '#FCD34D' }} className="p-3 rounded-lg border">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-bold" style={{ color: '#92400E' }}>
+                      {activeFiltersCount} active filters
+                    </span>
+                    <button
+                      onClick={clearAllFilters}
+                      className="text-xs font-bold"
+                      style={{ color: COLOR_ACCENT }}
+                    >
+                      Clear All
+                    </button>
+                  </div>
                 </div>
-                {selectedIndustries.length > 0 && (
-                  <button
-                    onClick={() => {
-                      setSelectedIndustries([])
-                      setCurrentPage(1)
-                    }}
-                    className="text-xs mt-2 text-blue-600 hover:underline"
+              )}
+
+              {/* Filter Sections */}
+              {FILTER_SECTIONS.map(section => {
+                const isExpanded = expandedFilters.includes(section.id)
+                const Icon = section.icon
+                const values = section.id === 'industry' ? industries : section.id === 'location' ? locations : section.id === 'sellerType' ? sellerTypes : motivations
+                const selected = section.id === 'industry' ? selectedIndustries : section.id === 'location' ? selectedLocations : section.id === 'sellerType' ? selectedSellerTypes : selectedMotivations
+                const setSelected = section.id === 'industry' ? setSelectedIndustries : section.id === 'location' ? setSelectedLocations : section.id === 'sellerType' ? setSelectedSellerTypes : setSelectedMotivations
+
+                return (
+                  <motion.div
+                    key={section.id}
+                    className="rounded-lg border overflow-hidden"
+                    style={{ borderColor: COLOR_BORDER }}
                   >
-                    Clear all industries
-                  </button>
-                )}
-              </div>
+                    <button
+                      onClick={() => toggleFilter(section.id)}
+                      className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50"
+                      style={{ background: section.color }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon size={24} style={{ color: COLOR_PRIMARY }} />
+                        <span className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                          {section.label}
+                        </span>
+                      </div>
+                      <ChevronDown
+                        size={18}
+                        style={{
+                          color: COLOR_PRIMARY,
+                          transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                          transition: 'transform 0.2s',
+                        }}
+                      />
+                    </button>
 
-              {/* VALUATION RANGE */}
+                    {isExpanded && (
+                      <div className="p-4 space-y-2" style={{ background: 'white' }}>
+                        {values.map(value => (
+                          <label key={value} className="flex items-center gap-3 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={selected.includes(value)}
+                              onChange={() => {
+                                const newSelected = selected.includes(value)
+                                  ? selected.filter(v => v !== value)
+                                  : [...selected, value]
+                                setSelected(newSelected)
+                                setCurrentPage(1)
+                              }}
+                              className="w-4 h-4"
+                            />
+                            <span className="text-sm" style={{ color: COLOR_PRIMARY }}>
+                              {value}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                )
+              })}
+
+              {/* VALUE RANGES */}
               <div>
-                <label className="block text-sm font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
-                  Valuation (USD)
-                </label>
-                <div className="space-y-3">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    value={minValuation}
-                    onChange={(e) => {
-                      setMinValuation(e.target.value === '' ? '' : Number(e.target.value))
-                      setCurrentPage(1)
-                    }}
-                    className="w-full px-3 py-2 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
-                    style={{
-                      borderColor: COLOR_BORDER,
-                      outlineColor: COLOR_ACCENT,
-                    } as React.CSSProperties}
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    value={maxValuation}
-                    onChange={(e) => {
-                      setMaxValuation(e.target.value === '' ? '' : Number(e.target.value))
-                      setCurrentPage(1)
-                    }}
-                    className="w-full px-3 py-2 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
-                    style={{
-                      borderColor: COLOR_BORDER,
-                      outlineColor: COLOR_ACCENT,
-                    } as React.CSSProperties}
-                  />
-                </div>
-              </div>
+                <h3 className="text-sm font-bold mb-4" style={{ color: COLOR_PRIMARY }}>
+                  VALUE RANGES
+                </h3>
 
-              {/* GROWTH FILTER */}
-              <div>
-                <label className="block text-sm font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
-                  Min Growth Rate
-                </label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    placeholder="Min Growth %"
-                    value={minGrowth}
-                    onChange={(e) => {
-                      setMinGrowth(e.target.value === '' ? '' : Number(e.target.value))
-                      setCurrentPage(1)
-                    }}
-                    step="1"
-                    className="w-full px-3 py-2 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
-                    style={{
-                      borderColor: COLOR_BORDER,
-                      outlineColor: COLOR_ACCENT,
-                    } as React.CSSProperties}
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-                    %
-                  </span>
-                </div>
-              </div>
+                {/* Valuation Slider */}
+                <motion.div
+                  className="rounded-lg border p-4 mb-3"
+                  style={{ borderColor: COLOR_BORDER }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <DollarSign size={20} style={{ color: '#10B981' }} />
+                    <span className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                      Valuation
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+                        Min: ${valuation.min.toFixed(1)}M
+                      </span>
+                      <input
+                        type="range"
+                        min="0.1"
+                        max="100"
+                        step="0.1"
+                        value={valuation.min}
+                        onChange={(e) => setValuation({ ...valuation, min: parseFloat(e.target.value) })}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+                        Max: ${valuation.max.toFixed(1)}M
+                      </span>
+                      <input
+                        type="range"
+                        min="0.1"
+                        max="100"
+                        step="0.1"
+                        value={valuation.max}
+                        onChange={(e) => setValuation({ ...valuation, max: parseFloat(e.target.value) })}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                </motion.div>
 
-              {/* RESET BUTTON */}
-              <button
-                onClick={handleResetFilters}
-                className="w-full px-4 py-2.5 rounded-lg border text-sm font-semibold transition-all hover:bg-gray-50 flex items-center justify-center gap-2"
-                style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
-              >
-                <X size={16} />
-                Clear Filters
-              </button>
+                {/* Revenue Slider */}
+                <motion.div
+                  className="rounded-lg border p-4 mb-3"
+                  style={{ borderColor: COLOR_BORDER }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <TrendingUp size={20} style={{ color: '#3B82F6' }} />
+                    <span className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                      Annual Revenue
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+                        Min: ${revenue.min.toFixed(1)}K
+                      </span>
+                      <input
+                        type="range"
+                        min="0.1"
+                        max="500"
+                        step="0.1"
+                        value={revenue.min}
+                        onChange={(e) => setRevenue({ ...revenue, min: parseFloat(e.target.value) })}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+                        Max: ${revenue.max.toFixed(1)}K
+                      </span>
+                      <input
+                        type="range"
+                        min="0.1"
+                        max="500"
+                        step="0.1"
+                        value={revenue.max}
+                        onChange={(e) => setRevenue({ ...revenue, max: parseFloat(e.target.value) })}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Heat Score Slider */}
+                <motion.div
+                  className="rounded-lg border p-4 mb-3"
+                  style={{ borderColor: COLOR_BORDER }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <Zap size={20} style={{ color: '#DC2626' }} />
+                    <span className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                      Deal Heat Score
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+                        Min: {heatScore.min}°
+                      </span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={heatScore.min}
+                        onChange={(e) => setHeatScore({ ...heatScore, min: parseInt(e.target.value) })}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+                        Max: {heatScore.max}°
+                      </span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={heatScore.max}
+                        onChange={(e) => setHeatScore({ ...heatScore, max: parseInt(e.target.value) })}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Success Probability Slider */}
+                <motion.div
+                  className="rounded-lg border p-4"
+                  style={{ borderColor: COLOR_BORDER }}
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <CheckCircle2 size={20} style={{ color: '#10B981' }} />
+                    <span className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                      Success Probability
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+                        Min: {successProb.min}%
+                      </span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={successProb.min}
+                        onChange={(e) => setSuccessProb({ ...successProb, min: parseInt(e.target.value) })}
+                        className="w-full"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+                        Max: {successProb.max}%
+                      </span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={successProb.max}
+                        onChange={(e) => setSuccessProb({ ...successProb, max: parseInt(e.target.value) })}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
             </div>
           </motion.div>
 
-          {/* MAIN CONTENT - GRID */}
+          {/* MAIN GRID */}
           <div className="lg:col-span-3">
-            {currentListings2.length > 0 ? (
+            {currentListings.length > 0 ? (
               <>
                 <motion.div
                   variants={containerVariants}
@@ -756,20 +835,20 @@ export default function MarketplacePage() {
                   animate="visible"
                   className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
                 >
-                  {currentListings2.map((listing) => (
+                  {currentListings.map((listing) => (
                     <motion.div key={listing.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                       <ListingCard
                         {...listing}
                         onSave={() => console.log('Saved:', listing.id)}
-                        onViewSimilar={() => console.log('View similar to:', listing.id)}
-                        onContact={() => console.log('Contact for:', listing.id)}
+                        onViewSimilar={() => console.log('Similar:', listing.id)}
+                        onContact={() => console.log('Contact:', listing.id)}
                       />
                     </motion.div>
                   ))}
                 </motion.div>
 
                 {/* PAGINATION */}
-                {totalPages2 > 1 && (
+                {totalPages > 1 && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -784,14 +863,14 @@ export default function MarketplacePage() {
                       <ChevronLeft size={20} />
                     </button>
 
-                    {Array.from({ length: Math.min(5, totalPages2) }, (_, i) => {
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       let pageNum
-                      if (totalPages2 <= 5) {
+                      if (totalPages <= 5) {
                         pageNum = i + 1
                       } else if (currentPage <= 3) {
                         pageNum = i + 1
-                      } else if (currentPage >= totalPages2 - 2) {
-                        pageNum = totalPages2 - 4 + i
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i
                       } else {
                         pageNum = currentPage - 2 + i
                       }
@@ -815,7 +894,7 @@ export default function MarketplacePage() {
 
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages2}
+                      disabled={currentPage === totalPages}
                       className="p-2 rounded-lg border transition-all hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
                     >
@@ -823,7 +902,7 @@ export default function MarketplacePage() {
                     </button>
 
                     <span className="ml-4 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-                      Page {currentPage} of {totalPages2}
+                      Page {currentPage} of {totalPages}
                     </span>
                   </motion.div>
                 )}
