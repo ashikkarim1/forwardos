@@ -27,6 +27,7 @@ import {
   BarChart3,
   Target,
   Sparkles,
+  Upload,
 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
@@ -1128,6 +1129,24 @@ export default function DealPage() {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Seller Action */}
+            <div className="p-4 rounded-lg border-2 mb-4" style={{ borderColor: COLOR_ACCENT, background: COLOR_ACCENT + '05' }}>
+              <p className="text-sm font-semibold mb-3" style={{ color: COLOR_PRIMARY }}>
+                📊 Are you the seller?
+              </p>
+              <Link
+                href={`/seller/submit-deal/${dealId}`}
+                className="w-full py-3 rounded-lg font-bold text-white hover:opacity-90 transition-all text-sm sm:text-base flex items-center justify-center gap-2"
+                style={{ background: COLOR_ACCENT, minHeight: '44px' }}
+              >
+                <Upload size={18} />
+                Submit Business Data
+              </Link>
+              <p className="text-xs mt-2" style={{ color: COLOR_TEXT_SECONDARY }}>
+                Upload financials to unlock premium buyer access
+              </p>
             </div>
 
             {/* CTA Buttons */}

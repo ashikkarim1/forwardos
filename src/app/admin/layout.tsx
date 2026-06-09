@@ -35,7 +35,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const currentSection = ADMIN_MENU.find((item) => pathname.startsWith(item.href))?.section
+  const currentSection = pathname ? ADMIN_MENU.find((item) => pathname.startsWith(item.href))?.section : undefined
 
   return (
     <div className="min-h-screen bg-white flex flex-col md:flex-row">
