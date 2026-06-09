@@ -378,7 +378,7 @@ export default function LandingPage() {
               return (
                 <motion.div
                   key={idx}
-                  className="p-8 rounded-lg border-2"
+                  className="p-8 rounded-lg border-2 flex flex-col"
                   style={{ borderColor: COLOR_BORDER, background: 'white' }}
                   variants={itemVariants}
                 >
@@ -391,7 +391,7 @@ export default function LandingPage() {
                   <p className="text-sm mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
                     {userType.subtitle}
                   </p>
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-3 mb-8 flex-1">
                     {userType.features.map((feature) => (
                       <li key={feature} className="text-sm flex items-start gap-2" style={{ color: COLOR_TEXT_SECONDARY }}>
                         <span className="mt-1">•</span>
