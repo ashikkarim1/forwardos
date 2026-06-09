@@ -1,6 +1,16 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let resend: Resend | null = null
+
+function getResend() {
+  if (!resend) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY environment variable is not set')
+    }
+    resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  return resend
+}
 
 interface EmailTemplate {
   id: string
@@ -25,6 +35,7 @@ interface EmailCampaignPayload {
  */
 export async function sendEmailCampaign(payload: EmailCampaignPayload) {
   try {
+    const resendClient = getResend()
     const { name, recipients, subject, template, variables = {}, tags = [] } = payload
 
     // Add campaign metadata to tags
@@ -41,7 +52,7 @@ export async function sendEmailCampaign(payload: EmailCampaignPayload) {
     for (let i = 0; i < recipients.length; i += batchSize) {
       const batch = recipients.slice(i, i + batchSize)
 
-      const result = await resend.emails.send({
+      const result = await resendClient.emails.send({
         from: 'Forward OS <notifications@forwardos.com>',
         to: batch,
         subject,
@@ -83,7 +94,8 @@ export async function sendTestEmail(
   variables?: Record<string, any>
 ) {
   try {
-    const result = await resend.emails.send({
+    const resendClient = getResend()
+    const result = await resendClient.emails.send({
       from: 'Forward OS <notifications@forwardos.com>',
       to,
       subject: `[TEST] ${subject}`,
@@ -236,9 +248,10 @@ export function getAvailableTemplates(): EmailTemplate[] {
  */
 export async function validateTemplate(templateId: string) {
   try {
+    const resendClient = getResend()
     // Attempt to get template details from Resend
     // This will fail if template doesn't exist
-    const result = await resend.emails.send({
+    const result = await resendClient.emails.send({
       from: 'Forward OS <notifications@forwardos.com>',
       to: 'test@example.com',
       template: {
