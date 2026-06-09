@@ -307,7 +307,6 @@ export function SellerBusinessUploadWizard({ onSuccess }: { onSuccess?: () => vo
                 className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all"
                 style={{
                   borderColor: errors.businessName ? '#EF4444' : COLOR_BORDER,
-                  focusRingColor: COLOR_ACCENT,
                 }}
               />
               {errors.businessName && (
@@ -328,7 +327,6 @@ export function SellerBusinessUploadWizard({ onSuccess }: { onSuccess?: () => vo
                 className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all"
                 style={{
                   borderColor: errors.businessType ? '#EF4444' : COLOR_BORDER,
-                  focusRingColor: COLOR_ACCENT,
                 }}
               >
                 <option value="">Select a category...</option>
@@ -362,7 +360,6 @@ export function SellerBusinessUploadWizard({ onSuccess }: { onSuccess?: () => vo
                 className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all"
                 style={{
                   borderColor: errors.location ? '#EF4444' : COLOR_BORDER,
-                  focusRingColor: COLOR_ACCENT,
                 }}
               />
               {errors.location && (
@@ -385,7 +382,6 @@ export function SellerBusinessUploadWizard({ onSuccess }: { onSuccess?: () => vo
                 className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all"
                 style={{
                   borderColor: errors.yearFounded ? '#EF4444' : COLOR_BORDER,
-                  focusRingColor: COLOR_ACCENT,
                 }}
                 min="1900"
                 max={new Date().getFullYear()}
@@ -410,7 +406,6 @@ export function SellerBusinessUploadWizard({ onSuccess }: { onSuccess?: () => vo
                 className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all"
                 style={{
                   borderColor: errors.employees ? '#EF4444' : COLOR_BORDER,
-                  focusRingColor: COLOR_ACCENT,
                 }}
                 min="1"
               />
@@ -434,7 +429,6 @@ export function SellerBusinessUploadWizard({ onSuccess }: { onSuccess?: () => vo
                 className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all"
                 style={{
                   borderColor: errors.website ? '#EF4444' : COLOR_BORDER,
-                  focusRingColor: COLOR_ACCENT,
                 }}
               />
               {errors.website && (
@@ -521,7 +515,6 @@ export function SellerBusinessUploadWizard({ onSuccess }: { onSuccess?: () => vo
                   className="w-full pl-8 pr-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: errors.annualRevenue ? '#EF4444' : COLOR_BORDER,
-                    focusRingColor: COLOR_ACCENT,
                   }}
                   min="0"
                 />
@@ -550,7 +543,6 @@ export function SellerBusinessUploadWizard({ onSuccess }: { onSuccess?: () => vo
                   className="w-full pl-8 pr-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: errors.valuation ? '#EF4444' : COLOR_BORDER,
-                    focusRingColor: COLOR_ACCENT,
                   }}
                   min="0"
                 />
@@ -576,7 +568,6 @@ export function SellerBusinessUploadWizard({ onSuccess }: { onSuccess?: () => vo
                   className="w-full px-4 pr-8 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: errors.growthRate ? '#EF4444' : COLOR_BORDER,
-                    focusRingColor: COLOR_ACCENT,
                   }}
                   min="-100"
                   max="1000"
@@ -681,7 +672,6 @@ export function SellerBusinessUploadWizard({ onSuccess }: { onSuccess?: () => vo
                 className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all resize-none"
                 style={{
                   borderColor: errors.businessDescription ? '#EF4444' : COLOR_BORDER,
-                  focusRingColor: COLOR_ACCENT,
                 }}
                 rows={6}
               />
@@ -712,7 +702,6 @@ export function SellerBusinessUploadWizard({ onSuccess }: { onSuccess?: () => vo
                 className="w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 transition-all resize-none"
                 style={{
                   borderColor: errors.whySellingReason ? '#EF4444' : COLOR_BORDER,
-                  focusRingColor: COLOR_ACCENT,
                 }}
                 rows={4}
               />

@@ -13,7 +13,6 @@ import {
   User,
   Building2,
   FileText,
-  Id,
   PhoneCall,
 } from 'lucide-react'
 import { useLocale } from '@/context/LocaleContext'
@@ -316,7 +315,6 @@ export function SellerKYCUploadWizard() {
               style={{
                 borderColor: sellerData.userType === 'seller' ? COLOR_ACCENT : COLOR_BORDER,
                 background: sellerData.userType === 'seller' ? COLOR_INFO_SOFT : COLOR_SURFACE_PRIMARY,
-                ringColor: COLOR_ACCENT,
               }}
             >
               <div className="flex items-start gap-4 mb-4">
@@ -351,7 +349,6 @@ export function SellerKYCUploadWizard() {
               style={{
                 borderColor: sellerData.userType === 'broker' ? COLOR_ACCENT : COLOR_BORDER,
                 background: sellerData.userType === 'broker' ? COLOR_INFO_SOFT : COLOR_SURFACE_PRIMARY,
-                ringColor: COLOR_ACCENT,
               }}
             >
               <div className="flex items-start gap-4 mb-4">
@@ -461,7 +458,6 @@ export function SellerKYCUploadWizard() {
                     className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                     style={{
                       borderColor: errors.brokerFirstName ? COLOR_ERROR : COLOR_BORDER,
-                      focusRingColor: COLOR_ACCENT,
                     }}
                   />
                   {errors.brokerFirstName && (
@@ -483,7 +479,6 @@ export function SellerKYCUploadWizard() {
                     className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                     style={{
                       borderColor: errors.brokerLastName ? COLOR_ERROR : COLOR_BORDER,
-                      focusRingColor: COLOR_ACCENT,
                     }}
                   />
                   {errors.brokerLastName && (
@@ -506,7 +501,6 @@ export function SellerKYCUploadWizard() {
                   className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: errors.brokerEmail ? COLOR_ERROR : COLOR_BORDER,
-                    focusRingColor: COLOR_ACCENT,
                   }}
                 />
                 {errors.brokerEmail && (
@@ -526,7 +520,6 @@ export function SellerKYCUploadWizard() {
                   className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: errors.brokerCountry ? COLOR_ERROR : COLOR_BORDER,
-                    focusRingColor: COLOR_ACCENT,
                     color: COLOR_TEXT_PRIMARY,
                   }}
                 >
@@ -563,7 +556,6 @@ export function SellerKYCUploadWizard() {
                   className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: errors.brokerPhone ? COLOR_ERROR : COLOR_BORDER,
-                    focusRingColor: COLOR_ACCENT,
                   }}
                 />
                 {errors.brokerPhone && (
@@ -592,7 +584,6 @@ export function SellerKYCUploadWizard() {
                   className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: errors.brokerCompanyName ? COLOR_ERROR : COLOR_BORDER,
-                    focusRingColor: COLOR_ACCENT,
                   }}
                 />
                 {errors.brokerCompanyName && (
@@ -614,7 +605,6 @@ export function SellerKYCUploadWizard() {
                   className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: errors.brokerLicenseNumber ? COLOR_ERROR : COLOR_BORDER,
-                    focusRingColor: COLOR_ACCENT,
                   }}
                 />
                 {errors.brokerLicenseNumber && (
@@ -717,7 +707,6 @@ export function SellerKYCUploadWizard() {
                     className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                     style={{
                       borderColor: errors.sellerFirstName ? COLOR_ERROR : COLOR_BORDER,
-                      focusRingColor: COLOR_ACCENT,
                     }}
                   />
                   {errors.sellerFirstName && (
@@ -739,7 +728,6 @@ export function SellerKYCUploadWizard() {
                     className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                     style={{
                       borderColor: errors.sellerLastName ? COLOR_ERROR : COLOR_BORDER,
-                      focusRingColor: COLOR_ACCENT,
                     }}
                   />
                   {errors.sellerLastName && (
@@ -762,7 +750,6 @@ export function SellerKYCUploadWizard() {
                   className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: errors.sellerEmail ? COLOR_ERROR : COLOR_BORDER,
-                    focusRingColor: COLOR_ACCENT,
                   }}
                 />
                 {errors.sellerEmail && (
@@ -782,7 +769,6 @@ export function SellerKYCUploadWizard() {
                   className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: errors.sellerCountry ? COLOR_ERROR : COLOR_BORDER,
-                    focusRingColor: COLOR_ACCENT,
                     color: COLOR_TEXT_PRIMARY,
                   }}
                 >
@@ -819,7 +805,6 @@ export function SellerKYCUploadWizard() {
                   className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: errors.sellerPhone ? COLOR_ERROR : COLOR_BORDER,
-                    focusRingColor: COLOR_ACCENT,
                   }}
                 />
                 {errors.sellerPhone && (
@@ -841,7 +826,6 @@ export function SellerKYCUploadWizard() {
                   className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition-all"
                   style={{
                     borderColor: COLOR_BORDER,
-                    focusRingColor: COLOR_ACCENT,
                   }}
                 />
                 <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-2">

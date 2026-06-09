@@ -15,7 +15,7 @@ import { CIMMetricsTable } from '@/components/cim/CIMMetricsTable'
 
 export default function CIMDashboardPage() {
   const params = useParams()
-  const dealId = params.id as string
+  const dealId = (params?.id || '') as string
   const { locale, isRTL } = useLocale()
   const t = useTranslation()
 
