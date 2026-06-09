@@ -1,4 +1,5 @@
 import '@/styles/globals.css'
+import { LocaleProvider } from '@/context/LocaleContext'
 
 export default function RootLayout({
   children,
@@ -14,7 +15,9 @@ export default function RootLayout({
         <link rel="icon" href="/FOS.jpg" type="image/jpeg" />
       </head>
       <body className="bg-white text-[#1A1A1A] font-sans antialiased">
-        <main id="main-content">{children}</main>
+        <LocaleProvider>
+          <main id="main-content">{children}</main>
+        </LocaleProvider>
       </body>
     </html>
   )

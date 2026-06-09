@@ -1,494 +1,388 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import {
-  LayoutGrid, Zap, Compass, TrendingUp, AlertCircle, Trophy, CheckCircle2,
-  Clock, Users, MessageSquare, Eye, Menu, X, ChevronRight, Flame
-} from 'lucide-react'
+import { useLocale } from '@/context/LocaleContext'
+import { formatCurrency } from '@/lib/currency'
+import { CreditCard, Download, Settings, LogOut, ArrowRight, CheckCircle2 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+interface Subscription {
+  plan: 'starter' | 'professional' | 'enterprise'
+  status: 'active' | 'past_due' | 'cancelled'
+  currentBillingCycle: {
+    startDate: string
+    endDate: string
+  }
+  nextBillingDate: string
+  amount: number
+  billingInterval: 'monthly' | 'annual'
 }
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
+interface Invoice {
+  id: string
+  date: string
+  amount: number
+  status: 'paid' | 'pending' | 'failed'
+  description: string
+}
+
+interface PaymentMethod {
+  id: string
+  type: 'card'
+  brand: string
+  last4: string
+  expMonth: number
+  expYear: number
+  isDefault: boolean
 }
 
 export default function DashboardPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const { locale, currency, isRTL } = useLocale()
 
   // Mock data
-  const listing = {
-    name: 'TechFlow Solutions',
-    ticker: 'TFS',
-    progress: 72,
-    daysToExit: 35,
-    heat: 92,
+  const subscription: Subscription = {
+    plan: 'professional',
+    status: 'active',
+    currentBillingCycle: {
+      startDate: '2024-12-09',
+      endDate: '2025-01-09',
+    },
+    nextBillingDate: '2025-01-09',
+    amount: 1999,
+    billingInterval: 'monthly',
   }
 
-  const alerts = [
+  const invoices: Invoice[] = [
     {
-      id: 1,
-      type: 'milestone',
-      title: '🏆 Milestone Achieved!',
-      description: 'Your listing reached 300+ views — strong buyer interest detected',
-      icon: Trophy,
+      id: 'INV-001',
+      date: '2024-12-09',
+      amount: 1999,
+      status: 'paid',
+      description: 'Professional Plan - Monthly',
     },
     {
-      id: 2,
-      type: 'action',
-      title: 'Buyers Waiting',
-      description: '12 qualified inquiries pending — respond within 2 hours for best conversion',
-      icon: AlertCircle,
+      id: 'INV-002',
+      date: '2024-11-09',
+      amount: 1999,
+      status: 'paid',
+      description: 'Professional Plan - Monthly',
+    },
+    {
+      id: 'INV-003',
+      date: '2024-10-09',
+      amount: 1999,
+      status: 'paid',
+      description: 'Professional Plan - Monthly',
     },
   ]
 
-  const metrics = {
-    daysToExit: 35,
-    status: 'Accelerating',
-    heat: 92,
-    heatTrend: '+14',
-    tasksCompleted: 8,
-    tasksInProgress: 3,
-    tasksBlocked: 1,
-    tasksNotStarted: 2,
-    currentPhase: 'Active Buyer Engagement',
-    phaseProgress: 72,
+  const paymentMethods: PaymentMethod[] = [
+    {
+      id: 'pm_1',
+      type: 'card',
+      brand: 'Visa',
+      last4: '4242',
+      expMonth: 12,
+      expYear: 2026,
+      isDefault: true,
+    },
+  ]
+
+  const planDetails = {
+    starter: { name: 'Starter', features: ['Advanced search & filters', 'Deal comparison (3)', 'PDF export', 'Email support'] },
+    professional: { name: 'Professional', features: ['Everything in Starter', 'Financial modeling tools', 'Deal comparison (5)', 'Portfolio dashboard', 'API access', 'Priority support'] },
+    enterprise: { name: 'Enterprise', features: ['Everything in Professional', 'Unlimited API access', 'Custom integrations', 'White-label marketplace', 'Dedicated account manager'] },
   }
 
+  const planInfo = planDetails[subscription.plan]
+
   return (
-    <div className="flex h-screen bg-white">
-      {/* Sidebar */}
-      <motion.aside
-        className={`${sidebarOpen ? 'w-64' : 'w-20'} border-r transition-all duration-300 flex flex-col overflow-y-auto`}
-        style={{ borderColor: COLOR_BORDER, background: '#FAFAF8' }}
-      >
-        {/* Header */}
-        <div className="p-6 border-b" style={{ borderColor: COLOR_BORDER }}>
-          <div className="flex items-center justify-between mb-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: COLOR_ACCENT }}>
-                <Zap className="w-5 h-5 text-white" />
-              </div>
-              {sidebarOpen && <span className="font-black" style={{ color: COLOR_PRIMARY }}>Forward</span>}
-            </Link>
-            {sidebarOpen && (
-              <button
-                onClick={() => setSidebarOpen(false)}
-                className="p-1 hover:bg-gray-200 rounded"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
-          {sidebarOpen && (
-            <div className="p-3 rounded-lg border" style={{ borderColor: COLOR_BORDER, background: 'white' }}>
-              <p className="text-sm font-bold" style={{ color: COLOR_PRIMARY }}>
-                {listing.name}
-              </p>
-              <p className="text-xs mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
-                {listing.ticker} • N/A
-              </p>
-              <div className="mt-3 flex items-center justify-between">
-                <span className="text-xs font-semibold" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  Progress
-                </span>
-                <span className="text-xs font-bold" style={{ color: COLOR_ACCENT }}>
-                  {metrics.phaseProgress}%
-                </span>
-              </div>
-              <div className="mt-2 h-2 rounded-full bg-gray-200 overflow-hidden">
-                <motion.div
-                  className="h-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${metrics.phaseProgress}%` }}
-                  transition={{ duration: 1 }}
-                  style={{ background: COLOR_ACCENT }}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Navigation */}
-        <div className="flex-1 p-4 space-y-8">
-          {/* Mission Section */}
+    <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Header */}
+      <div className="border-b py-8 px-4 sm:px-6 lg:px-8" style={{ borderColor: COLOR_BORDER }}>
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div>
-            {sidebarOpen && (
-              <p className="text-xs font-bold uppercase mb-3" style={{ color: COLOR_TEXT_SECONDARY }}>
-                Mission
-              </p>
-            )}
-            <nav className="space-y-2">
-              {[
-                { icon: Compass, label: 'New To This?', href: '#' },
-                { icon: LayoutGrid, label: 'Dashboard', href: '/dashboard', active: true },
-                { icon: Zap, label: 'Intelligence Hub', href: '/intelligence' },
-                { icon: Compass, label: 'Exit Journey™', href: '#' },
-                { icon: TrendingUp, label: 'Market Advantage', href: '/intelligence/heat-maps' },
-              ].map((item) => {
-                const Icon = item.icon
-                return (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
-                      item.active ? 'text-white' : 'hover:bg-white'
-                    }`}
-                    style={{ background: item.active ? COLOR_ACCENT : 'transparent' }}
-                  >
-                    <Icon className="w-5 h-5" />
-                    {sidebarOpen && <span className="text-sm font-semibold">{item.label}</span>}
-                  </Link>
-                )
-              })}
-            </nav>
-          </div>
-
-          {/* Work Section */}
-          <div>
-            {sidebarOpen && (
-              <p className="text-xs font-bold uppercase mb-3" style={{ color: COLOR_TEXT_SECONDARY }}>
-                Work
-              </p>
-            )}
-            <nav className="space-y-2">
-              {[
-                { icon: Eye, label: 'Listings' },
-                { icon: MessageSquare, label: 'Messages' },
-                { icon: Users, label: 'Buyers' },
-              ].map((item) => {
-                const Icon = item.icon
-                return (
-                  <button
-                    key={item.label}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white transition-all"
-                  >
-                    <Icon className="w-5 h-5" style={{ color: COLOR_TEXT_SECONDARY }} />
-                    {sidebarOpen && (
-                      <span className="text-sm font-semibold" style={{ color: COLOR_TEXT_SECONDARY }}>
-                        {item.label}
-                      </span>
-                    )}
-                  </button>
-                )
-              })}
-            </nav>
-          </div>
-        </div>
-
-        {/* Footer Metric */}
-        {sidebarOpen && (
-          <div className="p-6 border-t" style={{ borderColor: COLOR_BORDER }}>
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold flex items-center gap-2" style={{ color: COLOR_TEXT_SECONDARY }}>
-                <Flame className="w-4 h-4" style={{ color: COLOR_ACCENT }} />
-                Heat Score
-              </p>
-              <p className="text-lg font-black" style={{ color: COLOR_ACCENT }}>
-                {metrics.heat}
-              </p>
-            </div>
-            <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
-              <motion.div
-                className="h-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${metrics.heat}%` }}
-                transition={{ duration: 1 }}
-                style={{ background: COLOR_ACCENT }}
-              />
-            </div>
-            <p className="text-xs mt-2" style={{ color: COLOR_TEXT_SECONDARY }}>
-              🔥 Red Hot — Multiple buyers
+            <h1 className="text-3xl font-black" style={{ color: COLOR_PRIMARY }}>
+              Account Dashboard
+            </h1>
+            <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm mt-1">
+              Manage your subscription and billing
             </p>
           </div>
-        )}
-
-        {/* Collapse Button */}
-        {!sidebarOpen && (
-          <div className="p-4 border-t" style={{ borderColor: COLOR_BORDER }}>
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="w-full p-2 hover:bg-white rounded"
+          <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <Link
+              href="/"
+              className="px-4 py-2 rounded-lg border hover:bg-gray-50"
+              style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
             >
-              <Menu className="w-5 h-5 mx-auto" />
+              Browse Marketplace
+            </Link>
+            <button
+              className="px-4 py-2 rounded-lg font-bold text-white hover:opacity-90"
+              style={{ background: COLOR_ACCENT }}
+            >
+              <LogOut size={18} className="inline mr-2" /> Sign Out
             </button>
           </div>
-        )}
-      </motion.aside>
+        </div>
+      </div>
 
       {/* Main Content */}
-      <motion.main
-        className="flex-1 overflow-y-auto"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        {/* Header */}
-        <div className="border-b px-8 py-4" style={{ borderColor: COLOR_BORDER }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-                Forward OS → Dashboard
-              </p>
-              <h1 className="text-3xl font-black mt-1" style={{ color: COLOR_PRIMARY }}>
-                Mission Control
-              </h1>
-              <p className="text-sm mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
-                Your deal completion command centre
-              </p>
+      <div className="py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto space-y-8">
+          {/* Current Subscription */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-8 rounded-lg border-2"
+            style={{ borderColor: COLOR_ACCENT, background: COLOR_ACCENT + '05' }}
+          >
+            <div className={`flex justify-between items-start mb-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              <div>
+                <h2 className="text-2xl font-black" style={{ color: COLOR_PRIMARY }}>
+                  {planInfo.name} Plan
+                </h2>
+                <div className={`flex items-center gap-2 mt-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  <CheckCircle2 size={20} style={{ color: '#10b981' }} />
+                  <p style={{ color: '#10b981' }} className="font-semibold">
+                    Active Subscription
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-3xl font-black" style={{ color: COLOR_ACCENT }}>
+                  {formatCurrency(subscription.amount, currency, locale)}/month
+                </p>
+                <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm mt-1">
+                  Next billing: {subscription.nextBillingDate}
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
+
+            <div className="mb-6 pb-6 border-b" style={{ borderColor: COLOR_BORDER }}>
+              <h3 className="font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
+                Included Features:
+              </h3>
+              <ul className="space-y-2">
+                {planInfo.features.map((feature, idx) => (
+                  <li key={idx} className="flex gap-2" style={{ color: COLOR_TEXT_SECONDARY }}>
+                    <span style={{ color: COLOR_ACCENT }}>✓</span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
               <button
-                className="px-4 py-2 rounded-lg font-semibold border-2 transition-all hover:bg-orange-50"
-                style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}
-              >
-                ⚠️ Alert Mode
-              </button>
-              <button
-                className="px-4 py-2 rounded-lg font-semibold border-2 transition-all hover:bg-gray-50"
+                className="px-6 py-2 rounded-lg font-bold border hover:bg-gray-50"
                 style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
               >
-                📊 Summary
+                Change Plan
               </button>
               <button
-                className="px-4 py-2 rounded-lg font-semibold text-white transition-all hover:opacity-90"
+                className="px-6 py-2 rounded-lg font-bold text-white hover:opacity-90"
                 style={{ background: COLOR_ACCENT }}
               >
-                ✓ Open Checklist
+                Upgrade to Enterprise
               </button>
             </div>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="p-8 space-y-8">
-          {/* Alerts */}
-          <motion.div className="space-y-3" variants={containerVariants}>
-            {alerts.map((alert) => {
-              const Icon = alert.icon
-              return (
-                <motion.div
-                  key={alert.id}
-                  className="p-4 rounded-lg border-2 flex items-start gap-4"
-                  style={{
-                    borderColor: alert.type === 'milestone' ? COLOR_ACCENT : COLOR_BORDER,
-                    background: alert.type === 'milestone' ? COLOR_ACCENT + '10' : 'white',
-                  }}
-                  variants={itemVariants}
-                >
-                  <Icon
-                    className="w-6 h-6 mt-1 flex-shrink-0"
-                    style={{ color: alert.type === 'milestone' ? COLOR_ACCENT : COLOR_TEXT_SECONDARY }}
-                  />
-                  <div className="flex-1">
-                    <p className="font-bold" style={{ color: COLOR_PRIMARY }}>
-                      {alert.title}
-                    </p>
-                    <p className="text-sm mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
-                      {alert.description}
-                    </p>
-                  </div>
-                  <button className="text-xs font-semibold hover:opacity-70" style={{ color: COLOR_TEXT_SECONDARY }}>
-                    Dismiss
-                  </button>
-                </motion.div>
-              )
-            })}
           </motion.div>
 
-          {/* Main Metrics Grid */}
-          <motion.div className="grid grid-cols-1 lg:grid-cols-3 gap-8" variants={containerVariants}>
-            {/* Heat Score */}
+          {/* Billing Section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Payment Method */}
             <motion.div
-              className="p-8 rounded-lg border"
-              style={{ borderColor: COLOR_BORDER, background: 'white' }}
-              variants={itemVariants}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="p-6 rounded-lg border"
+              style={{ borderColor: COLOR_BORDER }}
             >
-              <h3 className="text-sm font-bold mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
-                DEAL HEAT SCORE
-              </h3>
-
-              <div className="relative w-32 h-32 mx-auto mb-6">
-                <motion.svg
-                  className="absolute inset-0"
-                  viewBox="0 0 100 100"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke="#E5E7EB"
-                    strokeWidth="8"
-                  />
-                  <motion.circle
-                    cx="50"
-                    cy="50"
-                    r="45"
-                    fill="none"
-                    stroke={COLOR_ACCENT}
-                    strokeWidth="8"
-                    strokeDasharray="282.7"
-                    initial={{ strokeDashoffset: 282.7 }}
-                    animate={{ strokeDashoffset: 282.7 * (1 - metrics.heat / 100) }}
-                    transition={{ duration: 2 }}
-                    strokeLinecap="round"
-                  />
-                </motion.svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-4xl font-black" style={{ color: COLOR_ACCENT }}>
-                      {metrics.heat}
-                    </p>
-                    <p className="text-xs mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
-                      degrees
-                    </p>
-                  </div>
-                </div>
+              <div className="flex items-center gap-2 mb-4">
+                <CreditCard size={20} style={{ color: COLOR_ACCENT }} />
+                <h3 className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                  Payment Method
+                </h3>
               </div>
-
-              <div className="space-y-2 pt-4 border-t" style={{ borderColor: COLOR_BORDER }}>
-                <p className="text-xs font-semibold" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  Status
-                </p>
-                <p className="text-sm font-bold" style={{ color: COLOR_PRIMARY }}>
-                  🔥 Red Hot
-                </p>
-                <p className="text-xs" style={{ color: COLOR_ACCENT }}>
-                  ↑ {metrics.heatTrend} this week
-                </p>
-              </div>
+              {paymentMethods[0] && (
+                <>
+                  <p className="text-sm mb-2" style={{ color: COLOR_TEXT_SECONDARY }}>
+                    {paymentMethods[0].brand} •••• {paymentMethods[0].last4}
+                  </p>
+                  <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+                    Expires {paymentMethods[0].expMonth}/{paymentMethods[0].expYear}
+                  </p>
+                </>
+              )}
+              <button
+                className="w-full mt-4 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50"
+                style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY, border: `1px solid ${COLOR_BORDER}` }}
+              >
+                Update Payment
+              </button>
             </motion.div>
 
-            {/* Days to Exit */}
+            {/* Billing History */}
             <motion.div
-              className="p-8 rounded-lg border"
-              style={{ borderColor: COLOR_BORDER, background: 'white' }}
-              variants={itemVariants}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="p-6 rounded-lg border"
+              style={{ borderColor: COLOR_BORDER }}
             >
-              <h3 className="text-sm font-bold mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
-                ESTIMATED TIMELINE
-              </h3>
-
-              <div className="text-center py-8">
-                <motion.p
-                  className="text-5xl font-black"
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  style={{ color: COLOR_PRIMARY }}
-                >
-                  {metrics.daysToExit}
-                </motion.p>
-                <p className="text-sm mt-2" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  days to exit
-                </p>
+              <div className="flex items-center gap-2 mb-4">
+                <Download size={20} style={{ color: COLOR_ACCENT }} />
+                <h3 className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                  Recent Invoices
+                </h3>
               </div>
-
-              <div className="space-y-2 pt-4 border-t" style={{ borderColor: COLOR_BORDER }}>
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-semibold" style={{ color: COLOR_TEXT_SECONDARY }}>
-                    Status
-                  </p>
-                  <p className="text-xs font-bold px-2 py-1 rounded-full text-white" style={{ background: COLOR_ACCENT }}>
-                    {metrics.status}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Tasks */}
-            <motion.div
-              className="p-8 rounded-lg border"
-              style={{ borderColor: COLOR_BORDER, background: 'white' }}
-              variants={itemVariants}
-            >
-              <h3 className="text-sm font-bold mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
-                TASKS
-              </h3>
-
-              <div className="space-y-3">
-                {[
-                  { label: 'Completed', value: metrics.tasksCompleted, color: '#10B981' },
-                  { label: 'In Progress', value: metrics.tasksInProgress, color: '#3B82F6' },
-                  { label: 'Blocked', value: metrics.tasksBlocked, color: COLOR_ACCENT },
-                  { label: 'Not Started', value: metrics.tasksNotStarted, color: '#9CA3AF' },
-                ].map((task) => (
-                  <div key={task.label} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ background: task.color }}
-                      />
-                      <span className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-                        {task.label}
-                      </span>
+              <div className="space-y-2 text-sm">
+                {invoices.slice(0, 3).map((invoice) => (
+                  <div key={invoice.id} className="flex justify-between items-center pb-2 border-b" style={{ borderColor: COLOR_BORDER }}>
+                    <div>
+                      <p style={{ color: COLOR_PRIMARY }}>{invoice.date}</p>
+                      <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs">
+                        {invoice.description}
+                      </p>
                     </div>
-                    <span className="text-lg font-bold" style={{ color: COLOR_PRIMARY }}>
-                      {task.value}
-                    </span>
+                    <button className="text-blue-600 hover:underline text-xs font-semibold">Download</button>
                   </div>
                 ))}
               </div>
-
-              <div className="mt-4 pt-4 border-t text-center" style={{ borderColor: COLOR_BORDER }}>
-                <p className="text-xs font-semibold" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  {metrics.tasksCompleted + metrics.tasksInProgress}/{metrics.tasksCompleted + metrics.tasksInProgress + metrics.tasksBlocked + metrics.tasksNotStarted} tasks
-                </p>
-              </div>
+              <button
+                className="w-full mt-4 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50"
+                style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY, border: `1px solid ${COLOR_BORDER}` }}
+              >
+                View All Invoices
+              </button>
             </motion.div>
+
+            {/* Account Settings */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="p-6 rounded-lg border"
+              style={{ borderColor: COLOR_BORDER }}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <Settings size={20} style={{ color: COLOR_ACCENT }} />
+                <h3 className="font-bold" style={{ color: COLOR_PRIMARY }}>
+                  Account
+                </h3>
+              </div>
+              <div className="space-y-2 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
+                <p>Email: john@example.com</p>
+                <p>Plan: Professional</p>
+                <p>Member Since: Jan 2025</p>
+              </div>
+              <button
+                className="w-full mt-4 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50"
+                style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY, border: `1px solid ${COLOR_BORDER}` }}
+              >
+                Manage Account
+              </button>
+            </motion.div>
+          </div>
+
+          {/* Invoices Table */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="p-6 rounded-lg border"
+            style={{ borderColor: COLOR_BORDER }}
+          >
+            <h3 className="font-bold text-lg mb-4" style={{ color: COLOR_PRIMARY }}>
+              Billing History
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr style={{ background: COLOR_PRIMARY + '02', borderBottom: `1px solid ${COLOR_BORDER}` }}>
+                    <th className="p-3 text-left font-semibold" style={{ color: COLOR_PRIMARY }}>
+                      Date
+                    </th>
+                    <th className="p-3 text-left font-semibold" style={{ color: COLOR_PRIMARY }}>
+                      Invoice
+                    </th>
+                    <th className="p-3 text-left font-semibold" style={{ color: COLOR_PRIMARY }}>
+                      Description
+                    </th>
+                    <th className="p-3 text-left font-semibold" style={{ color: COLOR_PRIMARY }}>
+                      Amount
+                    </th>
+                    <th className="p-3 text-left font-semibold" style={{ color: COLOR_PRIMARY }}>
+                      Status
+                    </th>
+                    <th className="p-3 text-left font-semibold" style={{ color: COLOR_PRIMARY }}>
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoices.map((invoice) => (
+                    <tr key={invoice.id} style={{ borderBottom: `1px solid ${COLOR_BORDER}` }}>
+                      <td className="p-3" style={{ color: COLOR_PRIMARY }}>
+                        {invoice.date}
+                      </td>
+                      <td className="p-3" style={{ color: COLOR_TEXT_SECONDARY }}>
+                        {invoice.id}
+                      </td>
+                      <td className="p-3" style={{ color: COLOR_TEXT_SECONDARY }}>
+                        {invoice.description}
+                      </td>
+                      <td className="p-3 font-bold" style={{ color: COLOR_PRIMARY }}>
+                        {formatCurrency(invoice.amount, currency, locale)}
+                      </td>
+                      <td className="p-3">
+                        <span
+                          className="px-2 py-1 rounded text-xs font-semibold"
+                          style={{
+                            background: invoice.status === 'paid' ? '#E8F5E9' : '#FFF3E0',
+                            color: invoice.status === 'paid' ? '#2E7D32' : '#E65100',
+                          }}
+                        >
+                          {invoice.status}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <button
+                          className="text-sm font-semibold hover:underline flex items-center gap-1"
+                          style={{ color: COLOR_ACCENT }}
+                        >
+                          Download <ArrowRight size={14} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </motion.div>
 
-          {/* Current Phase */}
+          {/* Danger Zone */}
           <motion.div
-            className="p-8 rounded-lg border"
-            style={{ borderColor: COLOR_BORDER, background: 'white' }}
-            variants={itemVariants}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="p-6 rounded-lg border"
+            style={{ borderColor: COLOR_BORDER, background: '#FEE2E2' }}
           >
-            <h3 className="text-sm font-bold mb-4" style={{ color: COLOR_TEXT_SECONDARY }}>
-              CURRENT PHASE
+            <h3 className="font-bold text-lg mb-2" style={{ color: '#B91C1C' }}>
+              Cancel Subscription
             </h3>
-            <p className="text-2xl font-black mb-4" style={{ color: COLOR_PRIMARY }}>
-              {metrics.currentPhase}
+            <p style={{ color: '#991B1B' }} className="text-sm mb-4">
+              If you cancel, you'll lose access to all features at the end of your current billing cycle.
             </p>
-            <div className="mb-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  Progress
-                </span>
-                <span className="text-sm font-bold" style={{ color: COLOR_ACCENT }}>
-                  {metrics.phaseProgress}%
-                </span>
-              </div>
-              <div className="h-3 rounded-full bg-gray-200 overflow-hidden">
-                <motion.div
-                  className="h-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${metrics.phaseProgress}%` }}
-                  transition={{ duration: 1 }}
-                  style={{ background: COLOR_ACCENT }}
-                />
-              </div>
-            </div>
-            <Link
-              href="/intelligence"
-              className="text-sm font-bold flex items-center gap-2 hover:opacity-70 transition-opacity"
-              style={{ color: COLOR_ACCENT }}
-            >
-              View activity <ChevronRight className="w-4 h-4" />
-            </Link>
+            <button style={{ background: '#DC2626', color: 'white' }} className="px-6 py-2 rounded-lg font-bold hover:opacity-90">
+              Cancel Subscription
+            </button>
           </motion.div>
         </div>
-      </motion.main>
+      </div>
     </div>
   )
 }
