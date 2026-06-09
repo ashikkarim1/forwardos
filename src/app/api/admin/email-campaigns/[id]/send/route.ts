@@ -29,7 +29,7 @@ export async function POST(
     }
 
     // Example: Send with Resend using different templates
-    const results = []
+    const results: Array<{batch: number; status: string; message: string; sentCount: number}> = []
     const batchSize = 100 // Resend recommends batching
 
     for (let i = 0; i < recipients.length; i += batchSize) {
