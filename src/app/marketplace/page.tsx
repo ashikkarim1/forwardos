@@ -570,7 +570,7 @@ export default function MarketplacePage() {
 
               {/* Active Filters Badge */}
               {activeFiltersCount > 0 && (
-                <div className="p-3 rounded-lg" style={{ background: '#FEF3C7', borderColor: '#FCD34D' }} className="p-3 rounded-lg border">
+                <div className="p-3 rounded-lg border" style={{ background: '#FEF3C7', borderColor: '#FCD34D' }}>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-bold" style={{ color: '#92400E' }}>
                       {activeFiltersCount} active filters
