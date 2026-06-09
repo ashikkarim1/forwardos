@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { Search, ChevronLeft, ChevronRight, Filter } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import ListingCard from '@/components/listing/ListingCard'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
@@ -482,20 +482,32 @@ const CARDS_PER_PAGE = 16
 export default function BrowsePage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
+  const [minPrice, setMinPrice] = useState<number | ''>(0)
+  const [maxPrice, setMaxPrice] = useState<number | ''>(5000000)
+  const [minROI, setMinROI] = useState<number | ''>(0)
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
 
-  // Filter listings based on search
+  // Filter listings based on search and filters
   const filteredListings = useMemo(() => {
-    return EXTENDED_LISTINGS.filter(listing =>
-      listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      listing.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      listing.category.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  }, [searchTerm])
+    return EXTENDED_LISTINGS.filter(listing => {
+      const matchesSearch =
+        listing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        listing.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        listing.category.toLowerCase().includes(searchTerm.toLowerCase())
+
+      const matchesPrice = listing.askingPrice >= (minPrice as number) && listing.askingPrice <= (maxPrice as number)
+      const matchesROI = listing.roiProjection >= (minROI as number)
+      const matchesCategory = selectedCategory === 'all' || listing.category === selectedCategory
+
+      return matchesSearch && matchesPrice && matchesROI && matchesCategory
+    })
+  }, [searchTerm, minPrice, maxPrice, minROI, selectedCategory])
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredListings.length / CARDS_PER_PAGE)
-  const startIdx = (currentPage - 1) * CARDS_PER_PAGE
-  const endIdx = startIdx + CARDS_PER_PAGE
+  const CARDS_PER_PAGE_NEW = 15 // 3 columns x 5 rows
+  const totalPages = Math.ceil(filteredListings.length / CARDS_PER_PAGE_NEW)
+  const startIdx = (currentPage - 1) * CARDS_PER_PAGE_NEW
+  const endIdx = startIdx + CARDS_PER_PAGE_NEW
   const currentListings = filteredListings.slice(startIdx, endIdx)
 
   const handlePageChange = (page: number) => {
@@ -503,15 +515,26 @@ export default function BrowsePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const handleResetFilters = () => {
+    setSearchTerm('')
+    setMinPrice(0)
+    setMaxPrice(5000000)
+    setMinROI(0)
+    setSelectedCategory('all')
+    setCurrentPage(1)
+  }
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05,
+        staggerChildren: 0.03,
       },
     },
   }
+
+  const categories = ['all', 'BUSINESS', 'FRANCHISE']
 
   return (
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
@@ -522,139 +545,247 @@ export default function BrowsePage() {
         className="sticky top-0 z-40 border-b"
         style={{ borderColor: COLOR_BORDER, background: 'white' }}
       >
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 space-y-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>
-              Browse Deals
-            </h1>
-            <p style={{ color: COLOR_TEXT_SECONDARY }}>
-              {filteredListings.length} opportunities available
-            </p>
-          </div>
-
-          {/* SEARCH BAR */}
-          <div className="flex gap-3">
-            <div className="flex-1 relative">
-              <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: COLOR_TEXT_SECONDARY }} />
-              <input
-                type="text"
-                placeholder="Search by business name, location, or type..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value)
-                  setCurrentPage(1)
-                }}
-                className="w-full pl-10 pr-4 py-3 rounded-lg border bg-white focus:outline-none focus:ring-2"
-                style={{
-                  borderColor: COLOR_BORDER,
-                  outlineColor: COLOR_ACCENT,
-                } as React.CSSProperties}
-              />
-            </div>
-            <button
-              className="px-4 py-3 rounded-lg border font-semibold transition-all hover:bg-gray-50 flex items-center gap-2"
-              style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
-            >
-              <Filter size={20} />
-              Filters
-            </button>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
+          <h1 className="text-3xl md:text-4xl font-black mb-1" style={{ color: COLOR_PRIMARY }}>
+            Browse Deals
+          </h1>
+          <p style={{ color: COLOR_TEXT_SECONDARY }}>
+            {filteredListings.length} opportunities available
+          </p>
         </div>
       </motion.div>
 
-      {/* GRID */}
+      {/* MAIN LAYOUT: SIDEBAR + GRID */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-        {currentListings.length > 0 ? (
-          <>
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8"
-            >
-              {currentListings.map((listing) => (
-                <motion.div key={listing.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                  <ListingCard
-                    {...listing}
-                    onSave={() => console.log('Saved:', listing.id)}
-                    onViewSimilar={() => console.log('View similar to:', listing.id)}
-                    onContact={() => console.log('Contact for:', listing.id)}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* SIDEBAR - FILTERS */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-1"
+          >
+            <div className="sticky top-24 space-y-6">
+              {/* SEARCH */}
+              <div>
+                <label className="block text-sm font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
+                  Search
+                </label>
+                <div className="relative">
+                  <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: COLOR_TEXT_SECONDARY }} />
+                  <input
+                    type="text"
+                    placeholder="Business name, location..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value)
+                      setCurrentPage(1)
+                    }}
+                    className="w-full pl-10 pr-3 py-2.5 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: COLOR_BORDER,
+                      outlineColor: COLOR_ACCENT,
+                    } as React.CSSProperties}
                   />
-                </motion.div>
-              ))}
-            </motion.div>
+                </div>
+              </div>
 
-            {/* PAGINATION */}
-            {totalPages > 1 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center justify-center gap-2 py-8"
+              {/* CATEGORY FILTER */}
+              <div>
+                <label className="block text-sm font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
+                  Category
+                </label>
+                <div className="space-y-2">
+                  {categories.map((cat) => (
+                    <label key={cat} className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="category"
+                        checked={selectedCategory === cat}
+                        onChange={() => {
+                          setSelectedCategory(cat)
+                          setCurrentPage(1)
+                        }}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm" style={{ color: COLOR_PRIMARY }}>
+                        {cat === 'all' ? 'All Categories' : cat}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* PRICE RANGE */}
+              <div>
+                <label className="block text-sm font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
+                  Asking Price (AED)
+                </label>
+                <div className="space-y-3">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={minPrice}
+                    onChange={(e) => {
+                      setMinPrice(e.target.value === '' ? '' : Number(e.target.value))
+                      setCurrentPage(1)
+                    }}
+                    className="w-full px-3 py-2 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: COLOR_BORDER,
+                      outlineColor: COLOR_ACCENT,
+                    } as React.CSSProperties}
+                  />
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={maxPrice}
+                    onChange={(e) => {
+                      setMaxPrice(e.target.value === '' ? '' : Number(e.target.value))
+                      setCurrentPage(1)
+                    }}
+                    className="w-full px-3 py-2 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: COLOR_BORDER,
+                      outlineColor: COLOR_ACCENT,
+                    } as React.CSSProperties}
+                  />
+                </div>
+              </div>
+
+              {/* ROI FILTER */}
+              <div>
+                <label className="block text-sm font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
+                  Min ROI Projection
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    placeholder="Min ROI %"
+                    value={minROI}
+                    onChange={(e) => {
+                      setMinROI(e.target.value === '' ? '' : Number(e.target.value))
+                      setCurrentPage(1)
+                    }}
+                    step="0.5"
+                    className="w-full px-3 py-2 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2"
+                    style={{
+                      borderColor: COLOR_BORDER,
+                      outlineColor: COLOR_ACCENT,
+                    } as React.CSSProperties}
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
+                    %
+                  </span>
+                </div>
+              </div>
+
+              {/* RESET BUTTON */}
+              <button
+                onClick={handleResetFilters}
+                className="w-full px-4 py-2.5 rounded-lg border text-sm font-semibold transition-all hover:bg-gray-50 flex items-center justify-center gap-2"
+                style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
               >
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="p-2 rounded-lg border transition-all hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
-                >
-                  <ChevronLeft size={20} />
-                </button>
+                <X size={16} />
+                Clear Filters
+              </button>
+            </div>
+          </motion.div>
 
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  let pageNum
-                  if (totalPages <= 5) {
-                    pageNum = i + 1
-                  } else if (currentPage <= 3) {
-                    pageNum = i + 1
-                  } else if (currentPage >= totalPages - 2) {
-                    pageNum = totalPages - 4 + i
-                  } else {
-                    pageNum = currentPage - 2 + i
-                  }
-                  return (
+          {/* MAIN CONTENT - GRID */}
+          <div className="lg:col-span-3">
+            {currentListings.length > 0 ? (
+              <>
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
+                >
+                  {currentListings.map((listing) => (
+                    <motion.div key={listing.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                      <ListingCard
+                        {...listing}
+                        onSave={() => console.log('Saved:', listing.id)}
+                        onViewSimilar={() => console.log('View similar to:', listing.id)}
+                        onContact={() => console.log('Contact for:', listing.id)}
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+
+                {/* PAGINATION */}
+                {totalPages > 1 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center justify-center gap-2 py-8"
+                  >
                     <button
-                      key={pageNum}
-                      onClick={() => handlePageChange(pageNum)}
-                      className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                        currentPage === pageNum ? 'text-white' : 'border hover:bg-gray-50'
-                      }`}
-                      style={
-                        currentPage === pageNum
-                          ? { background: COLOR_ACCENT }
-                          : { borderColor: COLOR_BORDER, color: COLOR_PRIMARY }
-                      }
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="p-2 rounded-lg border transition-all hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
                     >
-                      {pageNum}
+                      <ChevronLeft size={20} />
                     </button>
-                  )
-                })}
 
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg border transition-all hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
-                >
-                  <ChevronRight size={20} />
-                </button>
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum
+                      if (totalPages <= 5) {
+                        pageNum = i + 1
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i
+                      } else {
+                        pageNum = currentPage - 2 + i
+                      }
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => handlePageChange(pageNum)}
+                          className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                            currentPage === pageNum ? 'text-white' : 'border hover:bg-gray-50'
+                          }`}
+                          style={
+                            currentPage === pageNum
+                              ? { background: COLOR_ACCENT }
+                              : { borderColor: COLOR_BORDER, color: COLOR_PRIMARY }
+                          }
+                        >
+                          {pageNum}
+                        </button>
+                      )
+                    })}
 
-                <span className="ml-4 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  Page {currentPage} of {totalPages}
-                </span>
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="p-2 rounded-lg border transition-all hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+
+                    <span className="ml-4 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
+                      Page {currentPage} of {totalPages}
+                    </span>
+                  </motion.div>
+                )}
+              </>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-20"
+              >
+                <p className="text-lg" style={{ color: COLOR_TEXT_SECONDARY }}>
+                  No deals found. Try adjusting your filters.
+                </p>
               </motion.div>
             )}
-          </>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-20"
-          >
-            <p className="text-lg" style={{ color: COLOR_TEXT_SECONDARY }}>
-              No deals found. Try adjusting your search.
-            </p>
-          </motion.div>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   )
