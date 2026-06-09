@@ -7,9 +7,12 @@ import { CheckCircle2, Shield, Users, Zap, Lock, BarChart3, Globe, Award } from 
 import { PublicHeader } from '@/components/Navigation'
 import BrokerDirectory from '@/components/BrokerDirectory'
 import InstitutionalIntegrations from '@/components/InstitutionalIntegrations'
+import BrokerReputationSystem from '@/components/BrokerReputationSystem'
+import DealReviewCommunity from '@/components/DealReviewCommunity'
+import InstitutionalWhiteLabel from '@/components/InstitutionalWhiteLabel'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
-type TabType = 'overview' | 'brokers' | 'integrations' | 'compliance'
+type TabType = 'overview' | 'brokers' | 'integrations' | 'reputation' | 'community' | 'whitelabel' | 'compliance'
 
 export default function InstitutionalPage() {
   const [activeTab, setActiveTab] = useState<TabType>('overview')
@@ -135,6 +138,9 @@ export default function InstitutionalPage() {
                 { id: 'overview', label: '📋 Overview' },
                 { id: 'brokers', label: '🤝 Broker Network' },
                 { id: 'integrations', label: '🔗 Integrations' },
+                { id: 'reputation', label: '🏆 Reputation (Phase 5)' },
+                { id: 'community', label: '👥 Community (Phase 5)' },
+                { id: 'whitelabel', label: '🏢 White-Label (Phase 5)' },
                 { id: 'compliance', label: '🔒 Compliance' },
               ].map(tab => (
                 <button
@@ -200,6 +206,9 @@ export default function InstitutionalPage() {
 
               {activeTab === 'brokers' && <BrokerDirectory />}
               {activeTab === 'integrations' && <InstitutionalIntegrations />}
+              {activeTab === 'reputation' && <BrokerReputationSystem />}
+              {activeTab === 'community' && <DealReviewCommunity />}
+              {activeTab === 'whitelabel' && <InstitutionalWhiteLabel />}
               {activeTab === 'compliance' && (
                 <div className="space-y-6">
                   <div className="p-6 rounded-lg border" style={{ borderColor: COLOR_BORDER }}>
