@@ -271,7 +271,7 @@ export function SellerDashboardSummary({
 
           {/* Risk Summary */}
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="p-4 rounded-lg text-center" style={{ background: '#FEE2CC' }}>
+            <div className="p-4 rounded-lg text-center" style={{ background: '#F3F4F6' }}>
               <p className="text-2xl font-black" style={{ color: '#EF4444' }}>
                 {riskIndicators.high}
               </p>

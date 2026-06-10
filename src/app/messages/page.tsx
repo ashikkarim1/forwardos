@@ -264,7 +264,7 @@ export default function MessagesPage() {
                 className="w-full px-4 py-4 border-b flex gap-3 hover:bg-gray-50 transition-colors text-left relative"
                 style={{
                   borderColor: COLOR_BORDER,
-                  background: selectedConversation?.id === conv.id ? '#FEE2CC' : 'transparent',
+                  background: selectedConversation?.id === conv.id ? '#F3F4F6' : 'transparent',
                 }}
                 variants={itemVariants}
                 whileHover={{ x: 2 }}

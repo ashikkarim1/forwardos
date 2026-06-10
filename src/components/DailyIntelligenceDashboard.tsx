@@ -88,7 +88,7 @@ export function DailyIntelligenceDashboard({
   const getSignalBackground = (type: string) => {
     switch (type) {
       case 'hot':
-        return '#FEE2CC'
+        return '#F3F4F6'
       case 'cold':
         return '#F3F4F6'
       case 'trend':

@@ -6,19 +6,19 @@
 /* ── Forward Mission Control Colour System ──────────────────────────────────── */
 :root {
   --color-nav:          #1A1A1A;
-  --color-bg:           #F7F6F4;
+  --color-bg:           #FFFFFF;
   --color-surface:      #FFFFFF;
 
   --color-text:         #1A1A1A;
   --color-text-muted:   #717171;
   --color-text-light:   #9A9A9A;
 
-  --color-border:       #E5E4E0;
-  --color-border-dark:  #C8C7C2;
+  --color-border:       #E5E7EB;
+  --color-border-dark:  #D1D5DB;
 
-  --color-accent:       #FF8C00;
-  --color-accent-deep:  #E67E00;
-  --color-accent-soft:  #FEE2CC;
+  --color-accent:       #3B82F6;
+  --color-accent-deep:  #2563EB;
+  --color-accent-soft:  #F3F4F6;
 
   --color-green:        #2D7A5F;
   --color-green-soft:   #EAF5F0;
@@ -56,14 +56,14 @@ html, body {
 }
 
 body {
-  background: #F7F6F4;
+  background: #FFFFFF;
   color: #1A1A1A;
 }
 
 /* ─── Scrollbar ──────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar             { width: 5px; height: 5px; }
-::-webkit-scrollbar-track       { background: #F7F6F4; }
-::-webkit-scrollbar-thumb       { background: #C8C7C2; border-radius: 3px; }
+::-webkit-scrollbar-track       { background: #FFFFFF; }
+::-webkit-scrollbar-thumb       { background: #D1D5DB; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #9A9A9A; }
 
 /* ─── Focus ring ─────────────────────────────────────────────────────────── */
@@ -71,7 +71,7 @@ body {
   a, button, input, select, textarea,
   [role="button"], [tabindex]:not([tabindex="-1"])
 ):focus-visible {
-  outline: 2px solid #FF8C00;
+  outline: 2px solid #3B82F6;
   outline-offset: 2px;
   border-radius: 8px;
 }
@@ -98,7 +98,7 @@ body {
 /* ─── Card ───────────────────────────────────────────────────────────────── */
 .card {
   background: #FFFFFF;
-  border: 1px solid #E5E4E0;
+  border: 1px solid #E5E7EB;
   border-radius: 16px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
 }
@@ -108,14 +108,14 @@ body {
 }
 .card-hover:hover {
   box-shadow: 0 4px 12px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
-  border-color: #C8C7C2;
+  border-color: #D1D5DB;
   transform: translateY(-1px);
 }
 
 /* Legacy alias used by some pages */
 .glass-card {
   background: #FFFFFF;
-  border: 1px solid #E5E4E0;
+  border: 1px solid #E5E7EB;
   border-radius: 16px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
 }
@@ -173,17 +173,17 @@ body {
 
 /* Accent — orange */
 .btn-accent {
-  background: #FF8C00;
+  background: #3B82F6;
   color: #FFFFFF;
-  border-color: #FF8C00;
+  border-color: #3B82F6;
 }
-.btn-accent:hover { background: #E67E00; }
+.btn-accent:hover { background: #2563EB; }
 
 /* Secondary — outlined */
 .btn-secondary {
   background: #FFFFFF;
   color: #1A1A1A;
-  border-color: #E5E4E0;
+  border-color: #E5E7EB;
 }
 .btn-secondary:hover { border-color: #1A1A1A; }
 
@@ -194,12 +194,12 @@ body {
   border-color: transparent;
   border-radius: 999px;
 }
-.btn-ghost:hover { color: #1A1A1A; background: #F7F6F4; }
+.btn-ghost:hover { color: #1A1A1A; background: #FFFFFF; }
 
 /* Legacy aliases */
 .btn-brand        { background: #1D4ED8; color: #FFFFFF; border-radius: 8px; padding: 11px 24px; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; transition: all 0.18s ease; border: none; }
 .btn-brand:hover  { background: #1e40af; }
-.btn-brand-outline { background: transparent; border: 1.5px solid #E5E4E0; color: #1A1A1A; border-radius: 8px; padding: 10px 24px; font-weight: 500; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; transition: all 0.18s ease; }
+.btn-brand-outline { background: transparent; border: 1.5px solid #E5E7EB; color: #1A1A1A; border-radius: 8px; padding: 10px 24px; font-weight: 500; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; cursor: pointer; transition: all 0.18s ease; }
 .btn-brand-outline:hover { border-color: #1D4ED8; color: #1D4ED8; }
 
 /* ─── Sidebar Nav ────────────────────────────────────────────────────────── */
@@ -218,7 +218,7 @@ body {
   border: 1px solid transparent;
 }
 .nav-item:hover {
-  background: #F7F6F4;
+  background: #FFFFFF;
   color: #1A1A1A;
 }
 .nav-item.active {
@@ -229,7 +229,7 @@ body {
 /* ─── Inputs ─────────────────────────────────────────────────────────────── */
 .input-dark {
   background: #FFFFFF;
-  border: 1px solid #E5E4E0;
+  border: 1px solid #E5E7EB;
   color: #1A1A1A;
   border-radius: 10px;
   padding: 10px 14px;
@@ -249,13 +249,13 @@ body {
 .progress-bar {
   height: 6px;
   border-radius: 3px;
-  background: #E5E4E0;
+  background: #E5E7EB;
   overflow: hidden;
 }
 .progress-fill {
   height: 100%;
   border-radius: 3px;
-  background: linear-gradient(90deg, #FF8C00, #E67E00);
+  background: linear-gradient(90deg, #3B82F6, #2563EB);
   transition: width 1.2s cubic-bezier(0.4,0,0.2,1);
 }
 
@@ -265,7 +265,7 @@ body {
   100% { background-position:  200% 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, #F7F6F4 0%, #E5E4E0 50%, #F7F6F4 100%);
+  background: linear-gradient(90deg, #FFFFFF 0%, #E5E7EB 50%, #FFFFFF 100%);
   background-size: 200% 100%;
   animation: loading-shimmer 1.5s linear infinite;
   border-radius: 8px;
@@ -278,13 +278,13 @@ body {
   position: relative;
   height: 8px;
   border-radius: 4px;
-  background: #E5E4E0;
+  background: #E5E7EB;
   overflow: hidden;
 }
 .xp-fill {
   height: 100%;
   border-radius: 4px;
-  background: linear-gradient(90deg, #FF8C00, #FFA500);
+  background: linear-gradient(90deg, #3B82F6, #FFA500);
   transition: width 1s cubic-bezier(0.4,0,0.2,1);
 }
 

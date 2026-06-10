@@ -68,7 +68,7 @@ export function ContactCard() {
   return (
     <div
       className="p-4 rounded-lg border space-y-2"
-      style={{ borderColor: '#E5E4E0', direction: isRTL ? 'rtl' : 'ltr' }}
+      style={{ borderColor: '#E5E7EB', direction: isRTL ? 'rtl' : 'ltr' }}
     >
       <h4 className="font-bold" style={{ color: COLOR_PRIMARY }}>
         {office.city}, {office.region}

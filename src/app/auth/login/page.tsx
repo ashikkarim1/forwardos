@@ -130,7 +130,7 @@ export default function LoginPage() {
                 className="w-full pl-10 pr-4 py-3 rounded-lg border-2 transition-colors focus:outline-none"
                 style={{
                   borderColor: COLOR_BORDER,
-                  background: '#FAFAF9',
+                  background: '#F3F4F6',
                 }}
                 onFocus={(e) => (e.target.style.borderColor = COLOR_ACCENT)}
                 onBlur={(e) => (e.target.style.borderColor = COLOR_BORDER)}
@@ -154,7 +154,7 @@ export default function LoginPage() {
                 className="w-full pl-10 pr-4 py-3 rounded-lg border-2 transition-colors focus:outline-none"
                 style={{
                   borderColor: COLOR_BORDER,
-                  background: '#FAFAF9',
+                  background: '#F3F4F6',
                 }}
                 onFocus={(e) => (e.target.style.borderColor = COLOR_ACCENT)}
                 onBlur={(e) => (e.target.style.borderColor = COLOR_BORDER)}

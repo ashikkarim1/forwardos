@@ -87,7 +87,7 @@ function BadgeChip({ badge }: { badge: string | null }) {
 
   return (
     <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
-      style={{ background: '#F0EFED', color: COLOR_TEXT_SECONDARY }}>
+      style={{ background: '#F9FAFB', color: COLOR_TEXT_SECONDARY }}>
       {badge}
     </span>
   )
@@ -199,7 +199,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     className="w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-colors"
                     style={{
                       color: COLOR_TEXT_SECONDARY,
-                      background: expandedSections.includes(group.section) ? '#F7F6F4' : 'transparent',
+                      background: expandedSections.includes(group.section) ? '#FFFFFF' : 'transparent',
                     }}
                   >
                     <span>{group.section}</span>
@@ -233,7 +233,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                                 className="flex items-center justify-between px-3 py-2 rounded-md text-sm transition-all"
                                 style={{
                                   color: isActive ? COLOR_ACCENT : COLOR_TEXT_SECONDARY,
-                                  background: isActive ? '#FEE2CC' : 'transparent',
+                                  background: isActive ? '#F3F4F6' : 'transparent',
                                   fontWeight: isActive ? 600 : 500,
                                 }}
                               >

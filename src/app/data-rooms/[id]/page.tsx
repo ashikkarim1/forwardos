@@ -254,7 +254,7 @@ export default function DataRoomPage({ params }: { params: { id: string } }) {
       {errorMessage && (
         <motion.div
           className="mb-6 p-4 rounded-lg flex items-center gap-2"
-          style={{ background: '#FEE2CC', color: COLOR_ACCENT }}
+          style={{ background: '#F3F4F6', color: COLOR_ACCENT }}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >

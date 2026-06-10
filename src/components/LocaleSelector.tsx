@@ -42,7 +42,7 @@ export function LocaleSelector() {
         className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
         title="Change language and currency"
       >
-        <Globe size={20} style={{ color: '#FF8C00' }} />
+        <Globe size={20} style={{ color: '#3B82F6' }} />
         <span className="text-sm font-semibold uppercase">{locale}</span>
       </button>
 
@@ -50,10 +50,10 @@ export function LocaleSelector() {
         <div
           ref={popupRef}
           className="absolute top-12 right-0 bg-white border rounded-lg shadow-xl z-50 min-w-[320px]"
-          style={{ borderColor: '#E5E4E0' }}
+          style={{ borderColor: '#E5E7EB' }}
         >
           {/* Language Selection */}
-          <div className="border-b p-4" style={{ borderColor: '#E5E4E0' }}>
+          <div className="border-b p-4" style={{ borderColor: '#E5E7EB' }}>
             <h3 className="text-xs font-bold uppercase mb-3" style={{ color: '#1A1A1A' }}>
               Language
             </h3>
@@ -69,7 +69,7 @@ export function LocaleSelector() {
                     locale === loc.id ? 'text-white' : ''
                   }`}
                   style={{
-                    background: locale === loc.id ? '#FF8C00' : '#F7F6F4',
+                    background: locale === loc.id ? '#3B82F6' : '#F9FAFB',
                     color: locale === loc.id ? 'white' : '#1A1A1A',
                   }}
                 >
@@ -96,7 +96,7 @@ export function LocaleSelector() {
                     currency === curr.id ? 'text-white' : ''
                   }`}
                   style={{
-                    background: currency === curr.id ? '#FF8C00' : '#F7F6F4',
+                    background: currency === curr.id ? '#3B82F6' : '#FFFFFF',
                     color: currency === curr.id ? 'white' : '#1A1A1A',
                   }}
                 >

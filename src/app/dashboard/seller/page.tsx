@@ -941,7 +941,7 @@ export default function SellerDashboardV2() {
           <motion.div className="grid grid-cols-2 lg:grid-cols-4 gap-4" variants={itemVariants}>
             {[
               { label: 'In Interest', value: 3, color: '#3B82F6' },
-              { label: 'In Due Diligence', value: 1, color: '#FF8C00' },
+              { label: 'In Due Diligence', value: 1, color: '#3B82F6' },
               { label: 'In Negotiation', value: 1, color: '#F59E0B' },
               { label: 'Closed', value: 0, color: '#10B981' },
             ].map((stat) => (

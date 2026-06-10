@@ -21,14 +21,14 @@ const METRICS = [
     value: '47',
     change: '+12%',
     icon: Users,
-    color: '#FF8C00',
+    color: '#3B82F6',
   },
   {
     label: 'New Listings',
     value: '23',
     change: '+8%',
     icon: ShoppingCart,
-    color: '#FF8C00',
+    color: '#3B82F6',
   },
   {
     label: 'Pending Approvals',

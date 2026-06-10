@@ -1065,7 +1065,7 @@ export default function BuyerDashboardV2() {
               <motion.div
                 key={idx}
                 className="p-4 rounded-lg border-2"
-                style={{ borderColor: COLOR_BORDER, background: '#F7F6F4' }}
+                style={{ borderColor: COLOR_BORDER, background: '#FFFFFF' }}
                 variants={itemVariants}
               >
                 <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs font-semibold mb-2">
@@ -1088,7 +1088,7 @@ export default function BuyerDashboardV2() {
           </motion.div>
 
           {/* Pipeline Notes */}
-          <motion.div className="mt-6 p-6 rounded-lg border-2" style={{ borderColor: COLOR_BORDER, background: '#F7F6F4' }} variants={itemVariants}>
+          <motion.div className="mt-6 p-6 rounded-lg border-2" style={{ borderColor: COLOR_BORDER, background: '#FFFFFF' }} variants={itemVariants}>
             <h3 className="font-bold text-lg mb-4" style={{ color: COLOR_PRIMARY }}>
               About Your Deals
             </h3>

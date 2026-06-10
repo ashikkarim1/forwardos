@@ -19,12 +19,12 @@ export default function TestDashboard() {
         ].map((metric) => (
           <div key={metric.label} style={{
             padding: '20px',
-            border: '1px solid #E5E4E0',
+            border: '1px solid #E5E7EB',
             borderRadius: '16px',
             background: '#FFFFFF'
           }}>
             <p style={{ color: '#717171', fontSize: '12px', marginBottom: '8px' }}>{metric.label}</p>
-            <p style={{ color: '#FF8C00', fontSize: '28px', fontWeight: 'bold', margin: '0' }}>{metric.value}</p>
+            <p style={{ color: '#3B82F6', fontSize: '28px', fontWeight: 'bold', margin: '0' }}>{metric.value}</p>
           </div>
         ))}
       </div>
@@ -35,7 +35,7 @@ export default function TestDashboard() {
           style={{
             padding: '12px 24px',
             borderRadius: '8px',
-            background: '#FF8C00',
+            background: '#3B82F6',
             color: 'white',
             border: 'none',
             cursor: 'pointer',

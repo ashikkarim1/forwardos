@@ -111,7 +111,7 @@ export function BeeAnimation() {
       {/* Hover Hint */}
       {!isHovering && (
         <motion.div
-          className="absolute -bottom-8 text-xs font-medium text-orange-600 pointer-events-none whitespace-nowrap"
+          className="absolute -bottom-8 text-xs font-medium text-blue-600 pointer-events-none whitespace-nowrap"
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 2, repeat: Infinity }}
         >

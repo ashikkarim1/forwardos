@@ -82,7 +82,7 @@ const STATUS_COLORS = {
 }
 
 const TIER_COLORS = {
-  premium: '#FF8C00',
+  premium: '#3B82F6',
   standard: '#6366F1',
   free: '#8B5CF6',
 }
@@ -284,7 +284,7 @@ export default function AdminListingsPage() {
                         )}
                         <button
                           onClick={() => handleFlag(listing.id)}
-                          className="p-2 hover:bg-orange-100 rounded transition-colors"
+                          className="p-2 hover:bg-blue-100 rounded transition-colors"
                           title="Flag"
                         >
                           <Flag size={18} color={COLOR_ACCENT} />

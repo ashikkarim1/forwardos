@@ -76,7 +76,7 @@ export function AppShellSimple({ children }: { children: React.ReactNode }) {
                         className="flex items-center justify-between px-3 py-2 rounded-md text-sm transition-all"
                         style={{
                           color: isActive ? COLOR_ACCENT : COLOR_TEXT_SECONDARY,
-                          background: isActive ? '#FEE2CC' : 'transparent',
+                          background: isActive ? '#F3F4F6' : 'transparent',
                           fontWeight: isActive ? 600 : 500,
                         }}
                       >

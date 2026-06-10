@@ -88,7 +88,7 @@ export function DealPipeline({
               <div
                 className="p-4 rounded-lg mb-3 border-2"
                 style={{
-                  background: '#F7F6F4',
+                  background: '#FFFFFF',
                   borderColor: COLOR_BORDER,
                 }}
               >

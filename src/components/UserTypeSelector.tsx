@@ -24,7 +24,7 @@ export function UserTypeSelector({ isOpen, onClose, redirectAfterSelection = tru
       title: t('users.sellers.title'),
       description: t('users.sellers.desc'),
       href: '/auth/signup-seller',
-      color: '#FF8C00',
+      color: '#3B82F6',
     },
     {
       key: 'buyers',
@@ -32,7 +32,7 @@ export function UserTypeSelector({ isOpen, onClose, redirectAfterSelection = tru
       title: t('users.buyers.title'),
       description: t('users.buyers.desc'),
       href: '/auth/signup?type=buyer',
-      color: '#FF8C00',
+      color: '#3B82F6',
     },
     {
       key: 'brokers',
@@ -40,7 +40,7 @@ export function UserTypeSelector({ isOpen, onClose, redirectAfterSelection = tru
       title: t('users.brokers.title'),
       description: t('users.brokers.desc'),
       href: '/auth/signup?type=broker',
-      color: '#FF8C00',
+      color: '#3B82F6',
     },
   ]
 

@@ -48,7 +48,7 @@ const metrics: Metric[] = [
     value: 12,
     change: 3,
     icon: FileText,
-    color: '#FF8C00',
+    color: '#3B82F6',
   },
   {
     label: 'Total Inquiries',
