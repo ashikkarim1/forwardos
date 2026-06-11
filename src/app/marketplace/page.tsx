@@ -7,6 +7,7 @@ import { Search, ChevronLeft, ChevronRight, ChevronDown, Building2, MapPin, User
 import ListingCard from '@/components/listing/ListingCard'
 import { BusinessPhotoGallery } from '@/components/BusinessPhotoGallery'
 import { SaveSearchButton } from '@/components/SaveSearchButton'
+import { PublicHeader } from '@/components/Navigation'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 interface Deal {
@@ -135,23 +136,30 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="sticky top-0 z-40 border-b" style={{ borderColor: COLOR_BORDER, background: 'white' }}>
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
-          <h1 className="text-3xl md:text-4xl font-black mb-1" style={{ color: COLOR_PRIMARY }}>Global Marketplace</h1>
-          <p style={{ color: COLOR_TEXT_SECONDARY }}>{filteredListings.length} premium investment opportunities</p>
+      <PublicHeader />
+
+      <section className="px-4 md:px-8 py-12 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+        <div className="max-w-7xl mx-auto">
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4" style={{ background: COLOR_ACCENT, color: 'white' }}>
+            MARKETPLACE
+          </span>
+          <h1 className="text-4xl md:text-5xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>Global Marketplace</h1>
+          <p className="text-lg" style={{ color: COLOR_TEXT_SECONDARY }}>
+            {filteredListings.length} verified businesses for sale across the UAE &amp; Canada
+          </p>
         </div>
-      </motion.div>
+      </section>
 
       <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="border-b" style={{ borderColor: COLOR_BORDER, background: 'white' }}>
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
           <div className="flex items-center gap-2 mb-6">
             <span className="text-2xl">🔥</span>
             <h2 className="text-2xl font-black" style={{ color: COLOR_PRIMARY }}>Trending Deals Right Now</h2>
-            <span className="text-xs font-bold px-3 py-1 rounded-full text-white" style={{ background: '#DC2626' }}>HOTTEST</span>
+            <span className="text-xs font-bold px-3 py-1 rounded-full text-white" style={{ background: COLOR_ACCENT }}>HOTTEST</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {hotDeals.map(deal => (
-              <motion.div key={deal.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-3 rounded-lg border-2 hover:shadow-md transition-shadow cursor-pointer" style={{ borderColor: COLOR_ACCENT }}>
+              <motion.div key={deal.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border hover:shadow-md transition-shadow cursor-pointer bg-white" style={{ borderColor: COLOR_BORDER }}>
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1">
                     <h3 className="font-bold text-sm line-clamp-1" style={{ color: COLOR_PRIMARY }}>{deal.title}</h3>
@@ -199,7 +207,7 @@ export default function MarketplacePage() {
               />
 
               {activeFiltersCount > 0 && (
-                <div className="p-3 rounded-lg border-2 flex items-center justify-between" style={{ background: '#FEF3C7', borderColor: COLOR_ACCENT }}>
+                <div className="p-3 rounded-xl border flex items-center justify-between" style={{ background: '#EFF6FF', borderColor: COLOR_BORDER }}>
                   <span className="text-xs font-semibold" style={{ color: COLOR_PRIMARY }}>{activeFiltersCount} active filters</span>
                   <button onClick={clearAllFilters} className="text-xs font-bold hover:opacity-70 transition-opacity" style={{ color: COLOR_ACCENT }}>Clear All</button>
                 </div>
