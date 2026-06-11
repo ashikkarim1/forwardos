@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Check, ArrowRight, Crown } from 'lucide-react'
 import { useLocale } from '@/context/LocaleContext'
+import { PRICING, COMPETITORS, LAUNCH_DISCOUNT_PCT, lowestCompetitorMonthly } from '@/lib/pricing'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 export function SellerPricingTiers() {
@@ -53,7 +54,8 @@ export function SellerPricingTiers() {
       id: 'premium',
       name: 'Premium',
       description: 'Maximum visibility & buyer trust',
-      basePrice: 99,
+      basePrice: PRICING.premium.launch,
+      regularPrice: PRICING.premium.regular,
       period: '/month',
       features: [
         '⭐ Featured on homepage',
@@ -65,11 +67,11 @@ export function SellerPricingTiers() {
         '24/7 priority support',
         'Unlimited photos',
       ],
-      cta: 'Choose Premium',
+      cta: 'Lock in launch price',
       highlighted: true,
       premium: true,
       ctaAction: () => handleSelectPlan('premium'),
-      note: 'Free trial after approval',
+      note: `${LAUNCH_DISCOUNT_PCT}% off for 90 days · free trial after approval`,
     },
   ]
 
@@ -119,6 +121,16 @@ export function SellerPricingTiers() {
                 <div className="mb-6">
                   {tier.basePrice > 0 ? (
                     <>
+                      {'regularPrice' in tier && (tier as { regularPrice?: number }).regularPrice ? (
+                        <div className="inline-flex items-center gap-2 mb-1">
+                          <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white" style={{ background: '#2D7A5F' }}>
+                            {LAUNCH_DISCOUNT_PCT}% OFF · LAUNCH
+                          </span>
+                          <span className="text-sm line-through" style={{ color: COLOR_TEXT_SECONDARY }}>
+                            {getPrice((tier as { regularPrice: number }).regularPrice).display}{tier.period}
+                          </span>
+                        </div>
+                      ) : null}
                       <div className="flex items-baseline gap-2">
                         <p className="text-4xl font-black" style={{ color: COLOR_ACCENT }}>
                           {getPrice(tier.basePrice).display}
@@ -170,6 +182,58 @@ export function SellerPricingTiers() {
               </button>
             </motion.div>
           ))}
+        </div>
+
+        {/* How We Compare — 50% cheaper launch pricing */}
+        <div className="bg-white rounded-lg border p-8 md:p-12 mb-16" style={{ borderColor: COLOR_BORDER }}>
+          <div className="text-center mb-8">
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white mb-3" style={{ background: '#2D7A5F' }}>
+              90-DAY LAUNCH PRICING
+            </span>
+            <h3 className="text-2xl md:text-3xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>
+              Half the price of every major competitor
+            </h3>
+            <p style={{ color: COLOR_TEXT_SECONDARY }}>
+              Forward Premium is <strong>{getPrice(PRICING.premium.launch).display}/mo</strong> during launch —
+              less than half of comparable featured listings elsewhere.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr style={{ color: COLOR_TEXT_SECONDARY }}>
+                  <th className="text-left py-2 px-3 font-semibold">Platform</th>
+                  <th className="text-left py-2 px-3 font-semibold">Featured listing / mo</th>
+                  <th className="text-left py-2 px-3 font-semibold">You save with Forward</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="rounded-lg" style={{ background: COLOR_ACCENT + '10' }}>
+                  <td className="py-3 px-3 font-bold" style={{ color: COLOR_PRIMARY }}>⭐ Forward Premium (launch)</td>
+                  <td className="py-3 px-3 font-black" style={{ color: COLOR_ACCENT }}>{getPrice(PRICING.premium.launch).display}</td>
+                  <td className="py-3 px-3 font-semibold" style={{ color: '#2D7A5F' }}>—</td>
+                </tr>
+                {COMPETITORS.map((c) => {
+                  const savePct = Math.round((1 - PRICING.premium.launch / c.featuredMonthly) * 100)
+                  return (
+                    <tr key={c.name} className="border-t" style={{ borderColor: COLOR_BORDER }}>
+                      <td className="py-3 px-3" style={{ color: COLOR_PRIMARY }}>
+                        {c.name}
+                        <span className="block text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>{c.note}</span>
+                      </td>
+                      <td className="py-3 px-3" style={{ color: COLOR_TEXT_SECONDARY }}>{getPrice(c.featuredMonthly).display}</td>
+                      <td className="py-3 px-3 font-bold" style={{ color: '#2D7A5F' }}>{savePct}% less</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs mt-4" style={{ color: COLOR_TEXT_SECONDARY }}>
+            Competitor prices reflect publicly listed featured/premium tiers and may vary by term. Forward launch
+            pricing ends in 90 days; lock it in now and keep it for your listing period.
+          </p>
         </div>
 
         {/* Why Complete Listings Matter */}

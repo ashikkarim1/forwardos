@@ -1,5 +1,40 @@
 import '@/styles/globals.css'
+import type { Metadata } from 'next'
 import { LocaleProvider } from '@/context/LocaleContext'
+import { LaunchPromoBanner } from '@/components/LaunchPromoBanner'
+import {
+  SITE_URL, SITE_NAME, SITE_TAGLINE, DEFAULT_DESCRIPTION, DEFAULT_KEYWORDS, OG_IMAGE,
+  organizationLd, webSiteLd, jsonLdScript,
+} from '@/lib/seo'
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: DEFAULT_DESCRIPTION,
+  keywords: DEFAULT_KEYWORDS,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME }],
+  alternates: {
+    canonical: SITE_URL,
+    languages: { 'en': SITE_URL, 'fr-CA': SITE_URL, 'ar': SITE_URL },
+  },
+  openGraph: {
+    type: 'website', siteName: SITE_NAME, url: SITE_URL,
+    title: `${SITE_NAME} — ${SITE_TAGLINE}`, description: DEFAULT_DESCRIPTION,
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: SITE_NAME }],
+  },
+  twitter: {
+    card: 'summary_large_image', title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+    description: DEFAULT_DESCRIPTION, images: [OG_IMAGE],
+  },
+  robots: {
+    index: true, follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  },
+}
 
 export default function RootLayout({
   children,
@@ -9,13 +44,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#3B82F6" />
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3v6m0 0v6m0-6h-6m6 0h6M5.5 5.5l4.24 4.24M18.5 18.5l-4.24-4.24M18.5 5.5l-4.24 4.24M5.5 18.5l4.24-4.24'/></svg>" type="image/svg+xml" />
+        <link rel="icon" href="/FOS.jpg" type="image/jpeg" />
+        <link rel="apple-touch-icon" href="/FOS.jpg" />
+        {/* Structured data: Organization + WebSite (enables sitelinks search box) */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(organizationLd()) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(webSiteLd()) }} />
       </head>
       <body className="bg-white text-[#1A1A1A] font-sans antialiased">
         <LocaleProvider>
+          <LaunchPromoBanner />
           <main id="main-content">{children}</main>
         </LocaleProvider>
       </body>
