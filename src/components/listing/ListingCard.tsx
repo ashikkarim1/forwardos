@@ -145,8 +145,10 @@ export default function ListingCard({
       style={{ borderColor: COLOR_BORDER }}
     >
       {/* IMAGE + STATUS BADGES */}
-      <button
+      <div
         onClick={onViewPhotos}
+        role="button"
+        tabIndex={0}
         className="relative h-40 overflow-hidden bg-gray-200 flex-shrink-0 w-full text-left cursor-pointer group"
       >
         <img
@@ -232,7 +234,7 @@ export default function ListingCard({
             style={{ color: saved ? COLOR_ACCENT : COLOR_TEXT_SECONDARY }}
           />
         </button>
-      </button>
+      </div>
 
       {/* MAIN CONTENT */}
       <div className="p-3 space-y-3 flex flex-col flex-grow">
