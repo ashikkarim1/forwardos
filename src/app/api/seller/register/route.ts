@@ -2,35 +2,27 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendEmailVerification, sendAdminReviewNotification } from '@/lib/services/email'
 import { hashPassword } from '@/lib/auth'
+import { rateLimit, clientIp, isSameOrigin } from '@/lib/rate-limit'
+import { parseBody, registerSchema } from '@/lib/validation'
 import crypto from 'crypto'
-
-interface RegisterRequest {
-  firstName: string
-  lastName: string
-  email: string
-  companyName: string
-  password: string
-  planTier?: 'freemium' | 'premium'
-}
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json() as RegisterRequest
+    if (!isSameOrigin(request)) {
+      return NextResponse.json({ error: 'Cross-origin request blocked' }, { status: 403 })
+    }
+    // Abuse protection: 5 signups / hour per IP.
+    const rl = rateLimit(`register:${clientIp(request)}`, 5, 60 * 60_000)
+    if (!rl.ok) {
+      return NextResponse.json({ error: 'Too many signups. Try again later.' }, {
+        status: 429, headers: { 'Retry-After': String(rl.retryAfter) },
+      })
+    }
 
     // ========== VALIDATION ==========
-    if (!body.email || !body.password || !body.firstName || !body.lastName || !body.companyName) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      )
-    }
-
-    if (body.password.length < 8) {
-      return NextResponse.json(
-        { error: 'Password must be at least 8 characters' },
-        { status: 400 }
-      )
-    }
+    const parsed = await parseBody(request, registerSchema)
+    if (!parsed.ok) return parsed.response
+    const body = parsed.data
 
     // ========== CHECK IF EMAIL EXISTS ==========
     const existingUser = await prisma.user.findUnique({

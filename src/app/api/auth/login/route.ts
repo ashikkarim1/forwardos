@@ -1,17 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyPassword, signToken, setAuthCookie } from '@/lib/auth'
+import { rateLimit, clientIp, isSameOrigin } from '@/lib/rate-limit'
+import { parseBody, loginSchema } from '@/lib/validation'
 
 /**
  * POST /api/auth/login  { email, password }
  * Verifies credentials against the hashed password and sets an httpOnly session cookie.
+ * Hardened: same-origin check, brute-force rate limit, validated input.
  */
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json()
-    if (!email || !password) {
-      return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
+    if (!isSameOrigin(request)) {
+      return NextResponse.json({ error: 'Cross-origin request blocked' }, { status: 403 })
     }
+    // Brute-force protection: 10 attempts / 15 min per IP.
+    const rl = rateLimit(`login:${clientIp(request)}`, 10, 15 * 60_000)
+    if (!rl.ok) {
+      return NextResponse.json({ error: 'Too many attempts. Try again later.' }, {
+        status: 429, headers: { 'Retry-After': String(rl.retryAfter) },
+      })
+    }
+
+    const parsed = await parseBody(request, loginSchema)
+    if (!parsed.ok) return parsed.response
+    const { email, password } = parsed.data
 
     const user = await prisma.user.findUnique({ where: { email: String(email).toLowerCase() } })
     // Generic message — don't reveal whether the email exists.
