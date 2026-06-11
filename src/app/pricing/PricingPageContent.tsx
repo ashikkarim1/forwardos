@@ -6,102 +6,85 @@ import { Check, ArrowRight, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { useLocale } from '@/context/LocaleContext'
 import { useTranslation } from '@/hooks/useTranslation'
-import { LocaleSelector } from '@/components/LocaleSelector'
 import { SellerPricingTiers } from '@/components/SellerPricingTiers'
 import { UserTypeSelector } from '@/components/UserTypeSelector'
+import { PRICING, LAUNCH_DISCOUNT_PCT } from '@/lib/pricing'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
 interface PricingTier {
   id: string
   name: string
   description: string
-  basePrice: number
-  currency: string
+  basePrice: number      // launch price (USD)
+  regularPrice?: number  // struck-through regular price (USD)
   features: string[]
   cta: string
   highlighted?: boolean
 }
 
 export function PricingPageContent() {
-  const { locale, currency, isRTL } = useLocale()
+  const { isRTL } = useLocale()
   const t = useTranslation()
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly')
   const [showUserTypeModal, setShowUserTypeModal] = useState(false)
 
+  // Pricing is USD-only.
   const getPrice = (basePrice: number): { display: string; amount: number } => {
-    // Apply 15% discount for yearly billing
-    const finalPrice = billingPeriod === 'yearly' ? basePrice * 0.85 : basePrice
-
-    let display = ''
-    if (currency === 'CAD') {
-      display = `C$${Math.round(finalPrice * 1.35)}`
-    } else if (currency === 'AED') {
-      display = `د.إ${Math.round(finalPrice * 3.67)}`
-    } else {
-      display = `$${Math.round(finalPrice)}`
-    }
-
-    return { display, amount: finalPrice }
+    return { display: `$${Math.round(basePrice).toLocaleString()}`, amount: basePrice }
   }
 
   const tiers: PricingTier[] = [
     {
       id: 'starter',
-      name: t('pricing.starter'),
-      description: t('pricing.starterDesc'),
-      basePrice: 499,
-      currency: 'USD',
+      name: 'Starter',
+      description: 'For active individual buyers',
+      basePrice: PRICING.starter.launch,
+      regularPrice: PRICING.starter.regular,
       features: [
-        t('pricing.starter_feature1'),
+        'Full marketplace access',
         'Deal heat scores & success probability',
-        t('pricing.starter_feature2'),
-        t('pricing.starter_feature3'),
+        'Saved searches & email alerts',
         'Basic financial metrics',
-        'Saved searches & alerts',
-        t('pricing.starter_feature4'),
-        'Trusted by 100+ professionals',
+        'Buyer messaging & inquiries',
+        'Finance Center & valuation tools',
+        'Email support',
       ],
-      cta: t('pricing.trial'),
+      cta: 'Start free trial',
       highlighted: false,
     },
     {
       id: 'professional',
-      name: t('pricing.professional'),
-      description: t('pricing.professionalDesc'),
-      basePrice: 1999,
-      currency: 'USD',
+      name: 'Pro',
+      description: 'For serious acquirers & small funds',
+      basePrice: PRICING.pro.launch,
+      regularPrice: PRICING.pro.regular,
       features: [
-        t('pricing.pro_feature1'),
+        'Everything in Starter +',
         'Financial modeling tools (DCF, SDE, ROI)',
         'Deal comparison (up to 5)',
         'Portfolio dashboard & tracking',
         'AI-powered recommendations',
         'Comparables database access',
-        'API access (10,000 calls/month)',
+        'Secure data-room access',
         'Priority support',
-        'Discussion threads per deal',
       ],
-      cta: t('pricing.trial'),
+      cta: 'Start free trial',
       highlighted: true,
     },
     {
       id: 'enterprise',
-      name: t('pricing.enterprise'),
-      description: t('pricing.enterpriseDesc'),
+      name: 'Enterprise',
+      description: 'For institutions & PE firms',
       basePrice: 0,
-      currency: 'USD',
       features: [
-        'Everything in Professional +',
+        'Everything in Pro +',
         'Unlimited API access',
         'Custom integrations',
         'White-label marketplace',
         'Dedicated account manager',
         'Custom reporting & analytics',
-        'Institutional API tier',
-        'Advanced pipeline analytics',
         '24/7 phone support',
       ],
-      cta: t('pricing.contact'),
+      cta: 'Contact sales',
       highlighted: false,
     },
   ]
@@ -117,7 +100,7 @@ export function PricingPageContent() {
           <Link href="/" className="flex items-center gap-2">
             <Sparkles size={32} style={{ color: COLOR_ACCENT }} />
             <span className="text-xl font-black" style={{ color: COLOR_PRIMARY }}>
-              Forward OS
+              Forward Intelligence
             </span>
           </Link>
           <div className={`flex items-center gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
@@ -135,7 +118,6 @@ export function PricingPageContent() {
             >
               Pricing
             </Link>
-            <LocaleSelector />
             <Link
               href="/auth/signin"
               className="px-6 py-2 rounded-lg font-bold text-white hover:opacity-90"
@@ -159,57 +141,23 @@ export function PricingPageContent() {
         </div>
       </div>
 
-      {/* Billing Period Toggle */}
-      <div className="py-12 px-4 sm:px-6 lg:px-8" style={{ background: COLOR_PRIMARY + '02' }}>
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-center gap-6 flex-wrap">
-            <span style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm font-semibold">
-              Billed Monthly
-            </span>
+      {/* ============ SELLERS FIRST (free to list) ============ */}
+      <SellerPricingTiers />
 
-            {/* Toggle Switch */}
-            <button
-              onClick={() => setBillingPeriod(billingPeriod === 'monthly' ? 'yearly' : 'monthly')}
-              className={`relative w-16 h-8 rounded-full transition-all ${
-                billingPeriod === 'yearly' ? '' : ''
-              }`}
-              style={{
-                background: billingPeriod === 'yearly' ? COLOR_ACCENT : COLOR_BORDER,
-              }}
-            >
-              <motion.div
-                className="absolute top-1 w-6 h-6 rounded-full bg-white"
-                animate={{
-                  left: billingPeriod === 'yearly' ? '32px' : '2px',
-                }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-              />
-            </button>
-
-            <div className="flex items-center gap-2">
-              <span style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm font-semibold">
-                Billed Yearly
-              </span>
-              <span
-                className="px-3 py-1 rounded-full text-xs font-bold text-white"
-                style={{ background: COLOR_ACCENT }}
-              >
-                Save 15%
-              </span>
-            </div>
-          </div>
-
-          <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-center text-sm mt-6">
-            {billingPeriod === 'yearly'
-              ? '✅ Cancel anytime before period ends • No automatic renewals • End date is locked'
-              : '✅ Cancel anytime before month ends • No automatic renewals • End date is locked'}
-          </p>
-        </div>
-      </div>
-
-      {/* Pricing Cards */}
-      <div className="py-20 px-4 sm:px-6 lg:px-8">
+      {/* ============ BUYERS ============ */}
+      <div className="py-16 px-4 sm:px-6 lg:px-8 border-t" style={{ borderColor: COLOR_BORDER }}>
         <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white mb-3" style={{ background: '#2D7A5F' }}>
+              {LAUNCH_DISCOUNT_PCT}% OFF · 90-DAY LAUNCH
+            </span>
+            <h2 className="text-4xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>
+              For Buyers — Deal Intelligence Plans
+            </h2>
+            <p className="text-lg" style={{ color: COLOR_TEXT_SECONDARY }}>
+              Browsing is free. Upgrade for AI scoring, modeling tools, and data rooms — all USD, 50% off during launch.
+            </p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {tiers.map((tier, idx) => (
               <motion.div
@@ -245,21 +193,24 @@ export function PricingPageContent() {
                   <div className="mb-6">
                     {tier.basePrice > 0 ? (
                       <>
-                        <div className="flex items-baseline gap-3">
+                        {tier.regularPrice ? (
+                          <div className="inline-flex items-center gap-2 mb-1">
+                            <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white" style={{ background: '#2D7A5F' }}>
+                              {LAUNCH_DISCOUNT_PCT}% OFF
+                            </span>
+                            <span className="text-sm line-through" style={{ color: COLOR_TEXT_SECONDARY }}>
+                              {getPrice(tier.regularPrice).display}/mo
+                            </span>
+                          </div>
+                        ) : null}
+                        <div className="flex items-baseline gap-2">
                           <p className="text-4xl font-black" style={{ color: COLOR_ACCENT }}>
                             {getPrice(tier.basePrice).display}
                           </p>
-                          {billingPeriod === 'yearly' && (
-                            <span
-                              className="text-xs font-bold px-2 py-1 rounded"
-                              style={{ background: COLOR_ACCENT + '20', color: COLOR_ACCENT }}
-                            >
-                              Save 15%
-                            </span>
-                          )}
+                          <span style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">/month</span>
                         </div>
-                        <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm mt-1">
-                          {billingPeriod === 'yearly' ? 'per month, billed yearly' : 'per month, billed monthly'}
+                        <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-1">
+                          USD · 14-day free trial · cancel anytime
                         </p>
                       </>
                     ) : (
@@ -304,14 +255,11 @@ export function PricingPageContent() {
         </div>
       </div>
 
-      {/* Seller Pricing Section */}
-      <SellerPricingTiers />
-
       {/* Value Proposition */}
       <div className="bg-gray-50 py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-black mb-12 text-center" style={{ color: COLOR_PRIMARY }}>
-            Why Forward OS Pricing Is A Bargain
+            Why Forward Intelligence Pricing Is A Bargain
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
@@ -333,7 +281,7 @@ export function PricingPageContent() {
               style={{ borderColor: COLOR_ACCENT, background: COLOR_ACCENT + '08' }}
             >
               <p className="font-bold mb-4 text-lg" style={{ color: COLOR_PRIMARY }}>
-                Using Forward OS:
+                Using Forward Intelligence:
               </p>
               <ul className="space-y-3 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
                 <li>✓ 16 minutes per deal</li>
@@ -374,7 +322,7 @@ export function PricingPageContent() {
               },
               {
                 q: 'What payment methods do you accept?',
-                a: 'All major credit cards (Visa, Mastercard, Amex) via Stripe. We support USD, CAD, and AED.',
+                a: 'All major credit cards (Visa, Mastercard, Amex) via Stripe. All plans are billed in USD.',
               },
               {
                 q: 'Is there a free trial?',
@@ -385,8 +333,8 @@ export function PricingPageContent() {
                 a: 'Enterprise customers can customize integrations and pricing. Contact sales for details.',
               },
               {
-                q: 'Do you offer annual discounts?',
-                a: '15% discount when billed annually instead of monthly.',
+                q: 'Is there a launch discount?',
+                a: 'Yes — all paid plans are 50% off for the first 90 days during our launch. Lock in the rate now.',
               },
             ].map((faq, idx) => (
               <div key={idx} className="p-6 rounded-lg border" style={{ borderColor: COLOR_BORDER }}>

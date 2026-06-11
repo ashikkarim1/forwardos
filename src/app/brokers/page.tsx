@@ -43,10 +43,23 @@ export default function BrokersPage() {
           <h1 className="text-4xl md:text-5xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>
             Find a verified M&amp;A broker
           </h1>
-          <p className="text-lg max-w-2xl" style={{ color: COLOR_TEXT_SECONDARY }}>
-            Vetted advisors across Canada and the UAE — filter by region, industry, and the languages they
+          <p className="text-lg max-w-2xl mb-5" style={{ color: COLOR_TEXT_SECONDARY }}>
+            Vetted advisors across the USA, Canada and the UAE — filter by region, industry, and the languages they
             work in (EN / FR / AR). Every review is tied to a real closed deal.
           </p>
+          {/* Broker recruitment CTA */}
+          <div className="inline-flex items-center gap-3 flex-wrap bg-white rounded-xl border px-4 py-3" style={{ borderColor: COLOR_BORDER }}>
+            <span className="text-sm font-semibold" style={{ color: COLOR_PRIMARY }}>
+              Are you a broker? List businesses and reach verified buyers.
+            </span>
+            <Link
+              href="/seller/register?role=broker"
+              className="px-4 py-2 rounded-lg text-sm font-bold text-white hover:opacity-90"
+              style={{ background: COLOR_ACCENT }}
+            >
+              Join our broker network →
+            </Link>
+          </div>
         </div>
       </section>
 

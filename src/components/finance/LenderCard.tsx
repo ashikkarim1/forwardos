@@ -31,7 +31,7 @@ export function LenderCard({ lender, onInquire }: { lender: LenderView; onInquir
   const fmt = (cents: number) => formatCurrency(cents / 100, cur)
 
   return (
-    <div className="bg-white rounded-xl border p-6 flex flex-col" style={{ borderColor: COLOR_BORDER }}>
+    <div className="bg-white rounded-xl border p-6 flex flex-col h-full" style={{ borderColor: COLOR_BORDER }}>
       <div className="flex items-start justify-between gap-3 mb-3">
         <h3 className="text-lg font-bold leading-tight" style={{ color: COLOR_PRIMARY }}>
           {lender.name}
@@ -47,36 +47,40 @@ export function LenderCard({ lender, onInquire }: { lender: LenderView; onInquir
         )}
       </div>
 
-      <p className="text-sm mb-4 flex-1" style={{ color: COLOR_TEXT_SECONDARY }}>
-        {lender.description}
-      </p>
+      {/* Growing region: description + badges + metrics. Keeps the CTA row pinned
+          to the same bottom line across every card. */}
+      <div className="flex-1 flex flex-col">
+        <p className="text-sm mb-4" style={{ color: COLOR_TEXT_SECONDARY }}>
+          {lender.description}
+        </p>
 
-      <div className="flex flex-wrap gap-2 mb-4">
-        {lender.financingTypes.map((t) => (
-          <span
-            key={t}
-            className="px-2 py-1 rounded-md text-xs font-semibold"
-            style={{ background: '#EFF6FF', color: COLOR_ACCENT }}
-          >
-            {FINANCING_TYPE_LABELS[t]}
-          </span>
-        ))}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {lender.financingTypes.map((t) => (
+            <span
+              key={t}
+              className="px-2 py-1 rounded-md text-xs font-semibold"
+              style={{ background: '#EFF6FF', color: COLOR_ACCENT }}
+            >
+              {FINANCING_TYPE_LABELS[t]}
+            </span>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 text-sm mt-auto">
+          <Metric label="Amount" value={`${fmt(lender.minAmount)} – ${fmt(lender.maxAmount)}`} />
+          <Metric
+            label={lender.shariaCompliant ? 'Profit rate' : 'Rate (p.a.)'}
+            value={`${lender.interestRateMin}% – ${lender.interestRateMax}%`}
+          />
+          <Metric
+            label="Term"
+            value={`${Math.round(lender.termMonthsMin / 12)}–${Math.round(lender.termMonthsMax / 12)} yrs`}
+          />
+          <Metric label="Max LTV" value={`${lender.maxLtvPercent}%`} />
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 text-sm mb-4">
-        <Metric label="Amount" value={`${fmt(lender.minAmount)} – ${fmt(lender.maxAmount)}`} />
-        <Metric
-          label={lender.shariaCompliant ? 'Profit rate' : 'Rate (p.a.)'}
-          value={`${lender.interestRateMin}% – ${lender.interestRateMax}%`}
-        />
-        <Metric
-          label="Term"
-          value={`${Math.round(lender.termMonthsMin / 12)}–${Math.round(lender.termMonthsMax / 12)} yrs`}
-        />
-        <Metric label="Max LTV" value={`${lender.maxLtvPercent}%`} />
-      </div>
-
-      <div className="flex gap-2 mt-auto">
+      <div className="flex gap-2 pt-4">
         <button
           onClick={() => onInquire?.(lender.id)}
           className="flex-1 px-4 py-2 rounded-lg font-semibold text-white text-sm transition-all hover:opacity-90"

@@ -12,17 +12,9 @@ export function SellerPricingTiers() {
   const { locale, currency, isRTL } = useLocale()
   const router = useRouter()
 
+  // Pricing is USD-only.
   const getPrice = (basePrice: number): { display: string; amount: number } => {
-    let display = ''
-    if (currency === 'CAD') {
-      display = `C$${Math.round(basePrice * 1.35)}`
-    } else if (currency === 'AED') {
-      display = `د.إ${Math.round(basePrice * 3.67)}`
-    } else {
-      display = `$${Math.round(basePrice)}`
-    }
-
-    return { display, amount: basePrice }
+    return { display: `$${Math.round(basePrice)}`, amount: basePrice }
   }
 
   const handleSelectPlan = (plan: 'freemium' | 'premium') => {

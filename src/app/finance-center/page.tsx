@@ -52,7 +52,7 @@ export default function FinanceCenterPage() {
       <PublicHeader />
 
       {/* Hero */}
-      <section className="px-6 py-14 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-6 py-8 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
         <div className="max-w-6xl mx-auto">
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4" style={{ background: COLOR_ACCENT, color: 'white' }}>
             FINANCE CENTER
@@ -111,7 +111,7 @@ export default function FinanceCenterPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {lenders.map((lender, i) => (
-              <motion.div key={lender.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+              <motion.div key={lender.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="h-full">
                 <LenderCard
                   lender={lender}
                   onInquire={(id) => {

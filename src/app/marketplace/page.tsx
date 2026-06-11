@@ -59,7 +59,7 @@ export default function MarketplacePage() {
   const [selectedDealPhotos, setSelectedDealPhotos] = useState<string[]>([])
 
   const [valuation, setValuation] = useState({ min: 0.1, max: 100 })
-  const [revenue, setRevenue] = useState({ min: 0.1, max: 500 })
+  const [revenue, setRevenue] = useState({ min: 0, max: 50 })
   const [heatScore, setHeatScore] = useState({ min: 0, max: 100 })
   const [successProb, setSuccessProb] = useState({ min: 0, max: 100 })
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([])
@@ -91,7 +91,7 @@ export default function MarketplacePage() {
       const matchesSellerType = selectedSellerTypes.length === 0 || selectedSellerTypes.includes(deal.sellerType)
       const matchesMotivation = selectedMotivations.length === 0 || selectedMotivations.includes(deal.sellerMotivation)
       const matchesValuation = deal.askingPrice >= valuation.min * 1000000 && deal.askingPrice <= valuation.max * 1000000
-      const matchesRevenue = deal.annualRevenue >= revenue.min * 1000 && deal.annualRevenue <= revenue.max * 1000
+      const matchesRevenue = deal.annualRevenue >= revenue.min * 1000000 && deal.annualRevenue <= revenue.max * 1000000
       const matchesHeat = deal.heatIndex >= heatScore.min && deal.heatIndex <= heatScore.max
       const matchesSuccess = deal.dealQualityScore >= successProb.min && deal.dealQualityScore <= successProb.max
       return matchesSearch && matchesIndustry && matchesLocation && matchesSellerType && matchesMotivation && matchesValuation && matchesRevenue && matchesHeat && matchesSuccess
@@ -139,7 +139,7 @@ export default function MarketplacePage() {
     setSelectedSellerTypes([])
     setSelectedMotivations([])
     setValuation({ min: 0.1, max: 100 })
-    setRevenue({ min: 0.1, max: 500 })
+    setRevenue({ min: 0, max: 50 })
     setHeatScore({ min: 0, max: 100 })
     setSuccessProb({ min: 0, max: 100 })
     setCurrentPage(1)
@@ -149,14 +149,14 @@ export default function MarketplacePage() {
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
       <PublicHeader />
 
-      <section className="px-4 md:px-8 py-12 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-4 md:px-8 py-6 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
         <div className="max-w-7xl mx-auto">
-          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4" style={{ background: COLOR_ACCENT, color: 'white' }}>
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-2" style={{ background: COLOR_ACCENT, color: 'white' }}>
             MARKETPLACE
           </span>
-          <h1 className="text-4xl md:text-5xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>Global Marketplace</h1>
-          <p className="text-lg" style={{ color: COLOR_TEXT_SECONDARY }}>
-            {filteredListings.length} verified businesses for sale across the UAE &amp; Canada
+          <h1 className="text-3xl md:text-4xl font-black mb-1" style={{ color: COLOR_PRIMARY }}>Global Marketplace</h1>
+          <p className="text-base" style={{ color: COLOR_TEXT_SECONDARY }}>
+            {filteredListings.length} verified businesses for sale across the USA, Canada &amp; the UAE
           </p>
         </div>
       </section>
@@ -257,7 +257,7 @@ export default function MarketplacePage() {
               <div className="space-y-3 pt-1">
                 {[
                   { label: 'Valuation', icon: DollarSign, min: valuation.min, max: valuation.max, setRange: setValuation, minMax: { min: 0.1, max: 100 }, suffix: 'M' },
-                  { label: 'Annual Revenue', icon: TrendingUp, min: revenue.min, max: revenue.max, setRange: setRevenue, minMax: { min: 0.1, max: 500 }, suffix: 'K' },
+                  { label: 'Annual Revenue', icon: TrendingUp, min: revenue.min, max: revenue.max, setRange: setRevenue, minMax: { min: 0, max: 50 }, suffix: 'M' },
                   { label: 'Deal Heat Score', icon: Zap, min: heatScore.min, max: heatScore.max, setRange: setHeatScore, minMax: { min: 0, max: 100 }, suffix: '°' },
                   { label: 'Success Probability', icon: CheckCircle2, min: successProb.min, max: successProb.max, setRange: setSuccessProb, minMax: { min: 0, max: 100 }, suffix: '%' },
                 ].map((range, i) => {

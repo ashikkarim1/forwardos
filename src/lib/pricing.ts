@@ -10,10 +10,14 @@
 export const LAUNCH_END_ISO = '2026-09-09T23:59:59Z'
 export const LAUNCH_DISCOUNT_PCT = 50
 
-// USD base prices (the page converts to CAD/AED).
+// USD prices (pricing is USD-only). Launch = 50% off regular for the first 90 days.
 export const PRICING = {
+  // Seller plans
   freemium: { regular: 0, launch: 0 },
-  premium: { regular: 99, launch: 49 }, // $49/mo during launch (reg. $99)
+  premium: { regular: 78, launch: 39 }, // $39/mo launch (reg. $78)
+  // Buyer plans
+  starter: { regular: 998, launch: 499 }, // $499/mo launch (reg. $998)
+  pro: { regular: 4998, launch: 2499 }, // $2,499/mo launch (reg. $4,998)
 }
 
 /**

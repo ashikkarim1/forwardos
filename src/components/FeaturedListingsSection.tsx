@@ -294,6 +294,30 @@ export function FeaturedListingsSection() {
                     ⭐ Premium Featured
                   </span>
                 </div>
+
+                {/* Eye-catching key-data overlay on the image */}
+                <div className="absolute inset-x-0 bottom-0 p-5 pt-16" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.78), rgba(0,0,0,0.0))' }}>
+                  <p className="text-white/80 text-xs font-semibold uppercase tracking-wide mb-2">{currentBusiness.businessType}</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <p className="text-white/70 text-[11px] font-semibold uppercase">Asking</p>
+                      <p className="text-white text-xl font-black leading-tight">
+                        ${currentBusiness.valuation >= 1_000_000 ? `${(currentBusiness.valuation / 1_000_000).toFixed(1)}M` : `${Math.round(currentBusiness.valuation / 1000)}K`}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-white/70 text-[11px] font-semibold uppercase">Revenue</p>
+                      <p className="text-white text-xl font-black leading-tight">
+                        ${currentBusiness.revenue >= 1_000_000 ? `${(currentBusiness.revenue / 1_000_000).toFixed(1)}M` : `${Math.round(currentBusiness.revenue / 1000)}K`}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-white/70 text-[11px] font-semibold uppercase">Growth</p>
+                      <p className="text-xl font-black leading-tight" style={{ color: '#34D399' }}>↑ {currentBusiness.growthRate}%</p>
+                    </div>
+                  </div>
+                  <p className="text-white/70 text-[11px] mt-2">📍 {currentBusiness.location} · {currentBusiness.employees} employees</p>
+                </div>
               </motion.div>
             </AnimatePresence>
 
