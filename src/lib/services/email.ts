@@ -1,7 +1,8 @@
 /**
- * Email Service
- * Handles all email communications using Resend
+ * Email Service — delivers via Resend when RESEND_API_KEY is set, otherwise logs
+ * to the console (so flows keep working in dev/preview without a key).
  */
+import { Resend } from 'resend'
 
 interface EmailOptions {
   to: string
@@ -10,39 +11,34 @@ interface EmailOptions {
   from?: string
 }
 
-export async function sendEmail(options: EmailOptions) {
-  // In production, this would use Resend API
-  // For now, we'll prepare the structure
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
+const DEFAULT_FROM = process.env.EMAIL_FROM_ADDRESS || 'Forward Intelligence <noreply@forwardos.ai>'
 
-  const from = options.from || process.env.EMAIL_FROM_ADDRESS || 'noreply@forward.com'
+export async function sendEmail(options: EmailOptions) {
+  const from = options.from || DEFAULT_FROM
+
+  // No key configured → log instead of sending (never throws, so callers don't break).
+  if (!resend) {
+    console.log('[EMAIL:mock]', { to: options.to, subject: options.subject, from })
+    return { success: true, mocked: true as const }
+  }
 
   try {
-    // TODO: Integrate with Resend API
-    // const response = await fetch('https://api.resend.com/emails', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     from,
-    //     to: options.to,
-    //     subject: options.subject,
-    //     html: options.html,
-    //   }),
-    // })
-
-    // For development, just log
-    console.log('[EMAIL]', {
+    const { data, error } = await resend.emails.send({
+      from,
       to: options.to,
       subject: options.subject,
-      from,
+      html: options.html,
+      ...(process.env.EMAIL_REPLY_TO ? { replyTo: process.env.EMAIL_REPLY_TO } : {}),
     })
-
-    return { success: true }
+    if (error) {
+      console.error('[EMAIL] Resend error:', error)
+      return { success: false as const, error }
+    }
+    return { success: true as const, id: data?.id }
   } catch (error) {
-    console.error('Email send failed:', error)
-    throw error
+    console.error('[EMAIL] send failed:', error)
+    return { success: false as const, error }
   }
 }
 
