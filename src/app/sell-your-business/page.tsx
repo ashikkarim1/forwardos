@@ -7,7 +7,7 @@ import { PRICING, LAUNCH_DISCOUNT_PCT } from '@/lib/pricing'
 import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Sell Your Business — List Free in Canada & the UAE',
+  title: 'Sell Your Business — List Free in the USA, Canada & the UAE',
   description: 'Sell your business or franchise on Forward. List free, reach verified buyers, get an AI valuation, and only pay for Premium placement — currently 50% off for 90 days.',
   path: '/sell-your-business',
   keywords: ['sell my business', 'sell a business', 'how to sell my business', 'sell my business online', 'business for sale by owner', 'sell my business Canada', 'sell my business UAE'],
@@ -23,7 +23,7 @@ const steps = [
 const faqs = [
   { q: 'How much does it cost to sell my business?', a: `Listing is free. Premium featured placement is normally $${PRICING.premium.regular}/mo and is currently ${LAUNCH_DISCOUNT_PCT}% off — just $${PRICING.premium.launch}/mo during our 90-day launch.` },
   { q: 'How is my business valued?', a: 'Forward provides a free AI valuation range based on your financials and comparable sales, so you can price with confidence.' },
-  { q: 'Who sees my listing?', a: 'Verified buyers across Canada and the UAE discover your listing through search, alerts, and our marketplace. Confidential details are only shared after NDA.' },
+  { q: 'Who sees my listing?', a: 'Verified buyers across the USA, Canada and the UAE discover your listing through search, alerts, and our marketplace. Confidential details are only shared after NDA.' },
   { q: 'Do I pay commission?', a: 'Forward charges no success commission. You keep your proceeds (any broker you separately engage sets their own terms).' },
 ]
 
@@ -41,7 +41,7 @@ export default function SellYourBusinessPage() {
           </span>
           <h1 className="text-4xl md:text-5xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>Sell your business with confidence</h1>
           <p className="text-lg max-w-2xl mx-auto mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
-            List your business or franchise free, reach verified buyers across Canada and the UAE, and get a free
+            List your business or franchise free, reach verified buyers across the USA, Canada and the UAE, and get a free
             AI valuation. Only pay if you want featured placement.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">

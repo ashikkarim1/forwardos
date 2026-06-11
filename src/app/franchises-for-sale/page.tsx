@@ -8,8 +8,8 @@ import { pageMetadata, breadcrumbLd, faqLd, itemListLd, jsonLdScript } from '@/l
 import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Franchises for Sale in Canada & the UAE (2026)',
-  description: 'Browse franchise opportunities and resale franchises for sale in Canada and the UAE. Verified listings, transparent financials, financing options, and AI deal intelligence.',
+  title: 'Franchises for Sale in the USA, Canada & the UAE (2026)',
+  description: 'Browse franchise opportunities and resale franchises for sale in the USA, Canada and the UAE. Verified listings, transparent financials, financing options, and AI deal intelligence.',
   path: '/franchises-for-sale',
   keywords: ['franchises for sale', 'franchise for sale', 'buy a franchise', 'franchise opportunities', 'franchise resale', 'franchises for sale Canada', 'franchises for sale UAE'],
 })
@@ -33,7 +33,7 @@ export default async function FranchisesPage() {
         <div className="max-w-6xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>Franchises for Sale</h1>
           <p className="text-lg max-w-3xl" style={{ color: COLOR_TEXT_SECONDARY }}>
-            Discover new franchise opportunities and franchise resales across Canada and the UAE — with verified
+            Discover new franchise opportunities and franchise resales across the USA, Canada and the UAE — with verified
             financials, AI deal scores, and financing options on every listing.
           </p>
         </div>

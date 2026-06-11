@@ -2,10 +2,10 @@ import type { Metadata } from 'next'
 import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = pageMetadata({
-  title: 'Business Acquisition Financing — Canada & UAE',
-  description: 'Finance your business acquisition. Compare lenders (CSBFP, BDC, SME, and Sharia-compliant Murabaha/Ijara), model monthly payments, and check your financing readiness.',
+  title: 'Business Acquisition Financing — USA, Canada & UAE',
+  description: 'Finance your business acquisition with SBA 7(a) in the U.S., CSBFP and BDC in Canada, or SME and Sharia-compliant Murabaha/Ijara in the UAE. Model your monthly payments and check financing readiness.',
   path: '/finance-center',
-  keywords: ['business acquisition financing', 'SBA alternative', 'CSBFP', 'BDC loan', 'SME loan UAE', 'Islamic business financing', 'buy a business loan'],
+  keywords: ['business acquisition financing', 'SBA 7(a)', 'SBA loan', 'CSBFP', 'BDC loan', 'SME loan UAE', 'Islamic business financing', 'Murabaha', 'Ijara', 'buy a business loan'],
 })
 
 export default function SegmentLayout({ children }: { children: React.ReactNode }) {

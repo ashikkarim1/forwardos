@@ -39,3 +39,4 @@ yarn-error.log*
 
 # locally-persisted uploads (dev only; prod uses Vercel Blob)
 /public/uploads
+.vercel
