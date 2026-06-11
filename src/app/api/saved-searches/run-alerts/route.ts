@@ -41,7 +41,7 @@ export async function POST(_request: NextRequest) {
         html: `<h2>New matches for "${search.name}"</h2>
           <p>Ranked by ForwardOS heat score — strongest opportunities first.</p>
           <table style="border-collapse:collapse;width:100%"><tbody>${rows}</tbody></table>
-          <p style="margin-top:16px"><a href="${process.env.APP_URL || 'http://localhost:3000'}/saved-searches">Manage your alerts →</a></p>`,
+          <p style="margin-top:16px"><a href="${process.env.NEXT_PUBLIC_SITE_URL || process.env.APP_URL || 'http://localhost:3000'}/saved-searches">Manage your alerts →</a></p>`,
       })
 
       await prisma.alertDelivery.create({
