@@ -4,6 +4,7 @@ import { LocaleProvider } from '@/context/LocaleContext'
 import { LaunchPromoBanner } from '@/components/LaunchPromoBanner'
 import FeedbackWidget from '@/components/FeedbackWidget'
 import ConsentBanner from '@/components/ConsentBanner'
+import Analytics from '@/components/Analytics'
 import {
   SITE_URL, SITE_NAME, SITE_TAGLINE, DEFAULT_DESCRIPTION, DEFAULT_KEYWORDS, OG_IMAGE,
   organizationLd, webSiteLd, jsonLdScript,
@@ -57,6 +58,7 @@ export default function RootLayout({
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(webSiteLd()) }} />
       </head>
       <body className="bg-white text-[#1A1A1A] font-sans antialiased">
+        <Analytics />
         <LocaleProvider>
           <LaunchPromoBanner />
           <main id="main-content">{children}</main>
