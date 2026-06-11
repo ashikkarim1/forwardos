@@ -36,8 +36,11 @@ export async function POST(req: NextRequest) {
   ]
 
   const results: { type: string; ok: boolean; detail?: string }[] = []
-  for (const j of jobs) {
+  for (let i = 0; i < jobs.length; i++) {
+    const j = jobs[i]
     try {
+      // Stay under Resend's free-tier 2 req/s limit.
+      if (configured && i > 0) await new Promise((r) => setTimeout(r, 600))
       const r = (await j.run()) as { success?: boolean; mocked?: boolean } | undefined
       results.push({ type: j.type, ok: r?.success !== false, detail: r?.mocked ? 'mocked (no Resend key)' : 'sent' })
     } catch (e) {
