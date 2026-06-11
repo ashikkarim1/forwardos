@@ -34,6 +34,10 @@ export const metadata: Metadata = {
     index: true, follow: true,
     googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
   },
+  // Set NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION in your host env to verify Search Console.
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
 }
 
 export default function RootLayout({

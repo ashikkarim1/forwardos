@@ -1,0 +1,4 @@
+title,description,industry,country,city,revenue,ebitda,askingPrice,employees,foundedYear,isFranchise,financingEligible,financingNote,heatScore,sellerEmail,sellerName
+"Sunset Coffee Roasters","Established specialty coffee roaster with 3 retail locations and wholesale accounts.",HOSPITALITY,USA,Austin,1200000,260000,950000,18,2015,false,true,"SBA 7(a) eligible",78,owner1@example.com,"Jane Owner"
+"Maple Leaf Logistics","Regional last-mile delivery business with long-term B2B contracts.",LOGISTICS,Canada,Toronto,3100000,720000,2300000,34,2011,false,true,"BDC / CSBFP eligible",81,broker@example.com,"Acme Brokerage"
+"Gulf Digital Agency","Profitable Dubai-based performance marketing agency, free-zone licensed.",SERVICES,UAE,Dubai,860000,240000,680000,12,2018,false,true,"Sharia-compliant financing available",74,,
