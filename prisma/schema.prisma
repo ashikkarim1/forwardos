@@ -1024,6 +1024,36 @@ enum FinancierTier {
   STRATEGIC      // $5,000+/mo — homepage exposure + exclusive categories + performance fees
 }
 
+enum VerificationCaseStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_INFO
+}
+
+// Seller / business identity + legitimacy verification (manual review).
+// Region-aware required documents (US/CA/UAE) + UBO for UAE, with sanctions
+// screening attached. Approval flips the user's verificationStatus to VERIFIED.
+model VerificationCase {
+  id              String   @id @default(cuid())
+  userId          String?
+  businessName    String
+  region          LenderRegion
+  contactEmail    String?
+  documents       String   @db.Text // JSON: [{ type, label, url, name }]
+  ubo             String?  @db.Text // JSON: beneficial owners (UAE)
+  sanctionsClear  Boolean  @default(true)
+  sanctionsResult String?  @db.Text // JSON of the screening result
+  status          VerificationCaseStatus @default(PENDING)
+  reviewerNotes   String?  @db.Text
+  reviewedAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status])
+  @@index([userId])
+}
+
 enum FeedbackKind {
   FEATURE
   BUG

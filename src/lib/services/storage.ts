@@ -1,7 +1,15 @@
 /**
- * File Storage Service
- * Handles file uploads to S3
+ * File Storage Service.
+ *
+ * Persists uploads for real:
+ *  - Production: Vercel Blob when BLOB_READ_WRITE_TOKEN is set.
+ *  - Dev/local: writes to public/uploads so files actually persist without any
+ *    cloud account (Vercel's filesystem is read-only, so Blob is used there).
+ *
+ * Swap to S3 later by changing only this file.
  */
+import { promises as fs } from 'fs'
+import path from 'path'
 
 interface UploadOptions {
   file: File
@@ -15,64 +23,54 @@ interface UploadResult {
   bucket: string
 }
 
-/**
- * Upload a file to S3
- * In production, this would use AWS SDK
- */
+function safeName(name: string): string {
+  return name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-120)
+}
+
 export async function uploadFile(options: UploadOptions): Promise<UploadResult> {
   const bucket = options.bucket || 'documents'
-  const bucketName = getBucketName(bucket)
+  const key = `${bucket}/${options.path}/${Date.now()}-${safeName(options.file.name)}`.replace(/\/+/g, '/')
 
-  try {
-    // TODO: Implement AWS S3 upload
-    // const s3 = new AWS.S3()
-    // const key = `${options.path}/${Date.now()}-${options.file.name}`
-    // await s3.upload({
-    //   Bucket: bucketName,
-    //   Key: key,
-    //   Body: options.file,
-    // }).promise()
-
-    // For development, create a mock URL
-    const mockUrl = `/uploads/${bucket}/${Date.now()}-${options.file.name}`
-
-    console.log('[S3 UPLOAD]', {
-      bucket: bucketName,
-      path: options.path,
-      filename: options.file.name,
-      mockUrl,
+  // 1) Vercel Blob (production)
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const { put } = await import('@vercel/blob')
+    const blob = await put(key, options.file, {
+      access: 'public',
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+      addRandomSuffix: false,
     })
+    return { url: blob.url, key, bucket: getBucketName(bucket) }
+  }
 
-    return {
-      url: mockUrl,
-      key: `${options.path}/${Date.now()}-${options.file.name}`,
-      bucket: bucketName,
-    }
+  // 2) Local filesystem (dev) — genuinely persists under /public/uploads
+  try {
+    const buf = Buffer.from(await options.file.arrayBuffer())
+    const dest = path.join(process.cwd(), 'public', 'uploads', key)
+    await fs.mkdir(path.dirname(dest), { recursive: true })
+    await fs.writeFile(dest, buf)
+    return { url: `/uploads/${key}`, key, bucket: getBucketName(bucket) }
   } catch (error) {
-    console.error('File upload failed:', error)
+    console.error('Local file upload failed:', error)
     throw new Error('Failed to upload file')
   }
 }
 
-/**
- * Generate a presigned URL for accessing protected files
- */
-export async function getPresignedUrl(key: string, bucket: 'photos' | 'documents' | 'kyc' = 'documents'): Promise<string> {
-  // TODO: Generate presigned URL from S3
-  // For now, return mock URL
-  return `${process.env.AWS_S3_PUBLIC_URL || '/uploads'}/${key}`
+/** Protected files: Blob URLs are already accessible; local files are served from /public. */
+export async function getPresignedUrl(key: string): Promise<string> {
+  if (key.startsWith('http')) return key
+  return `/uploads/${key}`
 }
 
-/**
- * Delete a file from S3
- */
-export async function deleteFile(key: string, bucket: 'photos' | 'documents' | 'kyc' = 'documents'): Promise<void> {
+export async function deleteFile(key: string): Promise<void> {
   try {
-    // TODO: Implement AWS S3 delete
-    console.log('[S3 DELETE]', { bucket, key })
+    if (process.env.BLOB_READ_WRITE_TOKEN && key.startsWith('http')) {
+      const { del } = await import('@vercel/blob')
+      await del(key, { token: process.env.BLOB_READ_WRITE_TOKEN })
+      return
+    }
+    await fs.unlink(path.join(process.cwd(), 'public', 'uploads', key)).catch(() => {})
   } catch (error) {
     console.error('File deletion failed:', error)
-    throw new Error('Failed to delete file')
   }
 }
 
@@ -82,5 +80,5 @@ function getBucketName(bucket: string): string {
     documents: process.env.AWS_S3_BUCKET_DOCUMENTS || 'forward-os-documents',
     kyc: process.env.AWS_S3_BUCKET_KYC || 'forward-os-kyc-documents',
   }
-  return bucketMap[bucket as keyof typeof bucketMap]
+  return bucketMap[bucket as keyof typeof bucketMap] || 'forward-os-documents'
 }

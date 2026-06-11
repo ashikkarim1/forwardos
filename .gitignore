@@ -36,3 +36,6 @@ yarn-error.log*
 .turbo
 .cache
 .env
+
+# locally-persisted uploads (dev only; prod uses Vercel Blob)
+/public/uploads
