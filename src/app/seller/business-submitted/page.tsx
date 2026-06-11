@@ -206,6 +206,16 @@ function BusinessSubmittedPageInner() {
             })}
           </div>
 
+          {/* Get verified prompt */}
+          <div className="rounded-lg border p-4 mb-4 flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+            <p className="text-sm font-semibold" style={{ color: COLOR_PRIMARY }}>
+              🛡️ Next: verify your business to earn the trust badge &amp; more buyer interest.
+            </p>
+            <Link href="/seller/verify" className="px-4 py-2 rounded-lg text-sm font-bold text-white hover:opacity-90" style={{ background: COLOR_ACCENT }}>
+              Verify your business →
+            </Link>
+          </div>
+
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
             <Link

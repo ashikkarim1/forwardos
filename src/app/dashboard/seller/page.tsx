@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   FileText, Eye, Clock, Users, TrendingUp, AlertCircle, CheckCircle2, MessageSquare,
@@ -326,6 +327,24 @@ export default function SellerDashboardV2() {
           lastVerificationDate={new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()}
           expiryDate={new Date(Date.now() + 358 * 24 * 60 * 60 * 1000).toISOString()}
         />
+      </motion.div>
+
+      {/* Get Verified CTA */}
+      <motion.div variants={itemVariants} className="mb-8">
+        <div className="rounded-xl border p-5 flex items-center justify-between gap-4 flex-wrap" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+          <div className="flex items-start gap-3">
+            <Shield size={22} style={{ color: COLOR_ACCENT }} className="mt-0.5" />
+            <div>
+              <p className="font-bold" style={{ color: COLOR_PRIMARY }}>Get your business verified</p>
+              <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
+                Verified listings earn the trust badge and far more buyer interest. Upload your documents (US, Canada, or UAE) for a quick review.
+              </p>
+            </div>
+          </div>
+          <Link href="/seller/verify" className="shrink-0 px-5 py-2.5 rounded-lg font-bold text-white hover:opacity-90" style={{ background: COLOR_ACCENT }}>
+            Verify your business →
+          </Link>
+        </div>
       </motion.div>
 
       {/* Impact Dashboard Summary */}

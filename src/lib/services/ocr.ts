@@ -27,53 +27,90 @@ interface ExtractedFinancialData {
 }
 
 /**
- * Parse financial document using OCR
- * In production, this would use AWS Textract or similar
+ * Parse a financial document.
+ *  - If AWS Textract is configured (and the SDK is installed), OCR the file.
+ *  - Otherwise, fetch the document and extract from any readable text
+ *    (works for text-based PDFs / plain text), so it's usable without a vendor.
+ * Returns { confidence: 0 } when nothing could be extracted.
  */
-export async function parseFinancialDocument(fileUrl: string, fileName: string): Promise<ExtractedFinancialData> {
-  try {
-    // TODO: Implement AWS Textract integration
-    // const textract = new AWS.Textract()
-    // const response = await textract.detectDocumentText({
-    //   Document: { S3Object: { Bucket, Name: key } }
-    // })
-    // Parse the extracted text to find financial data
-
-    // For now, return mock data
-    console.log('[OCR] Processing document:', fileName)
-
-    // Mock extraction based on filename
-    if (fileName.toLowerCase().includes('financial') || fileName.toLowerCase().includes('statement')) {
-      return {
-        revenue: {
-          currentYear: 2500000,
-          previousYear: 1724137,
-          twoYearsAgo: 1189739,
-          trend: 'growing',
-        },
-        ebitda: {
-          currentYear: 550000,
-          previousYear: 379311,
-        },
-        margin: 22,
-        grossMargin: 68,
-        customers: [
-          { name: 'Goldman Sachs', revenue: 850000, percentage: 34 },
-          { name: 'JPMorgan Chase', revenue: 625000, percentage: 25 },
-          { name: 'Stripe', revenue: 437500, percentage: 17.5 },
-        ],
-        growthRate: 45,
-        confidence: 85,
-      }
+export async function parseFinancialDocument(fileUrl: string, fileName: string): Promise<ExtractedFinancialData & { source?: string }> {
+  // 1) AWS Textract (production) — only if configured AND SDK present.
+  if (process.env.AWS_ACCESS_KEY_ID && process.env.AWS_TEXTRACT_ENABLED === 'true') {
+    try {
+      const text = await extractTextFromDocument(fileUrl)
+      if (text) return { ...extractFinancialsFromText(text), source: 'textract' }
+    } catch (e) {
+      console.warn('[OCR] Textract path failed, falling back:', (e as Error).message)
     }
-
-    return {
-      confidence: 0,
-    }
-  } catch (error) {
-    console.error('[OCR] Document parsing failed:', error)
-    throw error
   }
+
+  // 2) Best-effort text fetch (works for text/CSV/text-PDF served over HTTP or /uploads).
+  try {
+    const url = fileUrl.startsWith('http') ? fileUrl : `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}${fileUrl}`
+    const res = await fetch(url)
+    const ct = res.headers.get('content-type') || ''
+    if (ct.includes('text') || ct.includes('csv') || ct.includes('json') || /\.(txt|csv)$/i.test(fileName)) {
+      const text = await res.text()
+      return { ...extractFinancialsFromText(text), source: 'text' }
+    }
+  } catch (e) {
+    console.warn('[OCR] text fetch failed:', (e as Error).message)
+  }
+
+  // Couldn't read it (e.g. scanned/binary PDF with no Textract) → manual review.
+  return { confidence: 0, source: 'unsupported' }
+}
+
+const moneyToNumber = (s: string): number => {
+  const mult = /m\b|million/i.test(s) ? 1_000_000 : /k\b|thousand/i.test(s) ? 1_000 : 1
+  const n = parseFloat(s.replace(/[^0-9.]/g, ''))
+  return Number.isFinite(n) ? Math.round(n * mult) : 0
+}
+
+/**
+ * Extract financial figures from raw text (Textract output, pasted P&L, CSV…).
+ * Regex-based — dependency-free and provider-agnostic.
+ */
+export function extractFinancialsFromText(text: string): ExtractedFinancialData {
+  const find = (labels: string[]): number => {
+    for (const label of labels) {
+      const re = new RegExp(`${label}[^0-9$]{0,20}\\$?\\s*([0-9][0-9,.]*\\s*(?:million|thousand|[mMkK])?)`, 'i')
+      const m = text.match(re)
+      if (m) return moneyToNumber(m[1])
+    }
+    return 0
+  }
+  const revenue = find(['total revenue', 'net revenue', 'revenue', 'total sales', 'turnover'])
+  const ebitda = find(['ebitda', 'operating income', 'operating profit'])
+  const grossProfit = find(['gross profit', 'gross margin'])
+  const result: ExtractedFinancialData = { confidence: 0 }
+  if (revenue) result.revenue = { currentYear: revenue }
+  if (ebitda) result.ebitda = { currentYear: ebitda }
+  if (revenue && grossProfit) result.grossMargin = Math.round((grossProfit / revenue) * 100)
+  if (revenue && ebitda) result.margin = Math.round((ebitda / revenue) * 100)
+  // Confidence reflects how many anchors we found.
+  const found = [revenue, ebitda, grossProfit].filter(Boolean).length
+  result.confidence = found === 0 ? 0 : Math.min(95, 40 + found * 18)
+  return result
+}
+
+/**
+ * Cross-check seller-entered figures against extracted figures. Flags material
+ * mismatches (>10% off) so a reviewer can confirm "verified financials".
+ */
+export function compareFinancials(
+  entered: { revenue?: number; ebitda?: number },
+  extracted: ExtractedFinancialData,
+): { field: string; entered: number; extracted: number; deltaPct: number; flag: boolean }[] {
+  const out: { field: string; entered: number; extracted: number; deltaPct: number; flag: boolean }[] = []
+  const check = (field: string, e?: number, x?: number) => {
+    if (e == null || !x) return
+    const deltaPct = Math.round((Math.abs(e - x) / Math.max(e, x)) * 100)
+    out.push({ field, entered: e, extracted: x, deltaPct, flag: deltaPct > 10 })
+  }
+  check('revenue', entered.revenue, extracted.revenue?.currentYear)
+  check('ebitda', entered.ebitda, extracted.ebitda?.currentYear)
+  return out
 }
 
 /**
