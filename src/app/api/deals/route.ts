@@ -1,0 +1,91 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+
+/**
+ * GET /api/deals — published marketplace listings from the database, mapped to
+ * the marketplace card display shape. Returns { deals, source }. The marketplace
+ * page falls back to its built-in sample set if this returns empty / errors.
+ */
+
+const IMAGE_BY_INDUSTRY: Record<string, string> = {
+  SAAS: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&h=400&fit=crop',
+  FINTECH: 'https://images.unsplash.com/photo-1565514020179-026b92b84bb6?w=500&h=400&fit=crop',
+  HEALTHCARE: 'https://images.unsplash.com/photo-1576091160550-112173f31c77?w=500&h=400&fit=crop',
+  HOSPITALITY: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500&h=400&fit=crop',
+  LOGISTICS: 'https://images.unsplash.com/photo-1586398128686-0a03e8917b87?w=500&h=400&fit=crop',
+  RETAIL: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500&h=400&fit=crop',
+  ECOMMERCE: 'https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?w=500&h=400&fit=crop',
+  SERVICES: 'https://images.unsplash.com/photo-1460925895917-adf4e565db18?w=500&h=400&fit=crop',
+  MANUFACTURING: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=500&h=400&fit=crop',
+  EDUCATION: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&h=400&fit=crop',
+  ENERGY: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=500&h=400&fit=crop',
+  DEFAULT: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=400&fit=crop',
+}
+
+function daysSince(date: Date | null): number {
+  if (!date) return 30
+  return Math.max(1, Math.round((Date.now() - new Date(date).getTime()) / 86_400_000))
+}
+
+export async function GET(_request: NextRequest) {
+  try {
+    const rows = await prisma.deal.findMany({
+      where: { status: { in: ['ACTIVE', 'PUBLISHED'] } },
+      orderBy: [{ heatScore: 'desc' }, { publishedAt: 'desc' }],
+      take: 200,
+    })
+
+    if (rows.length === 0) throw new Error('no-db-rows')
+
+    const deals = rows.map((d) => {
+      const askingPrice = d.askingPrice != null ? Number(d.askingPrice) / 100 : 0
+      const annualRevenue = d.revenue != null ? Number(d.revenue) / 100 : 0
+      const ebitda = d.ebitda != null ? Number(d.ebitda) / 100 : 0
+      const heat = d.heatScore ?? 50
+      const margin = d.ebitdaMargin ?? (annualRevenue > 0 ? Math.round((ebitda / annualRevenue) * 100) : 0)
+      const roi = askingPrice > 0 ? Number(((ebitda / askingPrice) * 100).toFixed(1)) : 0
+      const payback = ebitda > 0 ? Math.round((askingPrice / ebitda) * 12) : 0
+      const dom = daysSince(d.publishedAt)
+      const status: 'NEW' | 'FEATURED' | 'STANDARD' = heat >= 85 ? 'FEATURED' : dom <= 7 ? 'NEW' : 'STANDARD'
+      const position: 'underpriced' | 'fair' | 'premium' =
+        d.pricingMultiple != null ? (d.pricingMultiple < 3 ? 'underpriced' : d.pricingMultiple > 4.5 ? 'premium' : 'fair') : 'fair'
+
+      return {
+        id: d.id,
+        title: d.title,
+        location: d.city || d.country,
+        country: d.country,
+        image: IMAGE_BY_INDUSTRY[d.industry] || IMAGE_BY_INDUSTRY.DEFAULT,
+        askingPrice,
+        askingPriceCurrency: 'USD',
+        annualRevenue,
+        cashFlowMin: Math.round(ebitda * 0.8),
+        cashFlowMax: Math.round(ebitda * 1.05),
+        ebitda,
+        profitMarginPercent: Math.round(margin),
+        dealQualityScore: d.dealQualityScore ?? heat,
+        heatIndex: heat,
+        roiProjection: roi,
+        paybackPeriod: payback,
+        growthRate: d.predictedCloseProb != null ? Math.round(d.predictedCloseProb) : 30,
+        status,
+        category: d.industry,
+        dealType: 'SALE' as const,
+        employeeCount: d.employees ?? 0,
+        sellerVerified: true,
+        sellerTrustScore: 85,
+        marketTrend: 'up' as const,
+        marketPosition: position,
+        daysOnMarket: dom,
+        location_country: d.country,
+        sellerType: 'Founder',
+        sellerMotivation: 'Strategic Exit',
+        financingEligible: d.financingEligible,
+      }
+    })
+
+    return NextResponse.json({ deals, source: 'db', count: deals.length })
+  } catch (error) {
+    return NextResponse.json({ deals: [], source: 'fallback', note: (error as Error).message })
+  }
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Search, ChevronLeft, ChevronRight, ChevronDown, Building2, MapPin, Users, Target, DollarSign, TrendingUp, Zap, CheckCircle2 } from 'lucide-react'
@@ -67,13 +67,24 @@ export default function MarketplacePage() {
   const [selectedSellerTypes, setSelectedSellerTypes] = useState<string[]>([])
   const [selectedMotivations, setSelectedMotivations] = useState<string[]>([])
 
-  const industries = Array.from(new Set(EXTENDED_DEALS.map(d => d.category)))
-  const locations = Array.from(new Set(EXTENDED_DEALS.map(d => d.location_country)))
-  const sellerTypes = Array.from(new Set(EXTENDED_DEALS.map(d => d.sellerType)))
-  const motivations = Array.from(new Set(EXTENDED_DEALS.map(d => d.sellerMotivation)))
+  // Live deals from the database; falls back to the built-in sample set until
+  // loaded or if the DB returns nothing.
+  const [dbDeals, setDbDeals] = useState<Deal[] | null>(null)
+  useEffect(() => {
+    fetch('/api/deals')
+      .then(r => r.json())
+      .then(d => { if (Array.isArray(d.deals) && d.deals.length > 0) setDbDeals(d.deals) })
+      .catch(() => {})
+  }, [])
+  const activeDeals = dbDeals && dbDeals.length > 0 ? dbDeals : EXTENDED_DEALS
+
+  const industries = Array.from(new Set(activeDeals.map(d => d.category)))
+  const locations = Array.from(new Set(activeDeals.map(d => d.location_country)))
+  const sellerTypes = Array.from(new Set(activeDeals.map(d => d.sellerType)))
+  const motivations = Array.from(new Set(activeDeals.map(d => d.sellerMotivation)))
 
   const filteredListings = useMemo(() => {
-    let results = EXTENDED_DEALS.filter(deal => {
+    let results = activeDeals.filter(deal => {
       const matchesSearch = deal.title.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesIndustry = selectedIndustries.length === 0 || selectedIndustries.includes(deal.category)
       const matchesLocation = selectedLocations.length === 0 || selectedLocations.includes(deal.location_country)
@@ -102,9 +113,9 @@ export default function MarketplacePage() {
       return [...sortResults(featured), ...sortResults(nonFeatured)]
     }
     return sortResults(results)
-  }, [searchTerm, selectedIndustries, selectedLocations, selectedSellerTypes, selectedMotivations, valuation, revenue, heatScore, successProb, sortBy])
+  }, [activeDeals, searchTerm, selectedIndustries, selectedLocations, selectedSellerTypes, selectedMotivations, valuation, revenue, heatScore, successProb, sortBy])
 
-  const hotDeals = useMemo(() => EXTENDED_DEALS.sort((a, b) => b.heatIndex - a.heatIndex).slice(0, 4), [])
+  const hotDeals = useMemo(() => [...activeDeals].sort((a, b) => b.heatIndex - a.heatIndex).slice(0, 4), [activeDeals])
 
   const CARDS_PER_PAGE = 20
   const totalPages = Math.ceil(filteredListings.length / CARDS_PER_PAGE)
