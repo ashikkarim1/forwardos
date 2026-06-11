@@ -27,7 +27,7 @@ interface SubmissionDetails {
 
 export default function ApprovalDetailPage() {
   const params = useParams()
-  const dealId = params.dealId as string
+  const dealId = params?.dealId as string
 
   // Mock data
   const [submission] = useState<SubmissionDetails>({

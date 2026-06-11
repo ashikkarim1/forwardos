@@ -32,7 +32,7 @@ const COMPLETION_TIERS = {
 
 export default function SellerSubmitDeal() {
   const params = useParams()
-  const dealId = params.dealId as string
+  const dealId = params?.dealId as string
 
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState<SubmissionData>({

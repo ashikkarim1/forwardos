@@ -1,5 +1,10 @@
 'use client'
 
+// Dynamic: reads runtime query params (userId, plan, session) — not statically prerenderable
+export const dynamic = 'force-dynamic'
+
+import { Suspense } from 'react'
+
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -17,10 +22,10 @@ interface FormData {
   agreeToTerms: boolean
 }
 
-export default function SellerRegisterPage() {
+function SellerRegisterPageInner() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const selectedPlan = (searchParams.get('plan') as 'freemium' | 'premium' | null) || 'freemium'
+  const selectedPlan = (searchParams?.get('plan') as 'freemium' | 'premium' | null) || 'freemium'
 
   const [step, setStep] = useState<'form' | 'verification' | 'success'>('form')
   const [formData, setFormData] = useState<FormData>({
@@ -423,5 +428,14 @@ function VerificationStep({ email, userId }: { email: string; userId: string }) 
         </div>
       </motion.div>
     </div>
+  )
+}
+
+
+export default function SellerRegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <SellerRegisterPageInner />
+    </Suspense>
   )
 }

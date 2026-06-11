@@ -1,14 +1,19 @@
 'use client'
 
+// Dynamic: reads runtime query params (userId, plan, session) — not statically prerenderable
+export const dynamic = 'force-dynamic'
+
+import { Suspense } from 'react'
+
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { CheckCircle2, TrendingUp, Users, Zap, ArrowRight } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
-export default function BusinessSubmittedPage() {
+function BusinessSubmittedPageInner() {
   const searchParams = useSearchParams()
-  const score = parseInt(searchParams.get('score') || '0')
+  const score = parseInt(searchParams?.get('score') || '0')
 
   const getTierDetails = () => {
     if (score >= 80) {
@@ -266,5 +271,14 @@ export default function BusinessSubmittedPage() {
         </div>
       </motion.div>
     </div>
+  )
+}
+
+
+export default function BusinessSubmittedPage() {
+  return (
+    <Suspense fallback={null}>
+      <BusinessSubmittedPageInner />
+    </Suspense>
   )
 }

@@ -1,5 +1,10 @@
 'use client'
 
+// Dynamic: reads runtime query params (userId, plan, session) — not statically prerenderable
+export const dynamic = 'force-dynamic'
+
+import { Suspense } from 'react'
+
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
@@ -7,9 +12,9 @@ import { motion } from 'framer-motion'
 import { Clock, Mail, CheckCircle2, Zap, AlertCircle } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
-export default function PendingApprovalPage() {
+function PendingApprovalPageInner() {
   const searchParams = useSearchParams()
-  const userId = searchParams.get('userId')
+  const userId = searchParams?.get('userId')
   const [userEmail, setUserEmail] = useState('')
   const [userPlan, setUserPlan] = useState<'FREEMIUM' | 'PREMIUM'>('FREEMIUM')
   const [status, setStatus] = useState<'email_verified' | 'approved' | 'checking'>('checking')
@@ -254,5 +259,14 @@ function ApprovedPage({ userId }: { userId: string }) {
         </div>
       </motion.div>
     </div>
+  )
+}
+
+
+export default function PendingApprovalPage() {
+  return (
+    <Suspense fallback={null}>
+      <PendingApprovalPageInner />
+    </Suspense>
   )
 }

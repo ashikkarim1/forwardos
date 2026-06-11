@@ -1,5 +1,10 @@
 'use client'
 
+// Dynamic: reads runtime query params (userId, plan, session) — not statically prerenderable
+export const dynamic = 'force-dynamic'
+
+import { Suspense } from 'react'
+
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -46,10 +51,10 @@ const COMPLETION_WEIGHTS = {
   documents: 20,
 }
 
-export default function SubmitBusinessPage() {
+function SubmitBusinessPageInner() {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const userId = searchParams.get('userId')
+  const userId = searchParams?.get('userId')
 
   const [data, setData] = useState<SubmissionData>({
     businessDescription: '',
@@ -571,5 +576,14 @@ export default function SubmitBusinessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+
+export default function SubmitBusinessPage() {
+  return (
+    <Suspense fallback={null}>
+      <SubmitBusinessPageInner />
+    </Suspense>
   )
 }

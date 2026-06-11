@@ -1,5 +1,10 @@
 'use client'
 
+// Dynamic: reads runtime query params (userId, plan, session) — not statically prerenderable
+export const dynamic = 'force-dynamic'
+
+import { Suspense } from 'react'
+
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -7,10 +12,10 @@ import { motion } from 'framer-motion'
 import { AlertCircle, Loader, Lock } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
-export default function CheckoutPage() {
+function CheckoutPageInner() {
   const searchParams = useSearchParams()
-  const dealId = searchParams.get('dealId')
-  const planTier = searchParams.get('planTier')
+  const dealId = searchParams?.get('dealId')
+  const planTier = searchParams?.get('planTier')
 
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -111,5 +116,14 @@ export default function CheckoutPage() {
         </div>
       </motion.div>
     </div>
+  )
+}
+
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={null}>
+      <CheckoutPageInner />
+    </Suspense>
   )
 }
