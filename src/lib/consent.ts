@@ -29,7 +29,7 @@ export function getConsent(): ConsentState | null {
   }
 }
 
-export function setConsent(opts: { analytics: boolean; marketing: boolean }): ConsentState {
+export function setConsent(opts: { analytics: boolean; marketing: boolean; source?: string }): ConsentState {
   const c: ConsentState = {
     version: CONSENT_VERSION,
     essential: true,
@@ -40,6 +40,13 @@ export function setConsent(opts: { analytics: boolean; marketing: boolean }): Co
   try {
     localStorage.setItem(KEY, JSON.stringify(c))
     window.dispatchEvent(new CustomEvent('forward-consent-changed', { detail: c }))
+    // Persist server-side for demonstrable consent (Art. 7). Best-effort.
+    const anonId = localStorage.getItem('forward_anon_id')
+    fetch('/api/consent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ analytics: c.analytics, marketing: c.marketing, version: c.version, anonId, source: opts.source || 'banner' }),
+    }).catch(() => {})
   } catch {
     /* ignore */
   }

@@ -2,14 +2,20 @@
 
 import { useState } from 'react'
 import { useLocale } from '@/context/LocaleContext'
+import { hasConsent } from '@/lib/consent'
 
 const KINDS = ['feature', 'bug', 'praise', 'other'] as const
 const KIND_ICON: Record<string, string> = { feature: '💡', bug: '🐞', praise: '💜', other: '💬' }
 const KIND_LABEL: Record<string, string> = { feature: 'Feature idea', bug: 'Bug', praise: 'Praise', other: 'Other' }
 
-/** Stable anonymous id so anonymous feedback can be de-duplicated/correlated. */
-function anonId(): string {
-  if (typeof window === 'undefined') return 'server'
+/**
+ * Stable pseudonymous id used to correlate a visitor's own submissions. Gated on
+ * analytics consent: without consent we never create or read the id, so feedback
+ * is fully anonymous.
+ */
+function anonId(): string | null {
+  if (typeof window === 'undefined') return null
+  if (!hasConsent('analytics')) return null
   try {
     let id = localStorage.getItem('forward_anon_id')
     if (!id) {
@@ -18,7 +24,7 @@ function anonId(): string {
     }
     return id
   } catch {
-    return 'anon'
+    return null
   }
 }
 

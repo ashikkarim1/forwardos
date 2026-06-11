@@ -1016,6 +1016,25 @@ enum FeedbackKind {
   OTHER
 }
 
+// Demonstrable consent (GDPR Art. 7) — a server-side record each time a visitor
+// sets/updates their cookie & tracking preferences.
+model ConsentLog {
+  id        String   @id @default(cuid())
+  anonId    String?
+  userId    String?
+  analytics Boolean
+  marketing Boolean
+  version   Int
+  source    String?  // e.g. "banner", "settings"
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([anonId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
 // User feedback — feature requests, bugs, praise. Works logged-in or anonymous;
 // userId is attached server-side from the session when present (no FK, so
 // anonymous submissions are unconstrained).

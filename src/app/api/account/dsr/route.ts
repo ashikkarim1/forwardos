@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { sendEmail } from '@/lib/services/email'
 import { rateLimit, clientIp, isSameOrigin } from '@/lib/rate-limit'
+import { logAudit } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,6 +37,8 @@ export async function POST(req: NextRequest) {
       <blockquote>${message.replace(/</g, '&lt;') || '(no message)'}</blockquote>
       <p>Respond within one month per GDPR Art. 12(3).</p>`,
   }).catch(() => {})
+
+  await logAudit({ req, userId, action: 'dsr.request', resourceType: 'dsr', changes: { type } })
 
   return NextResponse.json({ success: true, message: 'Request received. We respond within 30 days.' })
 }

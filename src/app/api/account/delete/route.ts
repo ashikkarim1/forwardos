@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getSession, clearAuthCookie } from '@/lib/auth'
 import { isSameOrigin } from '@/lib/rate-limit'
+import { logAudit } from '@/lib/audit'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
@@ -48,6 +49,9 @@ export async function POST(req: NextRequest) {
         profileImage: null, investmentCriteria: null,
       },
     })
+
+    // Audit the erasure for accountability (logged against the now-anonymized id).
+    await logAudit({ req, userId, action: 'account.erasure', resourceType: 'user', resourceId: userId })
 
     await clearAuthCookie()
     return NextResponse.json({ success: true, message: 'Your account has been deleted and your personal data erased.' })

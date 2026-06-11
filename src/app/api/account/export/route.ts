@@ -3,6 +3,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
+import { logAudit } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
 
@@ -45,6 +46,8 @@ export async function GET() {
       data: { user, savedSearches, brokerProfile, reviews, financingInquiries, savedDeals, deals, feedback },
       note: 'This is the personal data Forward Intelligence holds about you. For requests we cannot self-serve (rectification, restriction, objection), email privacy@forwardos.ai.',
     })
+
+    await logAudit({ userId, action: 'data.export', resourceType: 'user', resourceId: userId })
 
     return new NextResponse(JSON.stringify(payload, null, 2), {
       status: 200,
