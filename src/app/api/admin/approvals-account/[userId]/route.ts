@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendEmail } from '@/lib/services/email'
+import { requireRole } from '@/lib/auth'
 
 interface AccountApprovalRequest {
   action: 'approve' | 'reject'
@@ -9,6 +10,11 @@ interface AccountApprovalRequest {
 
 export async function POST(request: NextRequest, { params }: { params: { userId: string } }) {
   try {
+    // Admin-only: reject anyone without an ADMIN session.
+    if (!(await requireRole(['ADMIN']))) {
+      return NextResponse.json({ error: 'Forbidden — admin access required' }, { status: 403 })
+    }
+
     const body = await request.json() as AccountApprovalRequest
     const { userId } = params
 

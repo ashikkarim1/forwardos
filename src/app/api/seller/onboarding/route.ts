@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendEmail, sendEmailVerification, sendAdminReviewNotification } from '@/lib/services/email'
 import { uploadFile } from '@/lib/services/storage'
+import { hashPassword } from '@/lib/auth'
 import crypto from 'crypto'
 
 interface OnboardingSubmission {
@@ -69,8 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ========== CREATE USER ACCOUNT ==========
-    // In production, hash password with bcrypt
-    const hashedPassword = body.password // TODO: Hash with bcrypt
+    const hashedPassword = await hashPassword(body.password)
 
     const user = await prisma.user.create({
       data: {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendApprovalNotification, sendPremiumPaymentLink, sendEmail } from '@/lib/services/email'
+import { requireRole } from '@/lib/auth'
 
 interface ApprovalRequest {
   action: 'approve' | 'reject' | 'request_changes'
@@ -10,6 +11,11 @@ interface ApprovalRequest {
 
 export async function POST(request: NextRequest, { params }: { params: { dealId: string } }) {
   try {
+    // Admin-only: reject anyone without an ADMIN session.
+    if (!(await requireRole(['ADMIN']))) {
+      return NextResponse.json({ error: 'Forbidden — admin access required' }, { status: 403 })
+    }
+
     const body = await request.json() as ApprovalRequest
     const { dealId } = params
 

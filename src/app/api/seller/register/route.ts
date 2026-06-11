@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendEmailVerification, sendAdminReviewNotification } from '@/lib/services/email'
+import { hashPassword } from '@/lib/auth'
 import crypto from 'crypto'
 
 interface RegisterRequest {
@@ -44,8 +45,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ========== CREATE USER ACCOUNT ==========
-    // In production, hash password with bcrypt
-    const hashedPassword = body.password // TODO: Hash with bcrypt
+    const hashedPassword = await hashPassword(body.password)
 
     const user = await prisma.user.create({
       data: {

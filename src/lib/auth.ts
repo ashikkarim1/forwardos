@@ -1,14 +1,29 @@
 import { jwtVerify, SignJWT } from 'jose'
 import { cookies } from 'next/headers'
+import bcrypt from 'bcryptjs'
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'dev-secret-key-change-in-production')
+
+export type UserRole = 'SELLER' | 'BUYER' | 'BROKER' | 'ADMIN'
 
 export interface JWTPayload {
   userId: string
   email: string
-  role: 'SELLER' | 'BUYER' | 'BROKER'
+  role: UserRole
   kycStatus: 'NOT_STARTED' | 'PENDING' | 'VERIFIED' | 'REJECTED' | 'EXPIRED'
   [key: string]: any
+}
+
+// ---------- password hashing ----------
+export async function hashPassword(plain: string): Promise<string> {
+  return bcrypt.hash(plain, 12)
+}
+
+export async function verifyPassword(plain: string, hash: string): Promise<boolean> {
+  // Tolerate legacy plaintext rows (pre-hashing) so existing accounts still log in,
+  // but registration never writes plaintext again.
+  if (!hash.startsWith('$2')) return plain === hash
+  return bcrypt.compare(plain, hash)
 }
 
 export async function signToken(payload: JWTPayload): Promise<string> {
@@ -59,7 +74,7 @@ export async function clearAuthCookie(): Promise<void> {
   cookieStore.delete('auth-token')
 }
 
-export function requireAuth(role?: 'SELLER' | 'BUYER' | 'BROKER') {
+export function requireAuth(role?: UserRole) {
   return async function checkAuth() {
     const session = await getSession()
 
@@ -77,4 +92,15 @@ export function requireAuth(role?: 'SELLER' | 'BUYER' | 'BROKER') {
 
     return session
   }
+}
+
+/**
+ * Lightweight role gate for API routes — checks an authenticated session whose
+ * role is in `roles`, WITHOUT requiring KYC (use requireAuth for KYC-gated flows).
+ * Returns the session or null; callers respond 401/403 on null.
+ */
+export async function requireRole(roles: UserRole[]): Promise<JWTPayload | null> {
+  const session = await getSession()
+  if (!session || !roles.includes(session.role)) return null
+  return session
 }
