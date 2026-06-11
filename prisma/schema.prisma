@@ -234,6 +234,12 @@ model User {
   emailVerificationTokens EmailVerificationToken[]
   businessPhotos        BusinessPhoto[] @relation("SellerPhotos")
 
+  // BizBuySell-parity features
+  savedSearches         SavedSearch[]
+  financingInquiries    FinancingInquiry[]
+  brokerProfile         BrokerProfile?
+  reviewsAuthored       Review[]  @relation("ReviewAuthor")
+
   // Billing & Subscriptions
   subscription          Subscription? @relation("UserSubscription")
 
@@ -432,6 +438,10 @@ model Deal {
   predictedCloseProb    Float?    // 0-100, M&A probability prediction
   dealQualityScore      Int?      // 0-100, deal quality assessment
 
+  // Financing (Finance Center)
+  financingEligible     Boolean   @default(false) // qualifies for CSBFP/BDC/SME/Islamic financing
+  financingNote         String?   // e.g. "CSBFP eligible up to $1.15M"
+
   // Relationships
   pipeline              DealPipeline?
   savedBy               SavedDeal[]
@@ -445,6 +455,7 @@ model Deal {
   transactions          Transaction[]
   milestones            DealMilestone[]
   documents             DealDocument[]
+  financingInquiries    FinancingInquiry[]
 
   // Dates
   createdAt             DateTime  @default(now())
@@ -970,4 +981,199 @@ model SystemConfig {
   value                 String    @db.Text // JSON if needed
 
   updatedAt             DateTime  @updatedAt
+}
+
+// ==================== BIZBUYSELL-PARITY: ENUMS ====================
+
+enum AlertFrequency {
+  INSTANT
+  DAILY
+  WEEKLY
+}
+
+enum FinancingType {
+  SBA                // US (parity reference)
+  CSBFP              // Canada Small Business Financing Program
+  BDC                // Business Development Bank of Canada
+  BANK_TERM          // Conventional bank term loan
+  SME_LOAN           // UAE SME lending
+  ISLAMIC_MURABAHA   // Sharia-compliant cost-plus financing
+  ISLAMIC_IJARA      // Sharia-compliant lease-to-own
+  SELLER_FINANCING   // Vendor take-back / earnout
+}
+
+enum LenderRegion {
+  CANADA
+  UAE
+  GLOBAL
+}
+
+// ==================== SAVED SEARCHES & EMAIL ALERTS ====================
+
+model SavedSearch {
+  id                    String    @id @default(cuid())
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+
+  name                  String
+  filters               String    @db.Text // JSON: industries, country, price/revenue ranges, etc.
+  country               String?
+
+  alertEnabled          Boolean   @default(true)
+  alertFrequency        AlertFrequency @default(DAILY)
+  lastAlertedAt         DateTime?
+
+  deliveries            AlertDelivery[]
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([alertEnabled])
+}
+
+model AlertDelivery {
+  id                    String    @id @default(cuid())
+  savedSearch           SavedSearch @relation(fields: [savedSearchId], references: [id], onDelete: Cascade)
+  savedSearchId         String
+
+  dealIds               String    @db.Text // JSON array of deal IDs included in this alert
+  matchCount            Int       @default(0)
+  sentAt                DateTime  @default(now())
+
+  @@index([savedSearchId])
+}
+
+// ==================== FINANCE CENTER (UAE + CANADA) ====================
+
+model Lender {
+  id                    String    @id @default(cuid())
+
+  name                  String
+  region                LenderRegion
+  financingTypes        String    @db.Text // JSON array of FinancingType
+  description           String    @db.Text
+  logoUrl               String?
+  applyUrl              String?
+
+  minAmount             BigInt    // cents (USD base)
+  maxAmount             BigInt    // cents (USD base)
+  interestRateMin       Float     // annual %, nominal (0 for profit-rate Islamic products)
+  interestRateMax       Float
+  termMonthsMin         Int
+  termMonthsMax         Int
+  maxLtvPercent         Int       @default(80) // max loan-to-value
+  shariaCompliant       Boolean   @default(false)
+
+  isActive              Boolean   @default(true)
+  inquiries             FinancingInquiry[]
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([region])
+  @@index([isActive])
+}
+
+model FinancingInquiry {
+  id                    String    @id @default(cuid())
+  user                  User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId                String?
+  deal                  Deal?     @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  dealId                String?
+  lender                Lender?   @relation(fields: [lenderId], references: [id], onDelete: SetNull)
+  lenderId              String?
+
+  requestedAmount       BigInt    // cents (USD base)
+  currency              String    @default("USD")
+  downPaymentPct        Float
+  termMonths            Int?
+  region                LenderRegion
+
+  contactName           String?
+  contactEmail          String?
+  message               String?   @db.Text
+  status                String    @default("pending") // pending / contacted / closed
+
+  createdAt             DateTime  @default(now())
+
+  @@index([userId])
+  @@index([dealId])
+  @@index([lenderId])
+}
+
+// ==================== BROKER DIRECTORY & REVIEWS ====================
+
+model BrokerProfile {
+  id                    String    @id @default(cuid())
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String    @unique
+
+  headline              String
+  bio                   String    @db.Text
+  specialties           String    @db.Text // JSON array
+  industries            String    @db.Text // JSON array of IndustryType
+  regions               String    @db.Text // JSON array (e.g. ["CANADA","UAE"])
+  languages             String    @db.Text // JSON array (e.g. ["EN","FR","AR"])
+
+  yearsExperience       Int       @default(0)
+  dealsClosed           Int       @default(0)
+  totalValueClosed      BigInt    @default(0) // cents (USD base)
+
+  isVerified            Boolean   @default(false)
+  isFeatured            Boolean   @default(false)
+  avgRating             Float     @default(0)
+  reviewCount           Int       @default(0)
+
+  reviews               Review[]
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([isVerified])
+}
+
+model Review {
+  id                    String    @id @default(cuid())
+  author                User      @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId              String
+  brokerProfile         BrokerProfile @relation(fields: [brokerProfileId], references: [id], onDelete: Cascade)
+  brokerProfileId       String
+  dealId                String?
+
+  rating                Int       // 1-5
+  title                 String
+  comment               String    @db.Text
+  communicationScore    Int?      // 1-5
+  transparencyScore     Int?      // 1-5
+  outcomeScore          Int?      // 1-5
+  isVerifiedDeal        Boolean   @default(false)
+
+  createdAt             DateTime  @default(now())
+
+  @@index([brokerProfileId])
+  @@index([authorId])
+}
+
+// ==================== MARKET INSIGHTS ====================
+
+model MarketInsightSnapshot {
+  id                    String    @id @default(cuid())
+
+  region                LenderRegion
+  period                String    // e.g. "2026-Q2"
+  industry              IndustryType?
+
+  medianAskingPrice     BigInt    // cents (USD base)
+  medianRevenue         BigInt    // cents (USD base)
+  medianMultiple        Float
+  salesToAskRatio       Float     // 0-1
+  activeListings        Int
+  avgDaysOnMarket       Int
+  metrics               String    @db.Text // JSON: sector breakdown, trend deltas
+
+  createdAt             DateTime  @default(now())
+
+  @@index([region, period])
 }

@@ -41,6 +41,7 @@ interface ListingCardProps {
   daysOnMarket?: number
   comparablePriceMean?: number
   upcomingAuction?: boolean
+  financingEligible?: boolean
 }
 
 const DEAL_QUALITY_COLORS = {
@@ -127,6 +128,7 @@ export default function ListingCard({
   daysOnMarket = 12,
   comparablePriceMean,
   upcomingAuction = false,
+  financingEligible = false,
 }: ListingCardProps) {
   const [saved, setSaved] = useState(isSaved)
 
@@ -170,6 +172,16 @@ export default function ListingCard({
             >
               ⭐ FEATURED
             </span>
+          )}
+          {financingEligible && (
+            <Link
+              href="/finance-center"
+              className="px-2 py-1 rounded-full text-xs font-bold text-white flex items-center gap-1 hover:opacity-90"
+              style={{ background: '#2D7A5F' }}
+              title="Pre-qualified for CSBFP / BDC / SME / Islamic financing"
+            >
+              💰 Financing Eligible
+            </Link>
           )}
         </div>
 

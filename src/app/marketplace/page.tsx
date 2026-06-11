@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { Search, ChevronLeft, ChevronRight, ChevronDown, Building2, MapPin, Users, Target, DollarSign, TrendingUp, Zap, CheckCircle2 } from 'lucide-react'
 import ListingCard from '@/components/listing/ListingCard'
 import { BusinessPhotoGallery } from '@/components/BusinessPhotoGallery'
+import { SaveSearchButton } from '@/components/SaveSearchButton'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 interface Deal {
@@ -186,6 +187,16 @@ export default function MarketplacePage() {
                 <option value="valuation">💵 Lowest Price</option>
                 <option value="relevant">Most Relevant</option>
               </select>
+
+              <SaveSearchButton
+                filters={{
+                  industries: selectedIndustries,
+                  country: selectedLocations[0],
+                  minPrice: valuation.min !== 0.1 ? Math.round(valuation.min * 1_000_000 * 100) : undefined,
+                  maxPrice: valuation.max !== 100 ? Math.round(valuation.max * 1_000_000 * 100) : undefined,
+                  minHeatScore: heatScore.min !== 0 ? heatScore.min : undefined,
+                }}
+              />
 
               {activeFiltersCount > 0 && (
                 <div className="p-3 rounded-lg border-2 flex items-center justify-between" style={{ background: '#FEF3C7', borderColor: COLOR_ACCENT }}>

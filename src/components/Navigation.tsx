@@ -38,13 +38,41 @@ export function PublicHeader() {
         </Link>
 
         {/* Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-6">
           <Link
-            href="/listings"
+            href="/marketplace"
             className="text-sm font-semibold hover:opacity-70 transition-opacity"
             style={{ color: '#1a1a1a' }}
           >
-            Listings
+            Marketplace
+          </Link>
+          <Link
+            href="/finance-center"
+            className="text-sm font-semibold hover:opacity-70 transition-opacity"
+            style={{ color: '#1a1a1a' }}
+          >
+            Finance
+          </Link>
+          <Link
+            href="/brokers"
+            className="text-sm font-semibold hover:opacity-70 transition-opacity"
+            style={{ color: '#1a1a1a' }}
+          >
+            Brokers
+          </Link>
+          <Link
+            href="/market-insights"
+            className="text-sm font-semibold hover:opacity-70 transition-opacity"
+            style={{ color: '#1a1a1a' }}
+          >
+            Insights
+          </Link>
+          <Link
+            href="/learning-center"
+            className="text-sm font-semibold hover:opacity-70 transition-opacity"
+            style={{ color: '#1a1a1a' }}
+          >
+            Learn
           </Link>
           <Link
             href="/pricing"
@@ -52,20 +80,6 @@ export function PublicHeader() {
             style={{ color: '#1a1a1a' }}
           >
             Pricing
-          </Link>
-          <Link
-            href="/"
-            className="text-sm font-semibold hover:opacity-70 transition-opacity"
-            style={{ color: '#1a1a1a' }}
-          >
-            Features
-          </Link>
-          <Link
-            href="/"
-            className="text-sm font-semibold hover:opacity-70 transition-opacity"
-            style={{ color: '#1a1a1a' }}
-          >
-            About
           </Link>
         </nav>
 
