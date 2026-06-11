@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { CheckCircle2, XCircle, ShieldCheck, AlertTriangle, FileText } from 'lucide-react'
+import { CheckCircle2, XCircle, ShieldCheck, AlertTriangle, FileText, Calculator } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 interface VCase {
@@ -103,12 +103,76 @@ export default function AdminVerificationsPage() {
                       ) : null}
                     </div>
                   </div>
+
+                  <FinancialAnalyzer />
                 </div>
               )
             })}
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+interface Extracted { revenue?: { currentYear?: number }; ebitda?: { currentYear?: number }; margin?: number; grossMargin?: number; confidence?: number }
+interface Cmp { field: string; entered: number; extracted: number; deltaPct: number; flag: boolean }
+
+const fmt = (n?: number) => (n == null ? '—' : `$${n.toLocaleString()}`)
+
+/** Reviewer tool: paste a P&L / financial statement (and the seller's claimed
+ *  figures) to extract numbers and flag mismatches via /api/ocr/analyze. */
+function FinancialAnalyzer() {
+  const [open, setOpen] = useState(false)
+  const [text, setText] = useState('')
+  const [revenue, setRevenue] = useState('')
+  const [ebitda, setEbitda] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [res, setRes] = useState<{ extracted: Extracted; comparison?: Cmp[]; source: string } | null>(null)
+  const [err, setErr] = useState('')
+
+  async function run() {
+    if (text.trim().length < 10) { setErr('Paste the financial statement text first.'); return }
+    setBusy(true); setErr(''); setRes(null)
+    try {
+      const entered = (revenue || ebitda) ? { revenue: revenue ? Number(revenue) : undefined, ebitda: ebitda ? Number(ebitda) : undefined } : undefined
+      const r = await fetch('/api/ocr/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, entered }) })
+      const d = await r.json()
+      if (!r.ok) { setErr(d.error || 'Analysis failed'); return }
+      setRes(d)
+    } finally { setBusy(false) }
+  }
+
+  return (
+    <div className="mt-4 pt-4 border-t" style={{ borderColor: COLOR_BORDER }}>
+      <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-1.5 text-sm font-semibold" style={{ color: COLOR_ACCENT }}>
+        <Calculator size={15} /> {open ? 'Hide' : 'Analyze financials'}
+      </button>
+      {open && (
+        <div className="mt-3 space-y-2">
+          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} placeholder="Paste the P&L / financial statement text…"
+            className="w-full px-3 py-2 rounded-lg border text-sm" style={{ borderColor: COLOR_BORDER }} />
+          <div className="flex gap-2 flex-wrap items-end">
+            <label className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>Claimed revenue ($)<input value={revenue} onChange={(e) => setRevenue(e.target.value)} type="number" className="block w-36 px-2 py-1.5 rounded border text-sm" style={{ borderColor: COLOR_BORDER }} /></label>
+            <label className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>Claimed EBITDA ($)<input value={ebitda} onChange={(e) => setEbitda(e.target.value)} type="number" className="block w-36 px-2 py-1.5 rounded border text-sm" style={{ borderColor: COLOR_BORDER }} /></label>
+            <button onClick={run} disabled={busy} className="px-4 py-2 rounded-lg text-sm font-bold text-white disabled:opacity-50" style={{ background: COLOR_ACCENT }}>{busy ? 'Analyzing…' : 'Analyze'}</button>
+          </div>
+          {err && <p className="text-xs font-semibold" style={{ color: '#DC2626' }}>{err}</p>}
+          {res && (
+            <div className="text-sm rounded-lg p-3" style={{ background: '#F9FAFB' }}>
+              <p style={{ color: COLOR_PRIMARY }}>
+                Extracted — Revenue {fmt(res.extracted.revenue?.currentYear)}, EBITDA {fmt(res.extracted.ebitda?.currentYear)}
+                {res.extracted.margin != null ? `, margin ${res.extracted.margin}%` : ''} · confidence {res.extracted.confidence ?? 0}% ({res.source})
+              </p>
+              {res.comparison?.map((c) => (
+                <p key={c.field} className="text-xs mt-1" style={{ color: c.flag ? '#991B1B' : '#2D7A5F' }}>
+                  {c.flag ? '⚠️' : '✓'} {c.field}: claimed {fmt(c.entered)} vs extracted {fmt(c.extracted)} ({c.deltaPct}% diff)
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
