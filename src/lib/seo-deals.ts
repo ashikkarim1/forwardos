@@ -62,3 +62,23 @@ export async function dealCountByLocation(country?: string, city?: string): Prom
     return 0
   }
 }
+
+export async function dealsByIndustry(industry: string, take = 24): Promise<SeoDeal[]> {
+  try {
+    const rows = await prisma.deal.findMany({
+      where: { status: { in: ['ACTIVE', 'PUBLISHED'] }, industry: industry as never },
+      orderBy: { heatScore: 'desc' }, take, select: SELECT,
+    })
+    return rows.map(serialize)
+  } catch {
+    return []
+  }
+}
+
+export async function dealCountByIndustry(industry: string): Promise<number> {
+  try {
+    return await prisma.deal.count({ where: { status: { in: ['ACTIVE', 'PUBLISHED'] }, industry: industry as never } })
+  } catch {
+    return 0
+  }
+}

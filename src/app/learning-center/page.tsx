@@ -64,9 +64,9 @@ export default function LearningCenterPage() {
                   <span className="px-2 py-1 rounded-md text-xs font-bold text-white" style={{ background: CATEGORY_COLORS[a.category] || COLOR_ACCENT }}>
                     {a.category}
                   </span>
-                  {a.region && a.region !== 'BOTH' && (
+                  {a.region && a.region !== 'BOTH' && a.region !== 'ALL' && (
                     <span className="text-xs font-semibold" style={{ color: COLOR_TEXT_SECONDARY }}>
-                      {a.region === 'CANADA' ? '🇨🇦 Canada' : '🇦🇪 UAE'}
+                      {a.region === 'USA' ? '🇺🇸 USA' : a.region === 'CANADA' ? '🇨🇦 Canada' : '🇦🇪 UAE'}
                     </span>
                   )}
                 </div>

@@ -4,6 +4,7 @@ import { ARTICLES } from '@/content/learning'
 import { BROKERS } from '@/lib/broker-data'
 import { prisma } from '@/lib/prisma'
 import { SEO_LOCATIONS } from '@/lib/seo-locations'
+import { SEO_INDUSTRIES } from '@/lib/seo-industries'
 
 /**
  * Dynamic sitemap: static pages + SEO landing pages + every deal, broker, and
@@ -27,6 +28,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Location landing pages (/businesses-for-sale/[location])
   const locationPaths = SEO_LOCATIONS.map((loc) => ({
     url: `${SITE_URL}/businesses-for-sale/${loc.slug}`,
+    lastModified: now,
+    changeFrequency: 'daily' as const,
+    priority: 0.9,
+  }))
+
+  // Industry landing pages (/businesses-for-sale/industry/[industry])
+  const industryPaths = SEO_INDUSTRIES.map((ind) => ({
+    url: `${SITE_URL}/businesses-for-sale/industry/${ind.slug}`,
     lastModified: now,
     changeFrequency: 'daily' as const,
     priority: 0.9,
@@ -63,5 +72,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // No DB — ship the static + content sitemap.
   }
 
-  return [...staticPaths, ...locationPaths, ...articlePaths, ...brokerPaths, ...dealPaths]
+  return [...staticPaths, ...locationPaths, ...industryPaths, ...articlePaths, ...brokerPaths, ...dealPaths]
 }

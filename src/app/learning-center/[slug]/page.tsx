@@ -28,9 +28,9 @@ export default function ArticlePage() {
           <>
             <div className="flex items-center gap-3 mb-4">
               <span className="px-2 py-1 rounded-md text-xs font-bold text-white" style={{ background: COLOR_ACCENT }}>{article.category}</span>
-              {article.region && article.region !== 'BOTH' && (
+              {article.region && article.region !== 'BOTH' && article.region !== 'ALL' && (
                 <span className="text-xs font-semibold" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  {article.region === 'CANADA' ? '🇨🇦 Canada' : '🇦🇪 UAE'}
+                  {article.region === 'USA' ? '🇺🇸 USA' : article.region === 'CANADA' ? '🇨🇦 Canada' : '🇦🇪 UAE'}
                 </span>
               )}
               <span className="flex items-center gap-1 text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
