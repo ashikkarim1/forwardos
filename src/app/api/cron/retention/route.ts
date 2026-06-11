@@ -7,7 +7,7 @@ import { logAudit } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
 
-export async function POST(req: NextRequest) {
+async function run(req: NextRequest) {
   const secret = process.env.CRON_SECRET
   const auth = req.headers.get('authorization')
   if (!secret || auth !== `Bearer ${secret}`) {
@@ -17,3 +17,7 @@ export async function POST(req: NextRequest) {
   await logAudit({ action: 'retention.purge', resourceType: 'system', changes: result })
   return NextResponse.json({ ok: true, purged: result })
 }
+
+// Vercel Cron invokes the path with GET and an Authorization: Bearer $CRON_SECRET header.
+export const GET = run
+export const POST = run
