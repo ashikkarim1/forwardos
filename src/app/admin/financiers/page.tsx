@@ -5,10 +5,14 @@ import { CheckCircle2, XCircle, Clock, Landmark } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 interface App {
-  id: string; name: string; region: string; status: string
-  contactName: string | null; contactEmail: string | null; contactPhone: string | null
+  id: string; name: string; region: string; status: string; partnerTier: string | null
+  contactName: string | null; contactEmail: string | null; contactPhone: string | null; linkedinUrl: string | null
   financingTypes: string[]; referralFeePercent: number | null; referralPlan: string | null
   description: string; shariaCompliant: boolean; agreementSignedAt: string | null; createdAt: string
+}
+
+const TIER_LABEL: Record<string, string> = {
+  LISTED: 'Listed (Free)', VERIFIED: 'Verified ($299)', PREFERRED: 'Preferred ($999)', STRATEGIC: 'Strategic ($5,000+)',
 }
 
 const STATUS_STYLE: Record<string, { bg: string; color: string; label: string }> = {
@@ -69,13 +73,19 @@ export default function AdminFinanciersPage() {
                 <div key={a.id} className="bg-white rounded-xl border p-5" style={{ borderColor: COLOR_BORDER }}>
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="text-lg font-bold" style={{ color: COLOR_PRIMARY }}>{a.name}</h3>
                         <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: s.bg, color: s.color }}>{s.label}</span>
+                        {a.partnerTier && <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: '#EFF6FF', color: COLOR_ACCENT }}>{TIER_LABEL[a.partnerTier] || a.partnerTier}</span>}
                       </div>
                       <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
                         {a.region} · {a.contactName || '—'} · {a.contactEmail} {a.contactPhone ? `· ${a.contactPhone}` : ''}
                       </p>
+                      {(a.linkedinUrl || a.description) && (
+                        <p className="text-xs mt-0.5" style={{ color: COLOR_TEXT_SECONDARY }}>
+                          {a.linkedinUrl ? <a href={a.linkedinUrl} target="_blank" rel="noopener noreferrer" style={{ color: COLOR_ACCENT }}>LinkedIn</a> : null}
+                        </p>
+                      )}
                     </div>
                     {a.status === 'PENDING' && (
                       <div className="flex gap-2">

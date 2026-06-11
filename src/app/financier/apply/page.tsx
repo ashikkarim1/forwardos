@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { CheckCircle2, Landmark } from 'lucide-react'
 import { PublicHeader } from '@/components/Navigation'
 import { FINANCING_TYPE_LABELS, REGION_LABELS, type FinancingType, type LenderRegion } from '@/lib/finance-data'
+import { FINANCIER_TIERS, validateFinancierCredentials, type FinancierTierId } from '@/lib/financier-tiers'
 import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 const TYPES = Object.keys(FINANCING_TYPE_LABELS) as FinancingType[]
@@ -12,7 +13,8 @@ const REGIONS = Object.keys(REGION_LABELS) as LenderRegion[]
 
 export default function FinancierApplyPage() {
   const [form, setForm] = useState({
-    name: '', contactName: '', contactEmail: '', contactPhone: '', website: '',
+    partnerTier: 'LISTED' as FinancierTierId,
+    name: '', contactName: '', contactEmail: '', contactPhone: '', website: '', linkedinUrl: '',
     region: 'USA' as LenderRegion, financingTypes: ['BANK_TERM'] as string[], shariaCompliant: false,
     minAmount: '', maxAmount: '', interestRateMin: '', interestRateMax: '',
     termMonthsMin: '12', termMonthsMax: '120', description: '',
@@ -26,7 +28,9 @@ export default function FinancierApplyPage() {
     setForm((f) => ({ ...f, financingTypes: f.financingTypes.includes(t) ? f.financingTypes.filter((x) => x !== t) : [...f.financingTypes, t] }))
 
   async function submit() {
-    if (!form.name || !form.contactEmail) { setError('Company name and contact email are required.'); return }
+    if (!form.name) { setError('Company name is required.'); return }
+    const credError = validateFinancierCredentials({ email: form.contactEmail, website: form.website, linkedin: form.linkedinUrl })
+    if (credError) { setError(credError); return }
     setState('sending'); setError('')
     try {
       const res = await fetch('/api/finance/partners/apply', {
@@ -75,12 +79,45 @@ export default function FinancierApplyPage() {
 
       <section className="px-6 py-10">
         <div className="max-w-3xl mx-auto space-y-6">
+          <Group title="Choose your partnership tier">
+            <div className="grid sm:grid-cols-2 gap-3">
+              {FINANCIER_TIERS.map((tier) => {
+                const selected = form.partnerTier === tier.id
+                return (
+                  <button
+                    type="button"
+                    key={tier.id}
+                    onClick={() => set('partnerTier', tier.id)}
+                    className="text-left p-4 rounded-xl border-2 transition-all"
+                    style={{ borderColor: selected ? COLOR_ACCENT : COLOR_BORDER, background: selected ? COLOR_ACCENT + '0D' : 'white' }}
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="font-bold" style={{ color: COLOR_PRIMARY }}>{tier.name}</span>
+                      <span className="text-sm font-black" style={{ color: COLOR_ACCENT }}>{tier.price}</span>
+                    </div>
+                    <ul className="text-xs space-y-0.5" style={{ color: COLOR_TEXT_SECONDARY }}>
+                      {tier.benefits.map((b) => <li key={b}>• {b}</li>)}
+                      {tier.performance?.map((p) => <li key={p} style={{ color: '#2D7A5F' }}>+ {p}</li>)}
+                    </ul>
+                  </button>
+                )
+              })}
+            </div>
+            <p className="text-xs mt-3" style={{ color: COLOR_TEXT_SECONDARY }}>
+              Pick the tier you&apos;re interested in — our team confirms it during review. You can start free as a Listed Partner.
+            </p>
+          </Group>
+
           <Group title="Company & contact">
+            <p className="text-xs mb-3" style={{ color: COLOR_TEXT_SECONDARY }}>
+              Please use your <strong>work email</strong>, and provide your <strong>website and/or LinkedIn</strong> (at least one required).
+            </p>
             <div className="grid md:grid-cols-2 gap-4">
               <Field label="Company / institution name *"><input className={inp} value={form.name} onChange={(e) => set('name', e.target.value)} /></Field>
-              <Field label="Website"><input className={inp} value={form.website} onChange={(e) => set('website', e.target.value)} placeholder="https://" /></Field>
+              <Field label="Work email *"><input type="email" className={inp} value={form.contactEmail} onChange={(e) => set('contactEmail', e.target.value)} placeholder="you@yourcompany.com" /></Field>
+              <Field label="Company website (LinkedIn or website required)"><input className={inp} value={form.website} onChange={(e) => set('website', e.target.value)} placeholder="https://yourcompany.com" /></Field>
+              <Field label="LinkedIn (profile or company)"><input className={inp} value={form.linkedinUrl} onChange={(e) => set('linkedinUrl', e.target.value)} placeholder="https://linkedin.com/in/…" /></Field>
               <Field label="Contact name"><input className={inp} value={form.contactName} onChange={(e) => set('contactName', e.target.value)} /></Field>
-              <Field label="Contact email *"><input type="email" className={inp} value={form.contactEmail} onChange={(e) => set('contactEmail', e.target.value)} /></Field>
               <Field label="Contact phone"><input className={inp} value={form.contactPhone} onChange={(e) => set('contactPhone', e.target.value)} /></Field>
               <Field label="Primary region">
                 <select className={inp} value={form.region} onChange={(e) => set('region', e.target.value)}>

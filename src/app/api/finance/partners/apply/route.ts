@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { sendEmail } from '@/lib/services/email'
 import { isSameOrigin, rateLimit, clientIp } from '@/lib/rate-limit'
 import { logAudit } from '@/lib/audit'
+import { validateFinancierCredentials, getFinancierTier } from '@/lib/financier-tiers'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,6 +25,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Company name, contact email, and a valid region are required.' }, { status: 400 })
     }
 
+    // Work email + at least one of website / LinkedIn.
+    const credError = validateFinancierCredentials({ email: b.contactEmail, website: b.website, linkedin: b.linkedinUrl })
+    if (credError) return NextResponse.json({ error: credError }, { status: 400 })
+
+    const tier = getFinancierTier(b.partnerTier)?.id ?? 'LISTED'
     const types = Array.isArray(b.financingTypes) && b.financingTypes.length ? b.financingTypes : ['BANK_TERM']
 
     const lender = await prisma.lender.create({
@@ -43,9 +49,11 @@ export async function POST(req: NextRequest) {
         // Application/onboarding state
         status: 'PENDING',
         isActive: false, // not marketed until approved + agreement signed
+        partnerTier: tier,
         contactName: b.contactName ? String(b.contactName).slice(0, 120) : null,
         contactEmail: String(b.contactEmail).slice(0, 254),
         contactPhone: b.contactPhone ? String(b.contactPhone).slice(0, 40) : null,
+        linkedinUrl: b.linkedinUrl ? String(b.linkedinUrl).slice(0, 300) : null,
         referralFeePercent: b.referralFeePercent != null ? Number(b.referralFeePercent) : null,
         referralPlan: b.referralPlan ? String(b.referralPlan).slice(0, 4000) : null,
       },

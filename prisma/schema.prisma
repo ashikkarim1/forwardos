@@ -1017,6 +1017,13 @@ enum FinancierStatus {
   REJECTED
 }
 
+enum FinancierTier {
+  LISTED         // free — profile + contact details
+  VERIFIED       // $299/mo — verified badge + analytics
+  PREFERRED      // $999/mo — featured placement + lead routing
+  STRATEGIC      // $5,000+/mo — homepage exposure + exclusive categories + performance fees
+}
+
 enum FeedbackKind {
   FEATURE
   BUG
@@ -1123,9 +1130,11 @@ model Lender {
 
   // ---- Financier partner application & onboarding ----
   status                FinancierStatus @default(ACTIVE) // seeded lenders ACTIVE; new applications start PENDING
+  partnerTier           FinancierTier?
   contactName           String?
   contactEmail          String?
   contactPhone          String?
+  linkedinUrl           String?
   referralFeePercent    Float?    // proposed referral fee %
   referralPlan          String?   @db.Text // their proposed referral plan / terms
   adminNotes            String?   @db.Text

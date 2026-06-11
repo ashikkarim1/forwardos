@@ -17,8 +17,8 @@ export async function GET(req: NextRequest) {
       take: 200,
     })
     const applications = rows.map((l) => ({
-      id: l.id, name: l.name, region: l.region, status: l.status,
-      contactName: l.contactName, contactEmail: l.contactEmail, contactPhone: l.contactPhone,
+      id: l.id, name: l.name, region: l.region, status: l.status, partnerTier: l.partnerTier,
+      contactName: l.contactName, contactEmail: l.contactEmail, contactPhone: l.contactPhone, linkedinUrl: l.linkedinUrl,
       financingTypes: JSON.parse(l.financingTypes),
       referralFeePercent: l.referralFeePercent, referralPlan: l.referralPlan,
       description: l.description, shariaCompliant: l.shariaCompliant,
