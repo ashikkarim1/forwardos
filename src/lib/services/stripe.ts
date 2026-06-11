@@ -1,179 +1,88 @@
 /**
- * Stripe Integration Service
- * Handles payment processing for Premium tier
+ * Stripe Integration Service.
+ *
+ * Uses the real Stripe SDK when STRIPE_SECRET_KEY is set; otherwise runs in a
+ * safe mock mode (logs + fake session) so the flow works in dev without keys.
+ * Plans map to price IDs via env — set these in your Stripe dashboard + Vercel:
+ *   STRIPE_PRICE_PREMIUM  (seller Premium, $39/mo)
+ *   STRIPE_PRICE_STARTER  (buyer Starter, $499/mo)
+ *   STRIPE_PRICE_PRO      (buyer Pro, $2,499/mo)
  */
+import Stripe from 'stripe'
+
+export type PlanTier = 'premium' | 'starter' | 'pro'
+
+const secretKey = process.env.STRIPE_SECRET_KEY
+export const stripeEnabled = Boolean(secretKey)
+const stripe = secretKey ? new Stripe(secretKey) : null
+
+const PRICE_ENV: Record<PlanTier, string> = {
+  premium: 'STRIPE_PRICE_PREMIUM',
+  starter: 'STRIPE_PRICE_STARTER',
+  pro: 'STRIPE_PRICE_PRO',
+}
+function priceFor(plan: PlanTier): string | undefined {
+  return process.env[PRICE_ENV[plan]]
+}
+function appUrl(): string {
+  return process.env.NEXT_PUBLIC_SITE_URL || process.env.APP_URL || 'http://localhost:3000'
+}
 
 interface CreateCheckoutSessionOptions {
-  dealId: string
+  dealId?: string
   userId: string
   userEmail: string
-  userName: string
-  planTier: 'premium'
+  userName?: string
+  planTier: PlanTier
+  successPath?: string
+  cancelPath?: string
 }
+interface CheckoutSession { sessionId: string; url: string; mocked?: boolean }
 
-interface CheckoutSession {
-  sessionId: string
-  url: string
-}
-
-/**
- * Create a Stripe checkout session for Premium seller plan
- */
 export async function createCheckoutSession(options: CreateCheckoutSessionOptions): Promise<CheckoutSession> {
-  // TODO: Implement Stripe API integration
-  // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-  // const session = await stripe.checkout.sessions.create({
-  //   payment_method_types: ['card'],
-  //   customer_email: options.userEmail,
-  //   line_items: [
-  //     {
-  //       price: process.env.STRIPE_PREMIUM_PRICE_ID,
-  //       quantity: 1,
-  //     },
-  //   ],
-  //   mode: 'subscription',
-  //   success_url: `${process.env.APP_URL}/seller/checkout/success?sessionId={CHECKOUT_SESSION_ID}&dealId=${options.dealId}`,
-  //   cancel_url: `${process.env.APP_URL}/seller/onboarding/pending?planTier=premium`,
-  //   metadata: {
-  //     dealId: options.dealId,
-  //     userId: options.userId,
-  //   },
-  // })
-  // return { sessionId: session.id, url: session.url! }
+  const success = `${appUrl()}${options.successPath || `/seller/checkout/success`}?sessionId={CHECKOUT_SESSION_ID}${options.dealId ? `&dealId=${options.dealId}` : ''}`
+  const cancel = `${appUrl()}${options.cancelPath || '/pricing'}`
 
-  // Mock implementation
-  const mockSessionId = `session_${Date.now()}`
-  const mockUrl = `https://checkout.stripe.com/pay/${mockSessionId}`
-
-  console.log('[STRIPE] Mock checkout session created:', {
-    sessionId: mockSessionId,
-    dealId: options.dealId,
-    userEmail: options.userEmail,
-    planTier: options.planTier,
-  })
-
-  return { sessionId: mockSessionId, url: mockUrl }
-}
-
-/**
- * Retrieve checkout session details
- */
-export async function retrieveCheckoutSession(sessionId: string) {
-  // TODO: Implement Stripe API integration
-  // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-  // const session = await stripe.checkout.sessions.retrieve(sessionId)
-  // return session
-
-  console.log('[STRIPE] Mock retrieve session:', sessionId)
-  return { id: sessionId, payment_status: 'paid' }
-}
-
-/**
- * Create or update subscription
- */
-export async function createSubscription(options: {
-  userId: string
-  stripeCustomerId: string
-  planTier: 'premium'
-}) {
-  // TODO: Implement Stripe API integration
-  // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-  // const subscription = await stripe.subscriptions.create({
-  //   customer: options.stripeCustomerId,
-  //   items: [
-  //     {
-  //       price: process.env.STRIPE_PREMIUM_PRICE_ID,
-  //     },
-  //   ],
-  //   metadata: {
-  //     userId: options.userId,
-  //   },
-  // })
-  // return subscription
-
-  console.log('[STRIPE] Mock subscription created:', {
-    userId: options.userId,
-    planTier: options.planTier,
-  })
-
-  return {
-    id: `sub_${Date.now()}`,
-    customer: options.stripeCustomerId,
-    status: 'active',
+  if (!stripe) {
+    const mockSessionId = `cs_mock_${Date.now()}`
+    console.log('[STRIPE:mock] checkout session', { plan: options.planTier, email: options.userEmail })
+    return { sessionId: mockSessionId, url: `${appUrl()}/seller/checkout/success?sessionId=${mockSessionId}${options.dealId ? `&dealId=${options.dealId}` : ''}`, mocked: true }
   }
-}
 
-/**
- * Verify Stripe webhook signature
- */
-export async function verifyWebhookSignature(body: string, signature: string): Promise<boolean> {
-  // TODO: Implement Stripe webhook verification
-  // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-  // const event = stripe.webhooks.constructEvent(
-  //   body,
-  //   signature,
-  //   process.env.STRIPE_WEBHOOK_SECRET!
-  // )
-  // return true
+  const price = priceFor(options.planTier)
+  if (!price) throw new Error(`Missing price ID for "${options.planTier}". Set ${PRICE_ENV[options.planTier]} in your environment.`)
 
-  // Mock implementation
-  return true
-}
-
-/**
- * Handle payment success webhook
- */
-export async function handlePaymentSuccess(sessionId: string, metadata: Record<string, any>) {
-  console.log('[STRIPE] Payment successful:', {
-    sessionId,
-    metadata,
+  const session = await stripe.checkout.sessions.create({
+    mode: 'subscription',
+    customer_email: options.userEmail,
+    line_items: [{ price, quantity: 1 }],
+    success_url: success,
+    cancel_url: cancel,
+    metadata: { userId: options.userId, dealId: options.dealId || '', planTier: options.planTier },
+    subscription_data: { metadata: { userId: options.userId, planTier: options.planTier } },
   })
-
-  // TODO: Update user subscription status in database
-  // Update deal status to ACTIVE
-  // Send confirmation email
+  return { sessionId: session.id, url: session.url || cancel }
 }
 
-/**
- * Handle subscription renewal/payment
- */
-export async function handleSubscriptionPayment(subscriptionId: string, userId: string) {
-  console.log('[STRIPE] Subscription payment processed:', {
-    subscriptionId,
-    userId,
-  })
-
-  // TODO: Update subscription renewal date
-  // Log transaction
+export async function retrieveCheckoutSession(sessionId: string) {
+  if (!stripe) return { id: sessionId, payment_status: 'paid', mocked: true } as { id: string; payment_status: string; mocked?: boolean }
+  return stripe.checkout.sessions.retrieve(sessionId)
 }
 
-/**
- * Cancel subscription
- */
-export async function cancelSubscription(subscriptionId: string, immediate: boolean = false) {
-  // TODO: Implement Stripe API integration
-  // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-  // await stripe.subscriptions.update(subscriptionId, {
-  //   cancel_at_period_end: !immediate,
-  // })
-
-  console.log('[STRIPE] Subscription cancelled:', {
-    subscriptionId,
-    immediate,
-  })
+/** Construct & verify a webhook event from the raw body + signature. */
+export function constructWebhookEvent(rawBody: string, signature: string): Stripe.Event | null {
+  if (!stripe || !process.env.STRIPE_WEBHOOK_SECRET) return null
+  return stripe.webhooks.constructEvent(rawBody, signature, process.env.STRIPE_WEBHOOK_SECRET)
 }
 
-/**
- * Get customer payment methods
- */
+export async function cancelSubscription(subscriptionId: string, immediate = false) {
+  if (!stripe) { console.log('[STRIPE:mock] cancel', subscriptionId); return }
+  if (immediate) await stripe.subscriptions.cancel(subscriptionId)
+  else await stripe.subscriptions.update(subscriptionId, { cancel_at_period_end: true })
+}
+
 export async function getPaymentMethods(stripeCustomerId: string) {
-  // TODO: Implement Stripe API integration
-  // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-  // const methods = await stripe.paymentMethods.list({
-  //   customer: stripeCustomerId,
-  // })
-  // return methods.data
-
-  console.log('[STRIPE] Get payment methods:', stripeCustomerId)
-  return []
+  if (!stripe) return []
+  const methods = await stripe.paymentMethods.list({ customer: stripeCustomerId, type: 'card' })
+  return methods.data
 }
