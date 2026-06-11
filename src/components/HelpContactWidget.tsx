@@ -31,7 +31,7 @@ export function HelpContactWidget() {
   ]
 
   const contactInfo = [
-    { icon: Mail, label: 'Email', value: 'support@forwardos.io', href: 'mailto:support@forwardos.io' },
+    { icon: Mail, label: 'Email', value: 'support@forwardos.ai', href: 'mailto:support@forwardos.ai' },
     { icon: Phone, label: 'Phone', value: '+1-888-FORWARD-1', href: 'tel:+18884436972' },
   ]
 

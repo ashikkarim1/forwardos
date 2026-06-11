@@ -56,7 +56,7 @@ export function WorldClassFooter() {
       city: 'San Francisco, CA',
       address: '123 Innovation Drive, San Francisco, CA 94105',
       phone: '+1 (888) FORWARD-1',
-      email: 'hello@forwardos.io',
+      email: 'hello@forwardos.ai',
       timezone: 'PT (UTC-8)',
     },
     {
@@ -64,7 +64,7 @@ export function WorldClassFooter() {
       city: 'Toronto, ON',
       address: '456 Innovation Lane, Toronto, ON M5V 3A8',
       phone: '+1 (888) FORWARD-1',
-      email: 'hello-ca@forwardos.io',
+      email: 'hello-ca@forwardos.ai',
       timezone: 'ET (UTC-5)',
     },
     {
@@ -72,7 +72,7 @@ export function WorldClassFooter() {
       city: 'Dubai, UAE',
       address: 'Building A1, Dubai Digital Park, Dubai Silicon Oasis',
       phone: '+971-4-XXX-XXXX',
-      email: 'hello-ae@forwardos.io',
+      email: 'hello-ae@forwardos.ai',
       timezone: 'GST (UTC+4)',
     },
   ]
@@ -81,7 +81,7 @@ export function WorldClassFooter() {
     { icon: Share2, href: 'https://twitter.com/forwardos', label: 'Twitter' },
     { icon: Briefcase, href: 'https://linkedin.com/company/forwardos', label: 'LinkedIn' },
     { icon: MessageCircle, href: 'https://github.com/forwardos', label: 'GitHub' },
-    { icon: Mail, href: 'mailto:hello@forwardos.io', label: 'Email' },
+    { icon: Mail, href: 'mailto:hello@forwardos.ai', label: 'Email' },
   ]
 
   return (

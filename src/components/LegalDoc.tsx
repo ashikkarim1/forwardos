@@ -55,7 +55,7 @@ export function LegalDoc({ title, lastUpdated, intro, sections }: {
         </div>
 
         <div className="mt-10 pt-6 border-t text-sm" style={{ borderColor: COLOR_BORDER, color: COLOR_TEXT_SECONDARY }}>
-          Questions about this policy? Contact <a href="mailto:legal@forwardos.io" style={{ color: COLOR_ACCENT }}>legal@forwardos.io</a>.
+          Questions about this policy? Contact <a href="mailto:legal@forwardos.ai" style={{ color: COLOR_ACCENT }}>legal@forwardos.ai</a>.
         </div>
       </article>
     </div>

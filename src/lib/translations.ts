@@ -84,7 +84,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'contact.headquarters': 'Headquarters',
     'contact.address': 'Building A1, Dubai Digital Park, Dubai Silicon Oasis, Dubai, United Arab Emirates',
     'contact.phone': '+971-4-XXX-XXXX',
-    'contact.email': 'hello@forwardos.io',
+    'contact.email': 'hello@forwardos.ai',
     'contact.timezone': 'Asia/Dubai',
     'contact.hours': 'Sat-Thu, 9:00 AM - 6:00 PM GST',
 
@@ -274,7 +274,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'contact.headquarters': 'Siège social',
     'contact.address': 'Bâtiment A1, Dubai Digital Park, Dubai Silicon Oasis, Dubaï, Émirats Arabes Unis',
     'contact.phone': '+971-4-XXX-XXXX',
-    'contact.email': 'hello-ca@forwardos.io',
+    'contact.email': 'hello-ca@forwardos.ai',
     'contact.timezone': 'Asie/Dubaï',
     'contact.hours': 'Sam-Jeu, 9:00 AM - 6:00 PM GST',
 
@@ -455,7 +455,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'contact.headquarters': 'المقر الرئيسي',
     'contact.address': 'المبنى A1، دبي ديجيتال بارك، واحة دبي السيليكون، دبي، الإمارات العربية المتحدة',
     'contact.phone': '+971-4-XXX-XXXX',
-    'contact.email': 'hello-ae@forwardos.io',
+    'contact.email': 'hello-ae@forwardos.ai',
     'contact.timezone': 'آسيا/دبي',
     'contact.hours': 'السبت-الخميس، 9:00 صباحاً - 6:00 مساءً GST',
 

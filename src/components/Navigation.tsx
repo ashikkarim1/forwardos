@@ -32,7 +32,7 @@ export function PublicHeader() {
               Forward
             </span>
             <span className="text-xs font-bold leading-none tracking-wide" style={{ color: COLOR_ACCENT }}>
-              OS
+              Intelligence
             </span>
           </div>
         </Link>

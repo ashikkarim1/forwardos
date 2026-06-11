@@ -5,13 +5,13 @@
  */
 import type { Metadata } from 'next'
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.forwardos.io').replace(/\/$/, '')
-export const SITE_NAME = 'Forward'
-export const SITE_TAGLINE = 'Buy & Sell Businesses and Franchises in Canada & the UAE'
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.forwardos.ai').replace(/\/$/, '')
+export const SITE_NAME = 'Forward Intelligence'
+export const SITE_TAGLINE = 'Buy & Sell Businesses and Franchises in the USA, Canada & the UAE'
 
 export const DEFAULT_DESCRIPTION =
-  'Forward is the modern marketplace to buy and sell businesses and franchises in Canada and the UAE. ' +
-  'Browse verified listings, get AI deal intelligence, find financing (CSBFP, BDC, SME & Sharia-compliant), ' +
+  'Forward Intelligence is the modern marketplace to buy and sell businesses and franchises across the USA, Canada, and the UAE. ' +
+  'Browse verified listings, get AI deal intelligence, find financing (SBA, CSBFP, BDC, SME & Sharia-compliant), ' +
   'connect with vetted brokers, and list your business for 50% less than anywhere else.'
 
 export const DEFAULT_KEYWORDS = [
@@ -62,9 +62,9 @@ export function organizationLd() {
     url: SITE_URL,
     logo: OG_IMAGE,
     description: DEFAULT_DESCRIPTION,
-    areaServed: ['CA', 'AE'],
+    areaServed: ['US', 'CA', 'AE'],
     sameAs: [] as string[],
-    contactPoint: [{ '@type': 'ContactPoint', email: 'support@forwardos.io', contactType: 'customer support' }],
+    contactPoint: [{ '@type': 'ContactPoint', email: 'support@forwardos.ai', contactType: 'customer support' }],
   }
 }
 

@@ -27,7 +27,7 @@ export const financingInquirySchema = z.object({
   userId: z.string().max(64).optional().nullable(),
   dealId: z.string().max(64).optional().nullable(),
   lenderId: z.string().max(64).optional().nullable(),
-  region: z.enum(['CANADA', 'UAE', 'GLOBAL']),
+  region: z.enum(['USA', 'CANADA', 'UAE', 'GLOBAL']),
   requestedAmount: z.number().nonnegative().max(1e13),
   currency: z.string().max(8).optional(),
   downPaymentPct: z.number().min(0).max(100).optional(),

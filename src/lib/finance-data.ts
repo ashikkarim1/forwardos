@@ -10,7 +10,7 @@
  * AND UAE — including Sharia-compliant Murabaha/Ijara — which BizBuySell cannot serve.
  */
 
-export type LenderRegion = 'CANADA' | 'UAE' | 'GLOBAL'
+export type LenderRegion = 'USA' | 'CANADA' | 'UAE' | 'GLOBAL'
 export type FinancingType =
   | 'SBA' | 'CSBFP' | 'BDC' | 'BANK_TERM' | 'SME_LOAN'
   | 'ISLAMIC_MURABAHA' | 'ISLAMIC_IJARA' | 'SELLER_FINANCING'
@@ -47,12 +47,65 @@ export const FINANCING_TYPE_LABELS: Record<FinancingType, string> = {
 }
 
 export const REGION_LABELS: Record<LenderRegion, string> = {
+  USA: 'United States 🇺🇸',
   CANADA: 'Canada 🇨🇦',
   UAE: 'United Arab Emirates 🇦🇪',
   GLOBAL: 'Global 🌍',
 }
 
 export const LENDERS: LenderSeed[] = [
+  // ---------------- USA ----------------
+  {
+    id: 'lender-live-oak',
+    name: 'Live Oak Bank — SBA 7(a)',
+    region: 'USA',
+    financingTypes: ['SBA', 'BANK_TERM'],
+    description:
+      'The nation\'s leading SBA 7(a) lender by volume, specializing in business-acquisition loans with long terms and low down payments for qualified U.S. buyers.',
+    applyUrl: 'https://www.liveoakbank.com/business-acquisition-financing/',
+    minAmount: usd(50_000),
+    maxAmount: usd(5_000_000),
+    interestRateMin: 10.5,
+    interestRateMax: 11.5,
+    termMonthsMin: 84,
+    termMonthsMax: 300,
+    maxLtvPercent: 90,
+    shariaCompliant: false,
+  },
+  {
+    id: 'lender-newtek',
+    name: 'Newtek Small Business Finance — SBA 7(a)',
+    region: 'USA',
+    financingTypes: ['SBA', 'SME_LOAN'],
+    description:
+      'A top non-bank SBA 7(a) lender offering acquisition and working-capital financing nationwide, with a fast digital application and flexible structures.',
+    applyUrl: 'https://www.newtekone.com/lending/sba-7a-loans/',
+    minAmount: usd(25_000),
+    maxAmount: usd(5_000_000),
+    interestRateMin: 10.5,
+    interestRateMax: 12.5,
+    termMonthsMin: 60,
+    termMonthsMax: 300,
+    maxLtvPercent: 90,
+    shariaCompliant: false,
+  },
+  {
+    id: 'lender-huntington',
+    name: 'Huntington Bank — SBA Lending',
+    region: 'USA',
+    financingTypes: ['SBA', 'BANK_TERM'],
+    description:
+      'A leading originator of SBA 7(a) loans by unit volume, with relationship banking and acquisition financing for small and lower-mid-market U.S. businesses.',
+    applyUrl: 'https://www.huntington.com/Commercial/loans-leasing/sba',
+    minAmount: usd(50_000),
+    maxAmount: usd(5_000_000),
+    interestRateMin: 10.0,
+    interestRateMax: 12.0,
+    termMonthsMin: 84,
+    termMonthsMax: 300,
+    maxLtvPercent: 85,
+    shariaCompliant: false,
+  },
   // ---------------- CANADA ----------------
   {
     id: 'lender-bdc',

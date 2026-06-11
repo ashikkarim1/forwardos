@@ -9,9 +9,11 @@ import { useLocale } from '@/context/LocaleContext'
 import { LENDERS, REGION_LABELS, type LenderRegion } from '@/lib/finance-data'
 import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
-// Map locale → default financing region (UAE for Arabic, Canada otherwise)
+// Map locale → default financing region (Arabic → UAE, French → Canada, else USA)
 function regionForLocale(locale: string): LenderRegion {
-  return locale === 'ar' ? 'UAE' : 'CANADA'
+  if (locale === 'ar') return 'UAE'
+  if (locale === 'fr') return 'CANADA'
+  return 'USA'
 }
 
 export default function FinanceCenterPage() {
@@ -42,7 +44,7 @@ export default function FinanceCenterPage() {
       })
   }, [region, shariaOnly])
 
-  const regionTabs: LenderRegion[] = ['CANADA', 'UAE']
+  const regionTabs: LenderRegion[] = ['USA', 'CANADA', 'UAE']
   const shariaAvailable = useMemo(() => region === 'UAE', [region])
 
   return (
@@ -56,12 +58,12 @@ export default function FinanceCenterPage() {
             FINANCE CENTER
           </span>
           <h1 className="text-4xl md:text-5xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>
-            Fund your acquisition — in Canada & the UAE
+            Fund your acquisition — in the USA, Canada & the UAE
           </h1>
           <p className="text-lg max-w-2xl" style={{ color: COLOR_TEXT_SECONDARY }}>
             Match with vetted lenders, model your monthly payment, and check financing readiness.
-            From <strong>CSBFP & BDC</strong> in Canada to <strong>SME and Sharia-compliant</strong> financing in the UAE —
-            options BizBuySell&apos;s US-only SBA tools can&apos;t reach.
+            From <strong>SBA 7(a)</strong> in the U.S. to <strong>CSBFP & BDC</strong> in Canada and
+            <strong> SME & Sharia-compliant</strong> financing in the UAE — all in one place.
           </p>
         </div>
       </section>

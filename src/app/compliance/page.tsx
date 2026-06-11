@@ -39,7 +39,7 @@ export default function CompliancePage() {
           'A designated Compliance Officer owns the AML/KYC program, staff receive periodic training, and the program is reviewed and independently tested on a regular basis.',
         ]},
         { heading: 'Contact', body: [
-          'Compliance enquiries: compliance@forwardos.io.',
+          'Compliance enquiries: compliance@forwardos.ai.',
         ]},
       ]}
     />

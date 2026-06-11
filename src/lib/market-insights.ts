@@ -8,7 +8,7 @@
  * All monetary values are USD base (dollars); the UI converts to the user's currency.
  */
 
-export type Region = 'CANADA' | 'UAE'
+export type Region = 'USA' | 'CANADA' | 'UAE'
 
 export interface SectorInsight {
   sector: string
@@ -39,6 +39,26 @@ export interface RegionInsight {
 const PERIOD = '2026-Q2'
 
 export const INSIGHTS: Record<Region, RegionInsight> = {
+  USA: {
+    region: 'USA',
+    period: PERIOD,
+    headline: {
+      medianAsking: 350_000,
+      medianMultiple: 2.7,
+      salesToAskRatio: 0.92,
+      activeListings: 64_000,
+      avgDaysOnMarket: 178,
+      yoyListingGrowth: 9.2,
+    },
+    sectors: [
+      { sector: 'Services', medianAsking: 320_000, medianRevenue: 540_000, medianMultiple: 2.5, activeListings: 14_200, salesToAskRatio: 0.93, avgDaysOnMarket: 162, momentum: 'rising' },
+      { sector: 'Restaurants / F&B', medianAsking: 195_000, medianRevenue: 620_000, medianMultiple: 1.7, activeListings: 9_800, salesToAskRatio: 0.90, avgDaysOnMarket: 188, momentum: 'steady' },
+      { sector: 'Retail', medianAsking: 250_000, medianRevenue: 700_000, medianMultiple: 1.9, activeListings: 8_400, salesToAskRatio: 0.89, avgDaysOnMarket: 184, momentum: 'cooling' },
+      { sector: 'SaaS / Tech', medianAsking: 1_250_000, medianRevenue: 780_000, medianMultiple: 4.3, activeListings: 3_900, salesToAskRatio: 0.96, avgDaysOnMarket: 128, momentum: 'rising' },
+      { sector: 'Manufacturing', medianAsking: 950_000, medianRevenue: 1_650_000, medianMultiple: 3.2, activeListings: 5_100, salesToAskRatio: 0.91, avgDaysOnMarket: 201, momentum: 'steady' },
+    ],
+    trend: 'SBA-financed acquisitions kept demand resilient; sales-to-ask held near 92%. Tech and services lead on multiples and speed, while retail softens on days-on-market.',
+  },
   CANADA: {
     region: 'CANADA',
     period: PERIOD,

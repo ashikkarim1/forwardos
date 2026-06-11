@@ -84,6 +84,55 @@ export const SEO_LOCATIONS: SeoLocation[] = [
       'Browse businesses for sale in Montréal and Québec — founder-led services, manufacturing, and franchises, with bilingual broker support. Verified, AI-scored opportunities.',
     financing: 'Québec buyers can use CSBFP and BDC financing — see what you qualify for in our Finance Center.',
   },
+  {
+    slug: 'usa',
+    name: 'the USA',
+    dbCountry: 'USA',
+    currency: 'USD',
+    intro:
+      'Browse verified businesses and franchises for sale across the United States — SaaS, services, healthcare, retail, manufacturing, and more. Real financials, AI deal scores, and SBA-eligible financing on every qualifying listing.',
+    financing: 'U.S. buyers can finance acquisitions with SBA 7(a) loans — check eligibility and model payments in our Finance Center.',
+  },
+  {
+    slug: 'new-york',
+    name: 'New York',
+    dbCountry: 'USA',
+    dbCity: 'New York',
+    currency: 'USD',
+    intro:
+      'Find businesses for sale in New York — fintech, professional services, hospitality, and established consumer businesses. Verified sellers and AI-ranked opportunities.',
+    financing: 'New York buyers can use SBA 7(a) financing — see eligible lenders in our Finance Center.',
+  },
+  {
+    slug: 'los-angeles',
+    name: 'Los Angeles',
+    dbCountry: 'USA',
+    dbCity: 'Los Angeles',
+    currency: 'USD',
+    intro:
+      'Explore businesses for sale in Los Angeles and Southern California — media, e-commerce, services, and consumer brands. Transparent financials and AI deal intelligence.',
+    financing: 'LA acquisitions are often SBA 7(a)-eligible — model your financing in our Finance Center.',
+  },
+  {
+    slug: 'miami',
+    name: 'Miami',
+    dbCountry: 'USA',
+    dbCity: 'Miami',
+    currency: 'USD',
+    intro:
+      'Businesses for sale in Miami and South Florida — hospitality, logistics, services, and fast-growing consumer businesses. Verified listings with full deal intelligence.',
+    financing: 'Miami buyers can finance with SBA 7(a) loans — compare options in our Finance Center.',
+  },
+  {
+    slug: 'austin',
+    name: 'Austin',
+    dbCountry: 'USA',
+    dbCity: 'Austin',
+    currency: 'USD',
+    intro:
+      'Find businesses for sale in Austin, Texas — SaaS, tech-enabled services, and consumer businesses in one of the fastest-growing U.S. markets. AI-scored, verified deals.',
+    financing: 'Austin acquisitions are frequently SBA 7(a)-eligible — see what you qualify for in our Finance Center.',
+  },
 ]
 
 export function getSeoLocation(slug: string): SeoLocation | undefined {

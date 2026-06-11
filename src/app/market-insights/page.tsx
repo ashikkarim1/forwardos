@@ -9,13 +9,15 @@ import { formatCurrency, type Currency } from '@/lib/currency'
 import { INSIGHTS, type Region, type RegionInsight } from '@/lib/market-insights'
 import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
+const REGION_LABEL: Record<Region, string> = { USA: '🇺🇸 USA', CANADA: '🇨🇦 Canada', UAE: '🇦🇪 UAE' }
+
 export default function MarketInsightsPage() {
   const { locale, currency, isRTL } = useLocale()
   const cur = currency as Currency
   const [region, setRegion] = useState<Region>('CANADA')
   const [insight, setInsight] = useState<RegionInsight>(INSIGHTS.CANADA)
 
-  useEffect(() => { setRegion(locale === 'ar' ? 'UAE' : 'CANADA') }, [locale])
+  useEffect(() => { setRegion(locale === 'ar' ? 'UAE' : locale === 'fr' ? 'CANADA' : 'USA') }, [locale])
   useEffect(() => {
     fetch(`/api/market-insights?region=${region}`)
       .then((r) => r.json())
@@ -37,17 +39,17 @@ export default function MarketInsightsPage() {
             MARKET INSIGHTS · {insight.period}
           </span>
           <h1 className="text-4xl md:text-5xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>
-            {region === 'CANADA' ? '🇨🇦 Canada' : '🇦🇪 UAE'} business-for-sale market
+            {REGION_LABEL[region]} business-for-sale market
           </h1>
           <p className="text-lg max-w-2xl mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
             Live regional intelligence — median pricing, multiples, and sell-through by sector.
             Updated continuously, not a static quarterly PDF.
           </p>
           <div className="inline-flex rounded-lg border overflow-hidden" style={{ borderColor: COLOR_BORDER }}>
-            {(['CANADA', 'UAE'] as Region[]).map((r) => (
+            {(['USA', 'CANADA', 'UAE'] as Region[]).map((r) => (
               <button key={r} onClick={() => setRegion(r)} className="px-5 py-2 text-sm font-semibold transition-colors"
                 style={{ background: region === r ? COLOR_ACCENT : 'white', color: region === r ? 'white' : COLOR_PRIMARY }}>
-                {r === 'CANADA' ? '🇨🇦 Canada' : '🇦🇪 UAE'}
+                {REGION_LABEL[r]}
               </button>
             ))}
           </div>

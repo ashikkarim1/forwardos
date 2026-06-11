@@ -176,7 +176,7 @@ export const billingConfig = {
   invoiceRetentionDays: 7,
   paymentRetryDays: 3,
   gracePeriodDays: 7,
-  supportEmail: 'billing@forwardos.io',
+  supportEmail: 'billing@forwardos.ai',
   supportPhone: {
     US: '+1-888-FORWARD-1',
     CA: '+1-888-FORWARD-1',

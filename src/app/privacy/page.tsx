@@ -33,13 +33,13 @@ export default function PrivacyPage() {
           'We retain personal data for as long as needed to provide the service and to meet legal, accounting, and AML record-keeping requirements, after which it is deleted or anonymized.',
         ]},
         { heading: 'Your Rights', body: [
-          'Subject to applicable law, you may request access to, correction, or deletion of your personal data, withdraw consent, and object to certain processing. Contact privacy@forwardos.io to exercise these rights.',
+          'Subject to applicable law, you may request access to, correction, or deletion of your personal data, withdraw consent, and object to certain processing. Contact privacy@forwardos.ai to exercise these rights.',
         ]},
         { heading: 'Security', body: [
           'We use encryption in transit, hashed credentials, access controls, and audit logging. See our Security page for details.',
         ]},
         { heading: 'Contact', body: [
-          'For privacy questions or to reach our Data Protection Officer, email privacy@forwardos.io.',
+          'For privacy questions or to reach our Data Protection Officer, email privacy@forwardos.ai.',
         ]},
       ]}
     />

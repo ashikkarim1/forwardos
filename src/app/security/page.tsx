@@ -28,7 +28,7 @@ export default function SecurityPage() {
           'We apply dependency updates, server-side input validation, rate limiting, and security headers. We welcome responsible disclosure of vulnerabilities.',
         ]},
         { heading: 'Reporting a Vulnerability', body: [
-          'If you believe you have found a security issue, please email security@forwardos.io. We aim to acknowledge reports within two business days.',
+          'If you believe you have found a security issue, please email security@forwardos.ai. We aim to acknowledge reports within two business days.',
         ]},
       ]}
     />
