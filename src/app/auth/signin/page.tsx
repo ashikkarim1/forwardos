@@ -46,8 +46,7 @@ function SigninContent() {
         createdAt: new Date().toISOString()
       }
 
-      localStorage.setItem('auth_token', 'demo_token_' + Math.random().toString(36))
-      localStorage.setItem('user', JSON.stringify(mockUser))
+      // Auth is handled by the httpOnly session cookie — no tokens/PII in localStorage.
 
       if (redirect) {
         router.push(redirect)

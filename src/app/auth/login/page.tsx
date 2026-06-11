@@ -43,8 +43,8 @@ export default function LoginPage() {
 
       const data = await response.json()
 
-      // Store JWT token in localStorage
-      localStorage.setItem('token', data.token)
+      // Auth is handled by the httpOnly session cookie set by /api/auth/login.
+      // Do NOT store tokens in localStorage (XSS-exposable).
 
       // Redirect based on role
       if (data.user.role === 'SELLER') {

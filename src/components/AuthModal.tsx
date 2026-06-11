@@ -79,8 +79,7 @@ export default function AuthModal({ isOpen, onClose, businessName = 'this deal',
         createdAt: new Date().toISOString(),
       }
 
-      localStorage.setItem('auth_token', 'demo_token_' + Math.random().toString(36))
-      localStorage.setItem('user', JSON.stringify(user))
+      // Auth is handled by the httpOnly session cookie — no tokens/PII in localStorage.
 
       // Success state before closing
       await new Promise(r => setTimeout(r, 800))

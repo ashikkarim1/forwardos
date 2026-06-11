@@ -43,13 +43,9 @@ export const sessionManager = {
       },
     }
     
-    // Persist to localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session))
-      localStorage.setItem('auth_token', session.token)
-      localStorage.setItem('user', JSON.stringify(user))
-    }
-    
+    // Auth tokens/PII are NOT persisted to localStorage (XSS-exposable).
+    // Real auth uses the httpOnly session cookie set server-side.
+
     return session
   },
 

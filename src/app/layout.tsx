@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { LocaleProvider } from '@/context/LocaleContext'
 import { LaunchPromoBanner } from '@/components/LaunchPromoBanner'
 import FeedbackWidget from '@/components/FeedbackWidget'
+import ConsentBanner from '@/components/ConsentBanner'
 import {
   SITE_URL, SITE_NAME, SITE_TAGLINE, DEFAULT_DESCRIPTION, DEFAULT_KEYWORDS, OG_IMAGE,
   organizationLd, webSiteLd, jsonLdScript,
@@ -61,6 +62,7 @@ export default function RootLayout({
           <LaunchPromoBanner />
           <main id="main-content">{children}</main>
           <FeedbackWidget />
+          <ConsentBanner />
         </LocaleProvider>
       </body>
     </html>
