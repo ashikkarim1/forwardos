@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Mail, Lock, ArrowRight, AlertCircle, Loader } from 'lucide-react'
+import { PasswordInput } from '@/components/PasswordInput'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
 const containerVariants = {
@@ -145,13 +146,12 @@ export default function LoginPage() {
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-3 w-5 h-5" style={{ color: COLOR_TEXT_SECONDARY }} />
-              <input
-                type="password"
+              <PasswordInput
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full pl-10 pr-4 py-3 rounded-lg border-2 transition-colors focus:outline-none"
+                className="w-full pl-10 py-3 rounded-lg border-2 transition-colors focus:outline-none"
                 style={{
                   borderColor: COLOR_BORDER,
                   background: '#F3F4F6',

@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Mail, Lock, ArrowRight, Flame } from 'lucide-react'
+import { PasswordInput } from '@/components/PasswordInput'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
 function SigninContent() {
@@ -158,13 +159,12 @@ function SigninContent() {
               </label>
               <div className="relative">
                 <Lock size={18} className="absolute left-3 top-3.5" style={{ color: COLOR_TEXT_SECONDARY }} />
-                <input
-                  type="password"
+                <PasswordInput
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Enter your password"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border"
+                  className="w-full pl-10 py-2.5 rounded-lg border"
                   style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
                 />
               </div>

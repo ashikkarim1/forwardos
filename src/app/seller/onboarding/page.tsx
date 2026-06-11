@@ -17,6 +17,7 @@ import {
   Upload,
   X,
 } from 'lucide-react'
+import { PasswordInput } from '@/components/PasswordInput'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 interface Step {
@@ -614,12 +615,11 @@ function StepAccountCreation({
         <label className="block text-sm font-semibold mb-2" style={{ color: COLOR_PRIMARY }}>
           Password
         </label>
-        <input
-          type="password"
+        <PasswordInput
           placeholder="Min 8 characters"
           value={data.password}
           onChange={(e) => updateData('password', e.target.value)}
-          className="w-full px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
+          className="w-full pl-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
           style={{ borderColor: errors.password ? '#EF4444' : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
         />
         {errors.password && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.password}</p>}
@@ -629,12 +629,11 @@ function StepAccountCreation({
         <label className="block text-sm font-semibold mb-2" style={{ color: COLOR_PRIMARY }}>
           Confirm Password
         </label>
-        <input
-          type="password"
+        <PasswordInput
           placeholder="Confirm password"
           value={data.confirmPassword}
           onChange={(e) => updateData('confirmPassword', e.target.value)}
-          className="w-full px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
+          className="w-full pl-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
           style={{ borderColor: errors.confirmPassword ? '#EF4444' : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
         />
         {errors.confirmPassword && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.confirmPassword}</p>}

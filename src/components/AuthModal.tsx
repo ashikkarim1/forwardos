@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Mail, Lock, User, ArrowRight, CheckCircle2, Flame, BarChart3, Users } from 'lucide-react'
+import { PasswordInput } from '@/components/PasswordInput'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
 interface AuthModalProps {
@@ -267,12 +268,11 @@ export default function AuthModal({ isOpen, onClose, businessName = 'this deal',
                     </label>
                     <div className="relative">
                       <Lock size={16} className="absolute left-3 top-3" style={{ color: COLOR_TEXT_SECONDARY }} />
-                      <input
-                        type="password"
+                      <PasswordInput
                         value={password}
                         onChange={(e) => { setPassword(e.target.value); setError('') }}
                         placeholder="Min 8 characters"
-                        className="w-full pl-9 pr-4 py-2.5 rounded-lg border"
+                        className="w-full pl-9 py-2.5 rounded-lg border"
                         style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
                       />
                     </div>
