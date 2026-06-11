@@ -7,7 +7,7 @@ import { isSameOrigin, clientIp, rateLimit } from '@/lib/rate-limit'
 import { logAudit } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
-export const AGREEMENT_VERSION = 'referral-v1-2026-06'
+const AGREEMENT_VERSION = 'referral-v1-2026-06'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   if (!isSameOrigin(req)) return NextResponse.json({ error: 'Cross-origin request blocked' }, { status: 403 })
