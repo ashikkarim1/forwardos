@@ -21,15 +21,15 @@ export const PRICING = {
 }
 
 /**
- * Published competitor prices for an equivalent *featured* listing (monthly,
- * standard term). Used for the transparent "how we compare" table.
- * Sources are each competitor's public pricing / listing pages.
+ * Typical market prices for an equivalent *featured* listing (monthly, standard
+ * term), described generically — no competitor is named. Figures reflect publicly
+ * published rates across the leading business-for-sale marketplaces.
  */
 export const COMPETITORS: { name: string; featuredMonthly: number; note: string }[] = [
-  { name: 'BizBuySell — Showcase', featuredMonthly: 99.95, note: 'Higher search placement' },
-  { name: 'BizBuySell — Diamond', featuredMonthly: 199.95, note: 'Top placement + BuyerBlast' },
-  { name: 'BizQuest', featuredMonthly: 59.95, note: 'Standard featured listing' },
-  { name: 'BusinessesForSale.com', featuredMonthly: 79.0, note: 'Premium listing' },
+  { name: 'Leading marketplace — featured tier', featuredMonthly: 99.95, note: 'Higher search placement' },
+  { name: 'Leading marketplace — top tier', featuredMonthly: 199.95, note: 'Top placement + buyer email blasts' },
+  { name: 'Major industry marketplace', featuredMonthly: 59.95, note: 'Standard featured listing' },
+  { name: 'International business-for-sale site', featuredMonthly: 79.0, note: 'Premium listing' },
 ]
 
 /** Lowest competitor featured price — the bar we beat by 50%. */

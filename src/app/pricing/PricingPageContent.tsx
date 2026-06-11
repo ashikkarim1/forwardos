@@ -26,6 +26,14 @@ export function PricingPageContent() {
   const { isRTL } = useLocale()
   const t = useTranslation()
   const [showUserTypeModal, setShowUserTypeModal] = useState(false)
+  const [view, setView] = useState<'sellers' | 'buyers'>('sellers')
+
+  const jumpTo = (section: 'sellers' | 'buyers') => {
+    setView(section)
+    if (typeof document !== 'undefined') {
+      document.getElementById(section)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
 
   // Pricing is USD-only.
   const getPrice = (basePrice: number): { display: string; amount: number } => {
@@ -130,22 +138,45 @@ export function PricingPageContent() {
       </nav>
 
       {/* Pricing Header */}
-      <div className="border-b py-20 px-4 sm:px-6 lg:px-8" style={{ borderColor: COLOR_BORDER }}>
+      <div className="border-b py-12 px-4 sm:px-6 lg:px-8" style={{ borderColor: COLOR_BORDER }}>
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl font-black mb-6" style={{ color: COLOR_PRIMARY }}>
+          <h1 className="text-4xl md:text-5xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>
             {t('pricing.title')}
           </h1>
-          <p className="text-xl mb-8" style={{ color: COLOR_TEXT_SECONDARY }}>
-            {t('pricing.subtitle')}
+          <p className="text-lg mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
+            14-day free trial. No credit card required. Cancel anytime.
+          </p>
+
+          {/* For Sellers / For Buyers toggle */}
+          <div className="inline-flex rounded-full border p-1" style={{ borderColor: COLOR_BORDER, background: '#F3F4F6' }}>
+            <button
+              onClick={() => jumpTo('sellers')}
+              className="px-6 py-2.5 rounded-full text-sm font-bold transition-all"
+              style={{ background: view === 'sellers' ? COLOR_ACCENT : 'transparent', color: view === 'sellers' ? 'white' : COLOR_PRIMARY }}
+            >
+              🏷️ For Sellers
+            </button>
+            <button
+              onClick={() => jumpTo('buyers')}
+              className="px-6 py-2.5 rounded-full text-sm font-bold transition-all"
+              style={{ background: view === 'buyers' ? COLOR_ACCENT : 'transparent', color: view === 'buyers' ? 'white' : COLOR_PRIMARY }}
+            >
+              🔍 For Buyers
+            </button>
+          </div>
+          <p className="text-xs mt-3" style={{ color: COLOR_TEXT_SECONDARY }}>
+            Sellers list free. Buyers unlock AI deal intelligence. All prices in USD.
           </p>
         </div>
       </div>
 
       {/* ============ SELLERS FIRST (free to list) ============ */}
-      <SellerPricingTiers />
+      <div id="sellers" className="scroll-mt-20">
+        <SellerPricingTiers />
+      </div>
 
       {/* ============ BUYERS ============ */}
-      <div className="py-16 px-4 sm:px-6 lg:px-8 border-t" style={{ borderColor: COLOR_BORDER }}>
+      <div id="buyers" className="py-16 px-4 sm:px-6 lg:px-8 border-t scroll-mt-20" style={{ borderColor: COLOR_BORDER }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white mb-3" style={{ background: '#2D7A5F' }}>
