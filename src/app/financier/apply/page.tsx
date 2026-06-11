@@ -1,0 +1,162 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { CheckCircle2, Landmark } from 'lucide-react'
+import { PublicHeader } from '@/components/Navigation'
+import { FINANCING_TYPE_LABELS, REGION_LABELS, type FinancingType, type LenderRegion } from '@/lib/finance-data'
+import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
+
+const TYPES = Object.keys(FINANCING_TYPE_LABELS) as FinancingType[]
+const REGIONS = Object.keys(REGION_LABELS) as LenderRegion[]
+
+export default function FinancierApplyPage() {
+  const [form, setForm] = useState({
+    name: '', contactName: '', contactEmail: '', contactPhone: '', website: '',
+    region: 'USA' as LenderRegion, financingTypes: ['BANK_TERM'] as string[], shariaCompliant: false,
+    minAmount: '', maxAmount: '', interestRateMin: '', interestRateMax: '',
+    termMonthsMin: '12', termMonthsMax: '120', description: '',
+    referralFeePercent: '', referralPlan: '',
+  })
+  const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
+  const [error, setError] = useState('')
+
+  const set = (k: string, v: unknown) => setForm((f) => ({ ...f, [k]: v }))
+  const toggleType = (t: string) =>
+    setForm((f) => ({ ...f, financingTypes: f.financingTypes.includes(t) ? f.financingTypes.filter((x) => x !== t) : [...f.financingTypes, t] }))
+
+  async function submit() {
+    if (!form.name || !form.contactEmail) { setError('Company name and contact email are required.'); return }
+    setState('sending'); setError('')
+    try {
+      const res = await fetch('/api/finance/partners/apply', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error || 'Application failed'); setState('error'); return }
+      setState('done')
+    } catch { setError('Request failed'); setState('error') }
+  }
+
+  if (state === 'done') {
+    return (
+      <Shell>
+        <div className="max-w-xl mx-auto px-6 py-20 text-center">
+          <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4" style={{ background: '#EAF5F0' }}>
+            <CheckCircle2 size={32} style={{ color: '#2D7A5F' }} />
+          </div>
+          <h1 className="text-3xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>Application received</h1>
+          <p style={{ color: COLOR_TEXT_SECONDARY }} className="mb-6">
+            Thank you. Our team will review your application. Once approved, you&apos;ll receive a referral agreement to
+            sign digitally — after that you&apos;re onboarded and marketed to qualified buyers across our marketplace.
+          </p>
+          <Link href="/finance-center" className="px-6 py-3 rounded-lg font-bold text-white hover:opacity-90" style={{ background: COLOR_ACCENT }}>
+            Back to Finance Center
+          </Link>
+        </div>
+      </Shell>
+    )
+  }
+
+  return (
+    <Shell>
+      <section className="px-6 py-8 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+        <div className="max-w-3xl mx-auto">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold mb-3 text-white" style={{ background: COLOR_ACCENT }}>
+            <Landmark size={13} /> BECOME A FINANCING PARTNER
+          </span>
+          <h1 className="text-3xl md:text-4xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>Join our lender network</h1>
+          <p style={{ color: COLOR_TEXT_SECONDARY }}>
+            Get matched with qualified business buyers across the USA, Canada, and the UAE. Apply below — once approved
+            and your referral agreement is signed, you&apos;re listed and actively marketed in our Finance Center.
+          </p>
+        </div>
+      </section>
+
+      <section className="px-6 py-10">
+        <div className="max-w-3xl mx-auto space-y-6">
+          <Group title="Company & contact">
+            <div className="grid md:grid-cols-2 gap-4">
+              <Field label="Company / institution name *"><input className={inp} value={form.name} onChange={(e) => set('name', e.target.value)} /></Field>
+              <Field label="Website"><input className={inp} value={form.website} onChange={(e) => set('website', e.target.value)} placeholder="https://" /></Field>
+              <Field label="Contact name"><input className={inp} value={form.contactName} onChange={(e) => set('contactName', e.target.value)} /></Field>
+              <Field label="Contact email *"><input type="email" className={inp} value={form.contactEmail} onChange={(e) => set('contactEmail', e.target.value)} /></Field>
+              <Field label="Contact phone"><input className={inp} value={form.contactPhone} onChange={(e) => set('contactPhone', e.target.value)} /></Field>
+              <Field label="Primary region">
+                <select className={inp} value={form.region} onChange={(e) => set('region', e.target.value)}>
+                  {REGIONS.map((r) => <option key={r} value={r}>{REGION_LABELS[r]}</option>)}
+                </select>
+              </Field>
+            </div>
+          </Group>
+
+          <Group title="Financing offered">
+            <p className="text-sm mb-3" style={{ color: COLOR_TEXT_SECONDARY }}>Select the products you offer:</p>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {TYPES.map((t) => (
+                <button key={t} type="button" onClick={() => toggleType(t)}
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors"
+                  style={{ borderColor: form.financingTypes.includes(t) ? COLOR_ACCENT : COLOR_BORDER, background: form.financingTypes.includes(t) ? COLOR_ACCENT : 'white', color: form.financingTypes.includes(t) ? 'white' : COLOR_PRIMARY }}>
+                  {FINANCING_TYPE_LABELS[t]}
+                </button>
+              ))}
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <Field label="Min amount (USD)"><input type="number" className={inp} value={form.minAmount} onChange={(e) => set('minAmount', e.target.value)} placeholder="50000" /></Field>
+              <Field label="Max amount (USD)"><input type="number" className={inp} value={form.maxAmount} onChange={(e) => set('maxAmount', e.target.value)} placeholder="5000000" /></Field>
+              <Field label="Rate / profit rate min (% p.a.)"><input type="number" className={inp} value={form.interestRateMin} onChange={(e) => set('interestRateMin', e.target.value)} placeholder="7.5" /></Field>
+              <Field label="Rate / profit rate max (% p.a.)"><input type="number" className={inp} value={form.interestRateMax} onChange={(e) => set('interestRateMax', e.target.value)} placeholder="11" /></Field>
+            </div>
+            <label className="flex items-center gap-2 mt-3 text-sm cursor-pointer" style={{ color: COLOR_PRIMARY }}>
+              <input type="checkbox" checked={form.shariaCompliant} onChange={(e) => set('shariaCompliant', e.target.checked)} className="accent-green-700" />
+              We offer Sharia-compliant products (Murabaha / Ijara)
+            </label>
+            <Field label="Description (shown in the directory)"><textarea rows={3} className={inp} value={form.description} onChange={(e) => set('description', e.target.value)} /></Field>
+          </Group>
+
+          <Group title="Referral plan">
+            <p className="text-sm mb-3" style={{ color: COLOR_TEXT_SECONDARY }}>
+              How would the referral relationship work? Propose your referral fee and terms — these form the basis of the
+              referral agreement with <strong>UpCapital Global FZCO</strong> (Forward OS platform).
+            </p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <Field label="Proposed referral fee (%)"><input type="number" className={inp} value={form.referralFeePercent} onChange={(e) => set('referralFeePercent', e.target.value)} placeholder="1.0" /></Field>
+            </div>
+            <Field label="Referral plan / terms"><textarea rows={4} className={inp} value={form.referralPlan} onChange={(e) => set('referralPlan', e.target.value)} placeholder="e.g. 1% of funded loan value, paid on drawdown; per-referral or revenue-share; any caps or minimums." /></Field>
+          </Group>
+
+          {error && <p className="text-sm font-semibold" style={{ color: '#DC2626' }}>{error}</p>}
+
+          <button onClick={submit} disabled={state === 'sending'} className="w-full px-6 py-3 rounded-lg font-bold text-white hover:opacity-90 disabled:opacity-50" style={{ background: COLOR_ACCENT }}>
+            {state === 'sending' ? 'Submitting…' : 'Submit application for review'}
+          </button>
+          <p className="text-xs text-center" style={{ color: COLOR_TEXT_SECONDARY }}>
+            After admin approval you&apos;ll receive a referral agreement to sign digitally before going live.
+          </p>
+        </div>
+      </section>
+    </Shell>
+  )
+}
+
+const inp = 'w-full px-3 py-2 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2'
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="block text-xs font-semibold mb-1" style={{ color: COLOR_PRIMARY }}>{label}</span>
+      {children}
+    </label>
+  )
+}
+function Group({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-white rounded-xl border p-6" style={{ borderColor: COLOR_BORDER }}>
+      <h2 className="text-lg font-bold mb-4" style={{ color: COLOR_PRIMARY }}>{title}</h2>
+      {children}
+    </div>
+  )
+}
+function Shell({ children }: { children: React.ReactNode }) {
+  return <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}><PublicHeader />{children}</div>
+}

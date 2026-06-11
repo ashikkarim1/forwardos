@@ -1009,6 +1009,14 @@ enum LenderRegion {
   GLOBAL
 }
 
+enum FinancierStatus {
+  PENDING        // applied, awaiting admin review
+  APPROVED       // admin approved; referral agreement sent for signature
+  SIGNED         // agreement digitally signed
+  ACTIVE         // fully onboarded and marketed
+  REJECTED
+}
+
 enum FeedbackKind {
   FEATURE
   BUG
@@ -1110,14 +1118,32 @@ model Lender {
   maxLtvPercent         Int       @default(80) // max loan-to-value
   shariaCompliant       Boolean   @default(false)
 
-  isActive              Boolean   @default(true)
+  isActive              Boolean   @default(true) // marketed in the directory when true
   inquiries             FinancingInquiry[]
+
+  // ---- Financier partner application & onboarding ----
+  status                FinancierStatus @default(ACTIVE) // seeded lenders ACTIVE; new applications start PENDING
+  contactName           String?
+  contactEmail          String?
+  contactPhone          String?
+  referralFeePercent    Float?    // proposed referral fee %
+  referralPlan          String?   @db.Text // their proposed referral plan / terms
+  adminNotes            String?   @db.Text
+
+  // Referral agreement (digital signature) with UpCapital Global FZCO
+  agreementVersion      String?
+  agreementSignerName   String?
+  agreementSignerTitle  String?
+  agreementSignatureUrl String?   @db.Text // base64 data-URL of the captured signature
+  agreementSignedAt     DateTime?
+  agreementIp           String?
 
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
   @@index([region])
   @@index([isActive])
+  @@index([status])
 }
 
 model FinancingInquiry {

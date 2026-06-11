@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { PublicHeader } from '@/components/Navigation'
 import { FinanceCalculator } from '@/components/finance/FinanceCalculator'
@@ -60,11 +61,20 @@ export default function FinanceCenterPage() {
           <h1 className="text-4xl md:text-5xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>
             Fund your acquisition — in the USA, Canada & the UAE
           </h1>
-          <p className="text-lg max-w-2xl" style={{ color: COLOR_TEXT_SECONDARY }}>
+          <p className="text-lg max-w-2xl mb-5" style={{ color: COLOR_TEXT_SECONDARY }}>
             Match with vetted lenders, model your monthly payment, and check financing readiness.
             From <strong>SBA 7(a)</strong> in the U.S. to <strong>CSBFP & BDC</strong> in Canada and
             <strong> SME & Sharia-compliant</strong> financing in the UAE — all in one place.
           </p>
+          {/* Financier recruitment CTA */}
+          <div className="inline-flex items-center gap-3 flex-wrap bg-white rounded-xl border px-4 py-3" style={{ borderColor: COLOR_BORDER }}>
+            <span className="text-sm font-semibold" style={{ color: COLOR_PRIMARY }}>
+              Are you a lender or financier? Get matched with qualified buyers.
+            </span>
+            <Link href="/financier/apply" className="px-4 py-2 rounded-lg text-sm font-bold text-white hover:opacity-90" style={{ background: COLOR_ACCENT }}>
+              Become a financing partner →
+            </Link>
+          </div>
         </div>
       </section>
 
