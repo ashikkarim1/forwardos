@@ -1135,7 +1135,9 @@ model Lender {
   contactEmail          String?
   contactPhone          String?
   linkedinUrl           String?
-  referralFeePercent    Float?    // proposed referral fee %
+  referralModel         String?   // 'PERCENTAGE' or 'FLAT'
+  referralFeePercent    Float?    // proposed referral fee % (when PERCENTAGE)
+  referralFlatAmount    Int?      // proposed flat fee / lump sum in USD (when FLAT)
   referralPlan          String?   @db.Text // their proposed referral plan / terms
   adminNotes            String?   @db.Text
 

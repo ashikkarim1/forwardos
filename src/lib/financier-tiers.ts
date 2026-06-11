@@ -44,9 +44,12 @@ export const FINANCIER_TIERS: FinancierTier[] = [
     price: '$5,000+/mo',
     priceMonthly: 5000,
     benefits: ['Homepage exposure — always on the main page', 'Exclusive categories'],
-    performance: ['$250 per qualified lead', '0.25% of funded transactions'],
+    performance: ['$100 per qualified lead (vs. $250 standard)'],
   },
 ]
+
+// Per-qualified-lead fee: standard rate, discounted for Strategic Partners.
+export const QUALIFIED_LEAD_FEE = { standard: 250, strategic: 100 }
 
 export function getFinancierTier(id: string): FinancierTier | undefined {
   return FINANCIER_TIERS.find((t) => t.id === id)

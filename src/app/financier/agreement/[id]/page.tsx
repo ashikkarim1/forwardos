@@ -10,7 +10,7 @@ import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_
 
 interface Partner {
   id: string; name: string; contactName: string | null; status: string
-  referralFeePercent: number | null; referralPlan: string | null
+  referralModel: string | null; referralFeePercent: number | null; referralFlatAmount: number | null; referralPlan: string | null
   agreementSignedAt: string | null; agreementSignerName: string | null
 }
 
@@ -78,7 +78,9 @@ export default function AgreementPage() {
     return <Shell><div className="max-w-xl mx-auto px-6 py-20 text-center"><h1 className="text-2xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>Application closed</h1><p style={{ color: COLOR_TEXT_SECONDARY }}>This application was not approved. Contact partners@forwardos.ai with questions.</p></div></Shell>
   }
 
-  const feeText = partner.referralFeePercent != null ? `${partner.referralFeePercent}%` : 'the agreed referral fee'
+  const feeText = partner.referralModel === 'FLAT'
+    ? (partner.referralFlatAmount != null ? `a flat referral fee of $${partner.referralFlatAmount.toLocaleString()} per funded deal` : 'the agreed flat referral fee')
+    : (partner.referralFeePercent != null ? `${partner.referralFeePercent}% of funded loan/financing value` : 'the agreed referral fee')
 
   return (
     <Shell>
@@ -100,7 +102,7 @@ export default function AgreementPage() {
             <p><strong>REFERRAL PARTNER AGREEMENT</strong></p>
             <p>This Referral Agreement (the “Agreement”) is entered into between <strong>UpCapital Global FZCO</strong>, a company registered in the UAE and operator of the Forward OS marketplace for buying and selling businesses (the “Platform”), and <strong>{partner.name}</strong> (the “Financing Partner”).</p>
             <p><strong>1. Referrals.</strong> The Platform may refer prospective borrowers (business buyers) to the Financing Partner. The Financing Partner will assess and, at its sole discretion, provide financing to referred parties subject to its own underwriting and applicable law.</p>
-            <p><strong>2. Referral Fee.</strong> The Financing Partner agrees to pay the Platform {feeText} of funded loan/financing value (or as otherwise set out in the partner&apos;s submitted referral plan), payable on drawdown, unless the parties agree otherwise in writing.</p>
+            <p><strong>2. Referral Fee.</strong> The Financing Partner agrees to pay the Platform {feeText} (or as otherwise set out in the partner&apos;s submitted referral plan), payable on drawdown, unless the parties agree otherwise in writing. Qualified-lead fees, where applicable, are billed at the standard rate of $250 per qualified lead, or $100 per qualified lead for Strategic Partners.</p>
             <p><strong>3. Marketing.</strong> Upon execution, the Platform will list and market the Financing Partner in its Finance Center to qualified buyers across the USA, Canada, and the UAE.</p>
             <p><strong>4. Compliance.</strong> Each party will comply with all applicable laws, including AML/CFT, sanctions, and data-protection requirements. Nothing herein constitutes the Platform as a lender, broker-dealer, or adviser.</p>
             <p><strong>5. Independent parties; no exclusivity.</strong> The parties are independent contractors. This Agreement is non-exclusive and may be terminated by either party on written notice.</p>

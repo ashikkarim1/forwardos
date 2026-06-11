@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { CheckCircle2, Landmark } from 'lucide-react'
 import { PublicHeader } from '@/components/Navigation'
 import { FINANCING_TYPE_LABELS, REGION_LABELS, type FinancingType, type LenderRegion } from '@/lib/finance-data'
-import { FINANCIER_TIERS, validateFinancierCredentials, type FinancierTierId } from '@/lib/financier-tiers'
+import { FINANCIER_TIERS, validateFinancierCredentials, QUALIFIED_LEAD_FEE, type FinancierTierId } from '@/lib/financier-tiers'
 import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 const TYPES = Object.keys(FINANCING_TYPE_LABELS) as FinancingType[]
@@ -18,7 +18,7 @@ export default function FinancierApplyPage() {
     region: 'USA' as LenderRegion, financingTypes: ['BANK_TERM'] as string[], shariaCompliant: false,
     minAmount: '', maxAmount: '', interestRateMin: '', interestRateMax: '',
     termMonthsMin: '12', termMonthsMax: '120', description: '',
-    referralFeePercent: '', referralPlan: '',
+    referralModel: 'PERCENTAGE' as 'PERCENTAGE' | 'FLAT', referralFeePercent: '', referralFlatAmount: '', referralPlan: '',
   })
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
   const [error, setError] = useState('')
@@ -105,6 +105,7 @@ export default function FinancierApplyPage() {
             </div>
             <p className="text-xs mt-3" style={{ color: COLOR_TEXT_SECONDARY }}>
               Pick the tier you&apos;re interested in — our team confirms it during review. You can start free as a Listed Partner.
+              Qualified-lead fee: <strong>${QUALIFIED_LEAD_FEE.standard}/lead</strong> standard, just <strong>${QUALIFIED_LEAD_FEE.strategic}/lead</strong> for Strategic Partners.
             </p>
           </Group>
 
@@ -153,13 +154,29 @@ export default function FinancierApplyPage() {
 
           <Group title="Referral plan">
             <p className="text-sm mb-3" style={{ color: COLOR_TEXT_SECONDARY }}>
-              How would the referral relationship work? Propose your referral fee and terms — these form the basis of the
-              referral agreement with <strong>UpCapital Global FZCO</strong> (Forward OS platform).
+              How would the referral relationship work? Choose how you&apos;d compensate referrals — these terms form the basis
+              of your referral agreement with <strong>UpCapital Global FZCO</strong> (Forward OS platform).
             </p>
-            <div className="grid md:grid-cols-2 gap-4">
-              <Field label="Proposed referral fee (%)"><input type="number" className={inp} value={form.referralFeePercent} onChange={(e) => set('referralFeePercent', e.target.value)} placeholder="1.0" /></Field>
+
+            {/* Percentage vs flat-fee / lump-sum toggle */}
+            <div className="inline-flex rounded-lg border p-1 mb-4" style={{ borderColor: COLOR_BORDER }}>
+              {(['PERCENTAGE', 'FLAT'] as const).map((m) => (
+                <button key={m} type="button" onClick={() => set('referralModel', m)}
+                  className="px-4 py-1.5 rounded-md text-sm font-semibold transition-colors"
+                  style={{ background: form.referralModel === m ? COLOR_ACCENT : 'transparent', color: form.referralModel === m ? 'white' : COLOR_PRIMARY }}>
+                  {m === 'PERCENTAGE' ? '% of funded value' : 'Flat fee / lump sum'}
+                </button>
+              ))}
             </div>
-            <Field label="Referral plan / terms"><textarea rows={4} className={inp} value={form.referralPlan} onChange={(e) => set('referralPlan', e.target.value)} placeholder="e.g. 1% of funded loan value, paid on drawdown; per-referral or revenue-share; any caps or minimums." /></Field>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {form.referralModel === 'PERCENTAGE' ? (
+                <Field label="Proposed referral fee (%)"><input type="number" className={inp} value={form.referralFeePercent} onChange={(e) => set('referralFeePercent', e.target.value)} placeholder="1.0" /></Field>
+              ) : (
+                <Field label="Flat fee / lump sum per deal (USD)"><input type="number" className={inp} value={form.referralFlatAmount} onChange={(e) => set('referralFlatAmount', e.target.value)} placeholder="2500" /></Field>
+              )}
+            </div>
+            <Field label="Referral plan / terms"><textarea rows={4} className={inp} value={form.referralPlan} onChange={(e) => set('referralPlan', e.target.value)} placeholder="e.g. paid on drawdown; per-referral or revenue-share; any caps, minimums, or how the flat fee applies." /></Field>
           </Group>
 
           {error && <p className="text-sm font-semibold" style={{ color: '#DC2626' }}>{error}</p>}

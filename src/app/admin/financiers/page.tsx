@@ -7,7 +7,7 @@ import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_
 interface App {
   id: string; name: string; region: string; status: string; partnerTier: string | null
   contactName: string | null; contactEmail: string | null; contactPhone: string | null; linkedinUrl: string | null
-  financingTypes: string[]; referralFeePercent: number | null; referralPlan: string | null
+  financingTypes: string[]; referralModel: string | null; referralFeePercent: number | null; referralFlatAmount: number | null; referralPlan: string | null
   description: string; shariaCompliant: boolean; agreementSignedAt: string | null; createdAt: string
 }
 
@@ -110,7 +110,11 @@ export default function AdminFinanciersPage() {
                     </div>
                     <div>
                       <p className="text-xs font-semibold uppercase mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>Proposed referral plan</p>
-                      <p style={{ color: COLOR_PRIMARY }}><strong>{a.referralFeePercent != null ? `${a.referralFeePercent}%` : '—'}</strong> {a.referralPlan || ''}</p>
+                      <p style={{ color: COLOR_PRIMARY }}>
+                        <strong>{a.referralModel === 'FLAT'
+                          ? (a.referralFlatAmount != null ? `$${a.referralFlatAmount.toLocaleString()} flat/deal` : 'Flat fee')
+                          : (a.referralFeePercent != null ? `${a.referralFeePercent}%` : '—')}</strong> {a.referralPlan || ''}
+                      </p>
                       {a.agreementSignedAt && <p className="mt-1 text-xs" style={{ color: '#2D7A5F' }}>✓ Agreement signed {new Date(a.agreementSignedAt).toLocaleDateString()}</p>}
                     </div>
                   </div>

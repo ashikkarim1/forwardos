@@ -54,7 +54,9 @@ export async function POST(req: NextRequest) {
         contactEmail: String(b.contactEmail).slice(0, 254),
         contactPhone: b.contactPhone ? String(b.contactPhone).slice(0, 40) : null,
         linkedinUrl: b.linkedinUrl ? String(b.linkedinUrl).slice(0, 300) : null,
-        referralFeePercent: b.referralFeePercent != null ? Number(b.referralFeePercent) : null,
+        referralModel: b.referralModel === 'FLAT' ? 'FLAT' : 'PERCENTAGE',
+        referralFeePercent: b.referralModel !== 'FLAT' && b.referralFeePercent != null && b.referralFeePercent !== '' ? Number(b.referralFeePercent) : null,
+        referralFlatAmount: b.referralModel === 'FLAT' && b.referralFlatAmount ? Math.round(Number(b.referralFlatAmount)) : null,
         referralPlan: b.referralPlan ? String(b.referralPlan).slice(0, 4000) : null,
       },
     })
