@@ -1009,6 +1009,31 @@ enum LenderRegion {
   GLOBAL
 }
 
+enum FeedbackKind {
+  FEATURE
+  BUG
+  PRAISE
+  OTHER
+}
+
+// User feedback — feature requests, bugs, praise. Works logged-in or anonymous;
+// userId is attached server-side from the session when present (no FK, so
+// anonymous submissions are unconstrained).
+model Feedback {
+  id        String       @id @default(cuid())
+  kind      FeedbackKind @default(OTHER)
+  message   String       @db.Text
+  page      String?
+  locale    String?
+  userId    String?
+  anonId    String?
+  userAgent String?
+  createdAt DateTime     @default(now())
+
+  @@index([kind])
+  @@index([createdAt])
+}
+
 // ==================== SAVED SEARCHES & EMAIL ALERTS ====================
 
 model SavedSearch {
