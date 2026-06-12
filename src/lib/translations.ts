@@ -50,7 +50,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     // CTA Section
     'cta.title': 'Ready to Win?',
     'cta.subtitle': 'Join 500+ deal professionals using Forward OS to source, analyze, and close M&A transactions.',
-    'cta.button1': 'Get Started Free →',
+    'cta.button1': 'List my company free →',
     'cta.button2': 'Enterprise Demo',
 
     // Footer
@@ -240,7 +240,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     // CTA Section
     'cta.title': 'Prêt à gagner ?',
     'cta.subtitle': 'Rejoignez 500+ professionnels des transactions utilisant Forward OS pour sourcer, analyser et conclure des transactions M&A.',
-    'cta.button1': 'Commencer gratuitement →',
+    'cta.button1': 'Vendre mon entreprise gratuitement →',
     'cta.button2': 'Démo d\'entreprise',
 
     // Footer
@@ -421,7 +421,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     // CTA Section
     'cta.title': 'هل أنت مستعد للفوز؟',
     'cta.subtitle': 'انضم إلى 500+ محترف في الصفقات باستخدام Forward OS لإيجاد وتحليل وإغلاق صفقات الاندماج والاستحواذ.',
-    'cta.button1': 'ابدأ مجاناً →',
+    'cta.button1': 'بيع شركتي مجاناً →',
     'cta.button2': 'عرض توضيحي للمؤسسة',
 
     // Footer

@@ -321,13 +321,13 @@ function LocalizedHomePageContent() {
             {t('cta.subtitle', locale)}
           </p>
           <div className={`flex flex-col sm:flex-row gap-4 justify-center ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
-            <button
-              onClick={() => setShowUserTypeModal(true)}
+            <Link
+              href="/list"
               className="px-8 py-4 rounded-lg font-bold text-white hover:opacity-90 transition-all"
               style={{ background: COLOR_ACCENT }}
             >
               {t('cta.button1', locale)}
-            </button>
+            </Link>
             <Link
               href="/contact-sales"
               className="px-8 py-4 rounded-lg font-bold border hover:bg-gray-50 transition-all"
