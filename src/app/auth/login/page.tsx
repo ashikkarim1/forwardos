@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Mail, Lock, ArrowRight, AlertCircle, Loader } from 'lucide-react'
 import { PasswordInput } from '@/components/PasswordInput'
+import { DashboardTour, type DemoRole } from '@/components/DashboardTour'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
 const containerVariants = {
@@ -22,6 +23,7 @@ export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [tourRole, setTourRole] = useState<DemoRole | null>(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -218,26 +220,27 @@ export default function LoginPage() {
           </div>
         </motion.div>
 
-        {/* Demo Accounts */}
-        <motion.div className="grid grid-cols-3 gap-3 mb-6" variants={itemVariants}>
-          {[
-            { role: 'Seller', email: 'seller@example.com', password: 'demo123' },
-            { role: 'Buyer', email: 'buyer@example.com', password: 'demo123' },
-            { role: 'Broker', email: 'broker@example.com', password: 'demo123' },
-          ].map((demo) => (
-            <button
-              key={demo.role}
-              type="button"
-              onClick={() => {
-                setEmail(demo.email)
-                setPassword(demo.password)
-              }}
-              className="p-3 rounded-lg border-2 text-sm font-medium transition-all hover:border-orange-300"
-              style={{ borderColor: COLOR_BORDER }}
-            >
-              Demo {demo.role}
-            </button>
-          ))}
+        {/* Dashboard tour — open a read-only preview instead of prefilling
+            credentials. The old prefill approach required real DB accounts
+            (a footgun: visitors could mutate real state) and broke as soon
+            as the demo passwords didn't exist. */}
+        <motion.div variants={itemVariants}>
+          <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-center mb-3" style={{ color: '#B8956A' }}>
+            See it in action
+          </p>
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            {(['seller', 'buyer', 'broker'] as const).map((r) => (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setTourRole(r)}
+                className="p-3 rounded-lg border-2 text-xs font-bold transition-colors hover:bg-gray-50"
+                style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
+              >
+                View {r[0].toUpperCase() + r.slice(1)} Dashboard
+              </button>
+            ))}
+          </div>
         </motion.div>
 
         {/* Footer */}
@@ -249,16 +252,9 @@ export default function LoginPage() {
             </Link>
           </p>
         </motion.div>
-
-        {/* Demo Mode Note */}
-        <motion.div
-          className="mt-6 p-3 rounded-lg text-xs"
-          style={{ background: '#DBEAFE', borderColor: '#93C5FD', borderWidth: 1, color: '#1E40AF' }}
-          variants={itemVariants}
-        >
-          💡 <strong>Demo Mode:</strong> Use the demo buttons above to test the platform with pre-filled credentials
-        </motion.div>
       </motion.div>
+
+      {tourRole && <DashboardTour role={tourRole} onClose={() => setTourRole(null)} />}
     </div>
   )
 }
