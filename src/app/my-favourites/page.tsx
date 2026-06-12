@@ -602,7 +602,7 @@ function MyFavouritesContent() {
                               Valuation
                             </td>
                             {selectedDealObjects.map((deal) => (
-                              <td key={deal.id} className="p-4 text-center font-black text-lg" style={{ color: '#3B82F6' }}>
+                              <td key={deal.id} className="p-4 text-center font-black text-lg" style={{ color: '#B8956A' }}>
                                 ${(deal.valuation / 1000000).toFixed(1)}M
                               </td>
                             ))}
@@ -718,7 +718,7 @@ function MyFavouritesContent() {
                               Revenue Multiple (V/R)
                             </td>
                             {selectedDealObjects.map((deal) => (
-                              <td key={deal.id} className="p-4 text-center font-bold" style={{ color: '#3B82F6' }}>
+                              <td key={deal.id} className="p-4 text-center font-bold" style={{ color: '#B8956A' }}>
                                 {(deal.valuation / deal.revenue).toFixed(1)}x
                               </td>
                             ))}
@@ -808,7 +808,7 @@ function MyFavouritesContent() {
                     {insights && (
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {[
-                          { label: 'Avg Valuation', value: `$${(insights.avgValuation / 1000000).toFixed(1)}M`, color: '#3B82F6' },
+                          { label: 'Avg Valuation', value: `$${(insights.avgValuation / 1000000).toFixed(1)}M`, color: '#B8956A' },
                           { label: 'Avg Growth', value: `${insights.avgGrowth.toFixed(0)}%`, color: '#10B981' },
                           { label: 'Avg Success %', value: `${insights.avgSuccess.toFixed(0)}%`, color: COLOR_ACCENT },
                           { label: 'Total Revenue', value: `$${(insights.totalRevenue / 1000000).toFixed(1)}M`, color: '#8B5CF6' },
@@ -1051,7 +1051,7 @@ function MyFavouritesContent() {
                                         <div
                                           className="w-1 h-1 rounded-full mt-2 flex-shrink-0"
                                           style={{
-                                            background: insight.severity === 'positive' ? '#10B981' : insight.severity === 'caution' ? '#F59E0B' : '#3B82F6',
+                                            background: insight.severity === 'positive' ? '#10B981' : insight.severity === 'caution' ? '#F59E0B' : '#B8956A',
                                           }}
                                         />
                                         <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm leading-relaxed">

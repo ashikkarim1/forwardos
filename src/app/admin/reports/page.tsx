@@ -58,7 +58,7 @@ const REPORTS = [
 const REPORT_METRICS = [
   { label: 'Revenue (This Month)', value: '$40,750', icon: DollarSign, color: COLOR_ACCENT },
   { label: 'Active Users (This Week)', value: '3,214', icon: Users, color: '#10B981' },
-  { label: 'Avg Email Open Rate', value: '36.9%', icon: Mail, color: '#3B82F6' },
+  { label: 'Avg Email Open Rate', value: '36.9%', icon: Mail, color: '#B8956A' },
   { label: 'Growth Rate (YoY)', value: '+34.2%', icon: TrendingUp, color: '#10B981' },
 ]
 

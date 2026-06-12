@@ -957,7 +957,7 @@ export default function BuyerDashboardV2() {
               key={access.id}
               className="p-6 rounded-lg border-2 hover:shadow-lg transition-all"
               style={{
-                borderColor: access.status === 'active' ? COLOR_ACCENT : access.status === 'approved' ? '#3B82F6' : COLOR_BORDER,
+                borderColor: access.status === 'active' ? COLOR_ACCENT : access.status === 'approved' ? '#B8956A' : COLOR_BORDER,
                 background: access.status === 'active' ? COLOR_ACCENT + '05' : access.status === 'approved' ? '#DBEAFE' : 'white',
               }}
               variants={itemVariants}

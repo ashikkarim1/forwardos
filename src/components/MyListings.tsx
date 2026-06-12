@@ -43,7 +43,7 @@ const STATUS_LABEL: Record<string, { label: string; color: string; bg: string }>
   PUBLISHED: { label: 'Live',        color: '#15803D', bg: '#EAF5F0' },
   DRAFT:     { label: 'Draft',       color: '#6B6760', bg: '#F4F2EE' },
   ARCHIVED:  { label: 'Unlisted',    color: '#B45309', bg: '#FEF3C7' },
-  CLOSED:    { label: 'Sold',        color: '#1D4ED8', bg: '#FAF6EF' },
+  CLOSED:    { label: 'Sold',        color: '#8C6D45', bg: '#FAF6EF' },
   WITHDRAWN: { label: 'Cancelled',   color: '#9A938A', bg: '#F4F2EE' },
 }
 
@@ -146,7 +146,7 @@ function DealRow({ deal, onChange }: { deal: Deal; onChange: () => void }) {
               </span>
             )}
             {deal.enquiryCount > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase" style={{ color: '#1D4ED8', background: '#FAF6EF' }}>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase" style={{ color: '#8C6D45', background: '#FAF6EF' }}>
                 <Inbox size={9} /> {deal.enquiryCount} inquir{deal.enquiryCount === 1 ? 'y' : 'ies'}
               </span>
             )}

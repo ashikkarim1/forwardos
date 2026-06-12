@@ -52,7 +52,7 @@ export async function sendEmailVerification(email: string, token: string) {
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .button { background-color: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; }
+          .button { background-color: #B8956A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; }
           .footer { color: #666; font-size: 12px; margin-top: 20px; }
         </style>
       </head>
@@ -60,7 +60,7 @@ export async function sendEmailVerification(email: string, token: string) {
         <div class="container">
           <h2>Verify Your Email Address</h2>
           <p>Welcome to Forward Intelligence! Click the button below to verify your email address and complete your account setup.</p>
-          <p><a href="${verificationUrl}" style="background-color:#3B82F6;color:#ffffff !important;padding:12px 24px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:bold;"><span style="color:#ffffff;">Verify Email Address</span></a></p>
+          <p><a href="${verificationUrl}" style="background-color:#B8956A;color:#ffffff !important;padding:12px 24px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:bold;"><span style="color:#ffffff;">Verify Email Address</span></a></p>
           <p>Or copy and paste this link in your browser:<br/>${verificationUrl}</p>
           <p>This link expires in 24 hours.</p>
           <div class="footer">
@@ -90,7 +90,7 @@ export async function sendApprovalNotification(email: string, sellerName: string
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
           .success { background-color: #D1FAE5; color: #065F46; padding: 16px; border-left: 4px solid #10B981; border-radius: 4px; margin: 20px 0; }
-          .button { background-color: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; margin: 10px 0; }
+          .button { background-color: #B8956A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; margin: 10px 0; }
         </style>
       </head>
       <body>
@@ -101,7 +101,7 @@ export async function sendApprovalNotification(email: string, sellerName: string
             <strong>Great news!</strong> Your listing "<strong>${listingTitle}</strong>" has been approved and is now live on the Forward marketplace!
           </div>
           <p>Buyers can now see your business profile, and you can start receiving inquiries.</p>
-          <p><a href="${dashboardUrl}" style="background-color:#3B82F6;color:#ffffff !important;padding:12px 24px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:bold;"><span style="color:#ffffff;">View Your Dashboard</span></a></p>
+          <p><a href="${dashboardUrl}" style="background-color:#B8956A;color:#ffffff !important;padding:12px 24px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:bold;"><span style="color:#ffffff;">View Your Dashboard</span></a></p>
           <h3>Next Steps:</h3>
           <ul>
             <li>Complete your seller profile for maximum visibility</li>
@@ -153,7 +153,7 @@ export async function sendPremiumPaymentLink(email: string, sellerName: string, 
             </ul>
             <p style="margin-bottom: 0;"><strong>Only $39/month</strong> (cancel anytime)</p>
           </div>
-          <p><a href="${checkoutUrl}" style="background-color:#3B82F6;color:#ffffff !important;padding:12px 24px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:bold;"><span style="color:#ffffff;">Complete Payment</span></a></p>
+          <p><a href="${checkoutUrl}" style="background-color:#B8956A;color:#ffffff !important;padding:12px 24px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:bold;"><span style="color:#ffffff;">Complete Payment</span></a></p>
           <p>Your listing will remain active during checkout. Premium features activate immediately after payment.</p>
           <p>Questions? We're here to help!</p>
           <div style="color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px;">
@@ -181,7 +181,7 @@ export async function sendAdminReviewNotification(adminEmail: string, sellerName
         <style>
           body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .button { background-color: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; }
+          .button { background-color: #B8956A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block; }
         </style>
       </head>
       <body>
@@ -193,7 +193,7 @@ export async function sendAdminReviewNotification(adminEmail: string, sellerName
             <strong>Email:</strong> ${sellerEmail}<br/>
             <strong>Listing ID:</strong> ${dealId}
           </p>
-          <p><a href="${reviewUrl}" style="background-color:#3B82F6;color:#ffffff !important;padding:12px 24px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:bold;"><span style="color:#ffffff;">Review Submission</span></a></p>
+          <p><a href="${reviewUrl}" style="background-color:#B8956A;color:#ffffff !important;padding:12px 24px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:bold;"><span style="color:#ffffff;">Review Submission</span></a></p>
           <p>Please review the submitted information and either approve or request revisions.</p>
         </div>
       </body>

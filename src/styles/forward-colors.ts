@@ -6,7 +6,7 @@
  * All colors are semantic tokens organized by function, not appearance.
  * This enables consistent theming, accessibility compliance, and future dark mode support.
  *
- * Theme: Blue (#3B82F6) — Crunchbase Firmology inspired professional data-driven palette
+ * Theme: Blue (#B8956A) — Crunchbase Firmology inspired professional data-driven palette
  *
  * Usage in components:
  * - CSS: Use CSS variables from globals.css (e.g., background: var(--color-bg-primary))
@@ -14,9 +14,9 @@
  * - React inline: Reference this object as JS constants
  *
  * Color Reference:
- * - Brand: #1A1A1A (primary dark), #3B82F6 (Crunchbase blue accent)
+ * - Brand: #1A1A1A (primary dark), #B8956A (Crunchbase blue accent)
  * - Grays: #FFFFFF (bg), #E5E7EB (border), #717171 (text)
- * - States: Blue (#3B82F6), Gray (#6B7280), Amber (#B45309), Green (#2D7A5F)
+ * - States: Blue (#B8956A), Gray (#6B7280), Amber (#B45309), Green (#2D7A5F)
  */
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -32,19 +32,19 @@ export const COLOR_PRIMARY = '#1A1A1A'
 /**
  * Brand accent color (Crunchbase blue) — used for call-to-action buttons,
  * brand highlights, deal indicators, intelligence signals, and important interactive elements
- * Firmology-inspired: Cool blue (#3B82F6) for professional data-driven feel
+ * Firmology-inspired: Cool blue (#B8956A) for professional data-driven feel
  */
-export const COLOR_ACCENT = '#3B82F6'
+export const COLOR_ACCENT = '#B8956A'
 
 /**
  * Secondary accent (darker blue) — used for positive states and secondary CTAs
  */
-export const COLOR_ACCENT_SECONDARY = '#2563EB'
+export const COLOR_ACCENT_SECONDARY = '#A3805A'
 
 /**
  * Intelligence accent (blue) — used for intelligence features and insights
  */
-export const COLOR_ACCENT_INTELLIGENCE = '#1D4ED8'
+export const COLOR_ACCENT_INTELLIGENCE = '#8C6D45'
 
 /**
  * Elevated/card surface — white background used for cards, modals, and raised surfaces
@@ -199,12 +199,12 @@ export const COLOR_WARNING_SOFT = '#FEF3C7'
 /**
  * Info color — used for informational states and secondary signals
  */
-export const COLOR_INFO = '#1D4ED8'
+export const COLOR_INFO = '#8C6D45'
 
 /**
  * Info soft — used for info backgrounds and info surfaces
  */
-export const COLOR_INFO_SOFT = '#EFF6FF'
+export const COLOR_INFO_SOFT = '#FAF6EF'
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // COMPONENT-SPECIFIC COLORS

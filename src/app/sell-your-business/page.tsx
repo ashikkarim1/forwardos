@@ -130,5 +130,5 @@ function TrustChip({ icon, title, body }: { icon: React.ReactNode; title: string
 function renderInline(s: string): string {
   return s
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:#3B82F6;text-decoration:underline">$1</a>')
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:#B8956A;text-decoration:underline">$1</a>')
 }

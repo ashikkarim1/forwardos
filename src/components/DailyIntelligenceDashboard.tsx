@@ -107,7 +107,7 @@ export function DailyIntelligenceDashboard({
       case 'cold':
         return '#D1D5DB'
       case 'trend':
-        return '#3B82F6'
+        return '#B8956A'
       case 'alert':
         return '#EF4444'
       default:
@@ -237,7 +237,7 @@ export function DailyIntelligenceDashboard({
                 >
                   {signal.type === 'hot' && <Flame className="w-4 h-4" style={{ color: COLOR_ACCENT }} />}
                   {signal.type === 'cold' && <TrendingDown className="w-4 h-4" style={{ color: '#6B7280' }} />}
-                  {signal.type === 'trend' && <TrendingUp className="w-4 h-4" style={{ color: '#3B82F6' }} />}
+                  {signal.type === 'trend' && <TrendingUp className="w-4 h-4" style={{ color: '#B8956A' }} />}
                   {signal.type === 'alert' && <AlertTriangle className="w-4 h-4" style={{ color: '#EF4444' }} />}
                 </div>
               </div>
@@ -503,7 +503,7 @@ export function DailyIntelligenceDashboard({
                 key={alert.id}
                 className="p-4 rounded-lg border-l-4"
                 style={{
-                  borderLeftColor: alert.severity === 'high' ? '#EF4444' : alert.severity === 'medium' ? '#F59E0B' : '#3B82F6',
+                  borderLeftColor: alert.severity === 'high' ? '#EF4444' : alert.severity === 'medium' ? '#F59E0B' : '#B8956A',
                   background: alert.severity === 'high' ? '#FEF2F2' : alert.severity === 'medium' ? '#FFFBEB' : '#DBEAFE',
                 }}
                 initial={{ opacity: 0, x: -20 }}
@@ -520,7 +520,7 @@ export function DailyIntelligenceDashboard({
                         <AlertCircle className="w-4 h-4" style={{ color: '#F59E0B' }} />
                       )}
                       {alert.severity === 'low' && (
-                        <AlertCircle className="w-4 h-4" style={{ color: '#3B82F6' }} />
+                        <AlertCircle className="w-4 h-4" style={{ color: '#B8956A' }} />
                       )}
                       <h3 className="font-bold text-sm" style={{ color: COLOR_PRIMARY }}>
                         {alert.title}

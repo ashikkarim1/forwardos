@@ -105,7 +105,7 @@ export default function AdminSupportPage() {
             { label: 'Open Tickets', value: openCount, color: '#EF4444' },
             { label: 'Urgent', value: urgentCount, color: '#DC2626' },
             { label: 'In Progress', value: 2, color: '#F59E0B' },
-            { label: 'Avg Wait Time', value: avgWaitTime, color: '#3B82F6' },
+            { label: 'Avg Wait Time', value: avgWaitTime, color: '#B8956A' },
           ].map((stat, idx) => (
             <motion.div
               key={idx}

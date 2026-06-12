@@ -328,7 +328,7 @@ export default function MarketplacePage() {
               className="px-3 py-2 rounded-full border text-sm bg-white font-semibold focus:outline-none"
               style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
             >
-              <option value="premium">⭐ Premium first</option>
+              <option value="premium">⭐ Featured first</option>
               <option value="newest">✨ Newest</option>
               <option value="oldest">📅 Oldest</option>
               <option value="heat">🔥 Hottest</option>
@@ -537,8 +537,8 @@ function EditorialRow({
           {deal.sellerVerified && <Badge bg="#EAF5F0" color="#2D7A5F"><CheckCircle2 size={10} className="inline mr-1 -mt-0.5" />Verified · trust {deal.sellerTrustScore}/100</Badge>}
           {deal.marketPosition === 'underpriced' && <Badge bg="#EAF5F0" color="#2D7A5F">Below market</Badge>}
           {deal.marketPosition === 'premium' && <Badge bg="#FEF3C7" color="#B45309">Premium positioning</Badge>}
-          {deal.marketTrend === 'up' && <Badge bg="#EFF6FF" color="#1D4ED8">Trending ↑</Badge>}
-          {deal.financingEligible && <Badge bg="#EFF6FF" color="#1D4ED8">Financing eligible</Badge>}
+          {deal.marketTrend === 'up' && <Badge bg="#EFF6FF" color="#8C6D45">Trending ↑</Badge>}
+          {deal.financingEligible && <Badge bg="#EFF6FF" color="#8C6D45">Financing eligible</Badge>}
         </div>
 
         {/* AI narrative */}
@@ -679,7 +679,7 @@ function OptionList({
             className="flex items-center justify-between gap-3 px-2 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
           >
             <span className="flex items-center gap-2.5">
-              <input type="checkbox" checked={checked} onChange={() => onToggle(value)} className="w-4 h-4 rounded cursor-pointer accent-blue-500" />
+              <input type="checkbox" checked={checked} onChange={() => onToggle(value)} className="w-4 h-4 rounded cursor-pointer accent-[#B8956A]" />
               <span className="text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
                 {raw ? value : formatLabel(value)}
               </span>
@@ -720,13 +720,13 @@ function RangeControl({
         <input
           type="range" min={minMax.min} max={minMax.max} step="0.1" value={value.min}
           onChange={(e) => onChange({ min: Math.min(parseFloat(e.target.value), value.max), max: value.max })}
-          className="w-full accent-blue-500"
+          className="w-full accent-[#B8956A]"
           aria-label={`${label} minimum`}
         />
         <input
           type="range" min={minMax.min} max={minMax.max} step="0.1" value={value.max}
           onChange={(e) => onChange({ min: value.min, max: Math.max(parseFloat(e.target.value), value.min) })}
-          className="w-full accent-blue-500"
+          className="w-full accent-[#B8956A]"
           aria-label={`${label} maximum`}
         />
       </div>

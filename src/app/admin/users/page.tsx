@@ -75,7 +75,7 @@ const USERS_DATA = [
 
 const USER_TYPE_COLORS = {
   seller: '#10B981',
-  broker: '#3B82F6',
+  broker: '#B8956A',
   buyer: '#8B5CF6',
 }
 
@@ -321,7 +321,7 @@ export default function AdminUsersPage() {
                           className="p-2 hover:bg-blue-100 rounded transition-colors"
                           title="Message"
                         >
-                          <Mail size={18} color="#3B82F6" />
+                          <Mail size={18} color="#B8956A" />
                         </button>
                         {user.status === 'active' ? (
                           <button

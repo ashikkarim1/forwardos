@@ -17,7 +17,7 @@ const TIER_LABEL: Record<string, string> = {
 
 const STATUS_STYLE: Record<string, { bg: string; color: string; label: string }> = {
   PENDING: { bg: '#FEF3C7', color: '#92400E', label: 'Pending review' },
-  APPROVED: { bg: '#EFF6FF', color: '#1D4ED8', label: 'Approved · awaiting signature' },
+  APPROVED: { bg: '#EFF6FF', color: '#8C6D45', label: 'Approved · awaiting signature' },
   ACTIVE: { bg: '#EAF5F0', color: '#2D7A5F', label: 'Active · marketed' },
   REJECTED: { bg: '#FEE2E2', color: '#991B1B', label: 'Rejected' },
   SIGNED: { bg: '#EAF5F0', color: '#2D7A5F', label: 'Signed' },
@@ -98,7 +98,7 @@ export default function AdminFinanciersPage() {
                       </div>
                     )}
                     {a.status === 'APPROVED' && (
-                      <span className="flex items-center gap-1 text-sm font-semibold" style={{ color: '#1D4ED8' }}><Clock size={15} /> Awaiting signature</span>
+                      <span className="flex items-center gap-1 text-sm font-semibold" style={{ color: '#8C6D45' }}><Clock size={15} /> Awaiting signature</span>
                     )}
                   </div>
 

@@ -49,9 +49,9 @@ class EmailService {
             <style>
               body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto; color: #1A1A1A; }
               .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: linear-gradient(135deg, #3B82F6, #2563EB); color: white; padding: 30px; border-radius: 8px; text-align: center; }
+              .header { background: linear-gradient(135deg, #B8956A, #A3805A); color: white; padding: 30px; border-radius: 8px; text-align: center; }
               .content { margin: 30px 0; line-height: 1.6; }
-              .button { display: inline-block; background: #3B82F6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; margin: 10px 0; }
+              .button { display: inline-block; background: #B8956A; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; margin: 10px 0; }
               .status-box { background: #EAF5F0; border-left: 4px solid #2D7A5F; padding: 15px; margin: 20px 0; }
               .footer { border-top: 1px solid #E5E7EB; padding-top: 20px; font-size: 12px; color: #717171; text-align: center; }
             </style>
@@ -160,8 +160,8 @@ class EmailService {
             <style>
               body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto; color: #1A1A1A; }
               .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .alert-box { background: #EFF6FF; border-left: 4px solid #1D4ED8; padding: 15px; margin: 20px 0; }
-              .button { display: inline-block; background: #3B82F6; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; }
+              .alert-box { background: #EFF6FF; border-left: 4px solid #8C6D45; padding: 15px; margin: 20px 0; }
+              .button { display: inline-block; background: #B8956A; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; }
               .broker-card { background: #FFFFFF; border: 1px solid #E5E7EB; padding: 15px; border-radius: 6px; margin: 20px 0; }
             </style>
           </head>
@@ -262,7 +262,7 @@ class EmailService {
               body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto; color: #1A1A1A; }
               .container { max-width: 600px; margin: 0 auto; padding: 20px; }
               .success { background: #EAF5F0; border-left: 4px solid #2D7A5F; padding: 15px; margin: 20px 0; }
-              .error { background: #F3F4F6; border-left: 4px solid #3B82F6; padding: 15px; margin: 20px 0; }
+              .error { background: #F3F4F6; border-left: 4px solid #B8956A; padding: 15px; margin: 20px 0; }
             </style>
           </head>
           <body>
@@ -335,7 +335,7 @@ class EmailService {
               body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto; color: #1A1A1A; }
               .container { max-width: 600px; margin: 0 auto; padding: 20px; }
               .card { background: #FFFFFF; border: 1px solid #E5E7EB; padding: 20px; border-radius: 6px; margin: 20px 0; }
-              .amount { font-size: 24px; font-weight: bold; color: #3B82F6; }
+              .amount { font-size: 24px; font-weight: bold; color: #B8956A; }
             </style>
           </head>
           <body>

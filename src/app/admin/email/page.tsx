@@ -153,7 +153,7 @@ export default function AdminEmailPage() {
                 </div>
 
                 <div className="text-center">
-                  <p className="text-2xl font-black" style={{ color: '#3B82F6' }}>
+                  <p className="text-2xl font-black" style={{ color: '#B8956A' }}>
                     {campaign.clickRate}%
                   </p>
                   <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
@@ -183,7 +183,7 @@ export default function AdminEmailPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                   {[
                     { label: 'Delivered', value: campaign.delivered, color: '#10B981' },
-                    { label: 'Opened', value: campaign.opened, color: '#3B82F6' },
+                    { label: 'Opened', value: campaign.opened, color: '#B8956A' },
                     { label: 'Clicked', value: campaign.clicked, color: COLOR_ACCENT },
                     { label: 'Unsubscribed', value: campaign.unsubscribed, color: '#EF4444' },
                   ].map((stat, idx) => (
@@ -271,7 +271,7 @@ export default function AdminEmailPage() {
         {[
           { label: 'Total Sent', value: '67,320', color: COLOR_ACCENT },
           { label: 'Avg Open Rate', value: '36.9%', color: '#10B981' },
-          { label: 'Avg Click Rate', value: '14.2%', color: '#3B82F6' },
+          { label: 'Avg Click Rate', value: '14.2%', color: '#B8956A' },
           { label: 'Unsubscribe Rate', value: '0.28%', color: '#EF4444' },
         ].map((stat, idx) => (
           <div key={idx} className="p-4 rounded-lg border" style={{ borderColor: COLOR_BORDER }}>

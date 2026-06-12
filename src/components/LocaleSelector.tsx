@@ -42,7 +42,7 @@ export function LocaleSelector() {
         className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
         title="Change language and currency"
       >
-        <Globe size={20} style={{ color: '#3B82F6' }} />
+        <Globe size={20} style={{ color: '#B8956A' }} />
         <span className="text-sm font-semibold uppercase">{locale}</span>
       </button>
 
@@ -69,7 +69,7 @@ export function LocaleSelector() {
                     locale === loc.id ? 'text-white' : ''
                   }`}
                   style={{
-                    background: locale === loc.id ? '#3B82F6' : '#F9FAFB',
+                    background: locale === loc.id ? '#B8956A' : '#F9FAFB',
                     color: locale === loc.id ? 'white' : '#1A1A1A',
                   }}
                 >
@@ -96,7 +96,7 @@ export function LocaleSelector() {
                     currency === curr.id ? 'text-white' : ''
                   }`}
                   style={{
-                    background: currency === curr.id ? '#3B82F6' : '#FFFFFF',
+                    background: currency === curr.id ? '#B8956A' : '#FFFFFF',
                     color: currency === curr.id ? 'white' : '#1A1A1A',
                   }}
                 >

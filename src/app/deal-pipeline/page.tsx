@@ -45,7 +45,7 @@ const mockDeals: Deal[] = [
     expectedClose: '3 weeks',
     notes: 4,
     lastActivity: '2 hours ago',
-    color: '#3B82F6',
+    color: '#B8956A',
   },
   {
     id: '2',
@@ -116,7 +116,7 @@ const mockDeals: Deal[] = [
 
 const stages = [
   { id: 'lead', label: 'Lead', color: '#6B7280', width: 'w-80' },
-  { id: 'qualified', label: 'Qualified', color: '#3B82F6', width: 'w-80' },
+  { id: 'qualified', label: 'Qualified', color: '#B8956A', width: 'w-80' },
   { id: 'negotiation', label: 'Negotiation', color: COLOR_ACCENT, width: 'w-80' },
   { id: 'loi', label: 'LOI', color: '#14B8A6', width: 'w-80' },
   { id: 'closing', label: 'Closing', color: '#10B981', width: 'w-80' },
@@ -278,7 +278,7 @@ export default function DealPipelinePage() {
                     <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: COLOR_BORDER }}>
                       <div className="flex gap-2">
                         <div className="flex items-center gap-1">
-                          <MessageSquare className="w-4 h-4" style={{ color: '#3B82F6' }} />
+                          <MessageSquare className="w-4 h-4" style={{ color: '#B8956A' }} />
                           <span className="text-xs font-bold" style={{ color: COLOR_TEXT_SECONDARY }}>
                             {deal.notes}
                           </span>

@@ -241,7 +241,7 @@ const resources: Resource[] = [
 ]
 
 const categoryConfig = {
-  buyer: { label: 'For Buyers', icon: Target, color: '#1D4ED8' },
+  buyer: { label: 'For Buyers', icon: Target, color: '#8C6D45' },
   seller: { label: 'For Sellers', icon: TrendingUp, color: '#059669' },
   valuation: { label: 'Valuation', icon: DollarSign, color: '#D97706' },
   market: { label: 'Market Intel', icon: BarChart3, color: '#7C3AED' },
@@ -478,7 +478,7 @@ export default function HelpPage() {
               description: 'Have a specific question? Reach out to our expert team.',
               icon: <MessageSquare className="w-8 h-8" />,
               href: '/contact-sales',
-              color: '#3B82F6',
+              color: '#B8956A',
             },
             {
               title: 'Watch Webinars',

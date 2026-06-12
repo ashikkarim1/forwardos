@@ -46,7 +46,7 @@ const filterCategoriesConfig = [
     id: 'industry',
     labelKey: 'marketplace.industry',
     icon: Building2,
-    color: '#3B82F6',
+    color: '#B8956A',
     options: ['SaaS / Software', 'Healthcare / Medical', 'Food & Beverage', 'Logistics / Transportation', 'Real Estate'],
   },
   {

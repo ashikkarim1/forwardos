@@ -82,7 +82,7 @@ const STATUS_COLORS = {
 }
 
 const TIER_COLORS = {
-  premium: '#3B82F6',
+  premium: '#B8956A',
   standard: '#6366F1',
   free: '#8B5CF6',
 }

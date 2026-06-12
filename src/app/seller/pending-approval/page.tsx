@@ -160,12 +160,12 @@ function PendingApprovalPageInner() {
             style={{ background: '#F0F9FF', borderColor: '#93C5FD' }}
           >
             <div className="flex items-start gap-3">
-              <Mail size={20} style={{ color: '#3B82F6' }} className="flex-shrink-0 mt-0.5" />
+              <Mail size={20} style={{ color: '#B8956A' }} className="flex-shrink-0 mt-0.5" />
               <div className="text-left">
                 <p className="font-bold text-sm" style={{ color: '#1E40AF' }}>
                   Check your email
                 </p>
-                <p className="text-xs mt-1" style={{ color: '#3B82F6' }}>
+                <p className="text-xs mt-1" style={{ color: '#B8956A' }}>
                   Once approved, we'll send you a confirmation email with a link to submit your business details.
                 </p>
               </div>

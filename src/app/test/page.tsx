@@ -12,12 +12,12 @@ export default function TestPage() {
         border: '1px solid #E5E7EB',
         marginTop: '20px'
       }}>
-        <h2 style={{ color: '#3B82F6' }}>Orange Theme Test</h2>
-        <p>Orange color: <span style={{ color: '#3B82F6', fontWeight: 'bold' }}>#3B82F6</span></p>
+        <h2 style={{ color: '#B8956A' }}>Orange Theme Test</h2>
+        <p>Orange color: <span style={{ color: '#B8956A', fontWeight: 'bold' }}>#B8956A</span></p>
         <button style={{
           padding: '10px 20px',
           borderRadius: '8px',
-          background: '#3B82F6',
+          background: '#B8956A',
           color: 'white',
           border: 'none',
           cursor: 'pointer',

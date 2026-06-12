@@ -1,8 +1,9 @@
 /**
  * Forward Intelligence — email template kit.
  *
- * Modern brand styling (matches the product: clean white, ink #1A1A1A,
- * Forward blue #3B82F6 accent, system sans). Layout rules are mobile-first:
+ * Editorial brand styling, end-to-end with the website: ink #1A1A1A type,
+ * champagne #B8956A accents, cream frame, system sans (closest mail-safe
+ * match to the site's Hanken Grotesk). Layout rules are mobile-first:
  * single-column cards, full-width CTA buttons that cannot wrap, no
  * multi-column <td> rows (iOS Mail collapses those to ~80px columns).
  *
@@ -16,9 +17,10 @@ const FONT = `-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial
 const INK = '#1A1A1A'
 const MUTED = '#717171'
 const FAINT = '#9A9A9A'
-const BLUE = '#3B82F6'
-const BORDER = '#E5E7EB'
-const BG = '#F4F6F8'
+const CHAMPAGNE = '#B8956A'
+const BLUE = CHAMPAGNE // legacy alias — accent is champagne brand-wide now
+const BORDER = '#E8E4DC'
+const BG = '#F4F2EE'
 
 /** Wrap any inner HTML in the brand shell — masthead, frame, footer. */
 export function luxuryEmail(opts: {
@@ -62,7 +64,7 @@ export function luxuryEmail(opts: {
         <!-- CTAs -->
         ${cta ? `
         <tr><td style="padding:26px 36px 6px">
-          <a href="${cta.href}" style="display:block;background:${BLUE};color:#FFFFFF !important;font-family:${FONT};font-size:14px;font-weight:800;text-decoration:none;text-align:center;padding:15px 24px;border-radius:8px">
+          <a href="${cta.href}" style="display:block;background:${INK};color:#FFFFFF !important;font-family:${FONT};font-size:14px;font-weight:800;text-decoration:none;text-align:center;padding:15px 24px;border-radius:8px">
             <span style="color:#FFFFFF">${escape(cta.label)}</span>
           </a>
         </td></tr>` : ''}

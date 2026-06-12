@@ -5,7 +5,7 @@ import { Search, Filter, Download, Eye, Save, Share2, FileDown, MessageSquare } 
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 const ACTIVITY_TYPES = {
-  login: { icon: '🔐', color: '#3B82F6', label: 'Login' },
+  login: { icon: '🔐', color: '#B8956A', label: 'Login' },
   view: { icon: '👁️', color: '#8B5CF6', label: 'View Deal' },
   save: { icon: '⭐', color: '#F59E0B', label: 'Save Deal' },
   compare: { icon: '📊', color: '#10B981', label: 'Compare' },
@@ -126,7 +126,7 @@ export default function AdminActivityPage() {
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
       >
         {[
-          { label: 'Logins This Week', value: '8,234', icon: '🔐', color: '#3B82F6' },
+          { label: 'Logins This Week', value: '8,234', icon: '🔐', color: '#B8956A' },
           { label: 'Deals Viewed', value: '45,120', icon: '👁️', color: '#8B5CF6' },
           { label: 'Comparisons', value: '2,345', icon: '📊', color: '#10B981' },
           { label: 'CIM Downloads', value: '567', icon: '⬇️', color: COLOR_ACCENT },

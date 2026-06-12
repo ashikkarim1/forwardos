@@ -104,7 +104,7 @@ const getStatusColor = (status: string) => {
     case 'approved':
       return '#10B981'
     case 'reviewed':
-      return '#3B82F6'
+      return '#B8956A'
     case 'received':
       return COLOR_ACCENT
     case 'requested':
@@ -297,7 +297,7 @@ export default function DocumentsPage() {
                   )}
                   {doc.buyerAccess && (
                     <button className="p-2 hover:bg-gray-100 rounded transition-colors">
-                      <Share2 className="w-5 h-5" style={{ color: '#3B82F6' }} />
+                      <Share2 className="w-5 h-5" style={{ color: '#B8956A' }} />
                     </button>
                   )}
                   <button className="p-2 hover:bg-gray-100 rounded transition-colors">

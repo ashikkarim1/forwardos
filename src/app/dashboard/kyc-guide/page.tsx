@@ -65,7 +65,7 @@ export default function KYCGuidePage() {
             description: 'Need help? Reach out to us',
             icon: Users,
             href: '/contact-sales',
-            color: '#3B82F6',
+            color: '#B8956A',
           },
         ].map((item, idx) => {
           const Icon = item.icon

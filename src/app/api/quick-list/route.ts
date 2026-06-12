@@ -145,14 +145,14 @@ export async function POST(request: NextRequest) {
             <p style="margin:0 0 4px;color:#1A1A1A;font-weight:bold">${deal.title}</p>
             <p style="margin:0;color:#717171;font-size:13px">Industry: ${industry} · Country: ${country} · Asking: ${askRange.label}</p>
           </div>
-          <p style="margin:0 0 16px"><a href="${listingUrl}" style="background:#3B82F6;color:#ffffff !important;padding:12px 20px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:bold"><span style="color:#ffffff">View your listing</span></a></p>
+          <p style="margin:0 0 16px"><a href="${listingUrl}" style="background:#B8956A;color:#ffffff !important;padding:12px 20px;text-decoration:none;border-radius:8px;display:inline-block;font-weight:bold"><span style="color:#ffffff">View your listing</span></a></p>
           <p style="color:#717171;font-size:13px;margin:0 0 8px">Next steps in your dashboard:</p>
           <ul style="color:#717171;font-size:13px;margin:0 0 16px;padding-left:20px">
             <li>Add photos → roughly 3x more buyer views</li>
             <li>Verify your business → unlock funded-buyer matching</li>
             <li>Upload financials → get a "Verified Financials" trust badge</li>
           </ul>
-          <p style="margin:0 0 24px"><a href="${dashboardUrl}" style="color:#3B82F6">Open seller dashboard →</a></p>
+          <p style="margin:0 0 24px"><a href="${dashboardUrl}" style="color:#B8956A">Open seller dashboard →</a></p>
           <p style="color:#9A9A9A;font-size:11px;margin:24px 0 0">© 2026 Forward Intelligence. You're getting this because you just listed a business at forwardos.ai.</p>
         </body></html>
       `,

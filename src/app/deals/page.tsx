@@ -603,7 +603,7 @@ export default function DealsPage() {
           {[
             { icon: Flame, label: 'Hot Opportunities', value: filteredListings.filter(l => l.heatIndex > 80).length.toString(), color: COLOR_ACCENT },
             { icon: TrendingUp, label: 'High ROI', value: filteredListings.filter(l => l.roiProjection > 17).length.toString(), color: COLOR_ACCENT },
-            { icon: Eye, label: 'Excellent Quality', value: filteredListings.filter(l => l.dealQualityScore > 80).length.toString(), color: '#1D4ED8' },
+            { icon: Eye, label: 'Excellent Quality', value: filteredListings.filter(l => l.dealQualityScore > 80).length.toString(), color: '#8C6D45' },
             { icon: BarChart3, label: 'Total Value', value: `${(filteredListings.reduce((sum, l) => sum + l.askingPrice, 0) / 1000000).toFixed(0)}M`, color: '#B45309' },
           ].map((stat, i) => {
             const Icon = stat.icon

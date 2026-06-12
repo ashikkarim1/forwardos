@@ -104,12 +104,12 @@ export default function PendingApprovalPage() {
               style={{ background: '#F0F9FF', borderColor: '#93C5FD' }}
             >
               <div className="flex items-start gap-3">
-                <Mail size={20} style={{ color: '#3B82F6' }} />
+                <Mail size={20} style={{ color: '#B8956A' }} />
                 <div className="text-left">
                   <p className="font-bold text-sm" style={{ color: '#1E40AF' }}>
                     Check your email
                   </p>
-                  <p className="text-xs mt-1" style={{ color: '#3B82F6' }}>
+                  <p className="text-xs mt-1" style={{ color: '#B8956A' }}>
                     We've sent a verification link to confirm your email address. Click it to complete email verification.
                   </p>
                 </div>

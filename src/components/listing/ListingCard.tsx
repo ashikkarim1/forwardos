@@ -46,7 +46,7 @@ interface ListingCardProps {
 
 const DEAL_QUALITY_COLORS = {
   excellent: '#10B981',
-  good: '#3B82F6',
+  good: '#B8956A',
   fair: '#F59E0B',
   poor: '#EF4444',
 }
@@ -72,7 +72,7 @@ const getMarketPositionColor = (position?: string) => {
     case 'premium':
       return '#EF4444' // Red - expensive
     default:
-      return '#3B82F6' // Blue - fair
+      return '#B8956A' // Blue - fair
   }
 }
 
@@ -302,9 +302,9 @@ export default function ListingCard({
           )}
 
           {/* Seller Trust Score */}
-          <div className="flex items-center justify-between p-1.5 rounded" style={{ background: '#3B82F615', borderLeft: '3px solid #3B82F6' }}>
+          <div className="flex items-center justify-between p-1.5 rounded" style={{ background: '#B8956A15', borderLeft: '3px solid #B8956A' }}>
             <span style={{ color: COLOR_TEXT_SECONDARY, fontSize: '10px' }}>Trust</span>
-            <span className="font-bold" style={{ color: '#3B82F6' }}>
+            <span className="font-bold" style={{ color: '#B8956A' }}>
               {sellerTrustScore}/100
             </span>
           </div>
@@ -362,7 +362,7 @@ export default function ListingCard({
             <p className="font-semibold mb-0.5 leading-tight" style={{ color: COLOR_TEXT_SECONDARY }}>
               Margin
             </p>
-            <p className="font-black text-xs" style={{ color: '#3B82F6' }}>
+            <p className="font-black text-xs" style={{ color: '#B8956A' }}>
               {profitMarginPercent}%
             </p>
           </div>

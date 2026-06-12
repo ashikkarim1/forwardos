@@ -51,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="theme-color" content="#3B82F6" />
+        <meta name="theme-color" content="#B8956A" />
         {/* Favicon is served from src/app/icon.svg (the brand mark) automatically. */}
         {/* Structured data: Organization + WebSite (enables sitelinks search box) */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(organizationLd()) }} />

@@ -48,14 +48,14 @@ const metrics: Metric[] = [
     value: 12,
     change: 3,
     icon: FileText,
-    color: '#3B82F6',
+    color: '#B8956A',
   },
   {
     label: 'Total Inquiries',
     value: 47,
     change: 12,
     icon: MessageSquare,
-    color: '#3B82F6',
+    color: '#B8956A',
   },
   {
     label: 'Profile Views',

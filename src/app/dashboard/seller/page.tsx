@@ -668,7 +668,7 @@ export default function SellerDashboardV2() {
               <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: COLOR_PRIMARY }}>
                 <MessageSquare className="w-5 h-5" style={{ color: COLOR_ACCENT }} />
                 Messages Requiring Response
-                <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white" style={{ background: '#3B82F6' }}>
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white" style={{ background: '#B8956A' }}>
                   {mockMessages.filter(m => m.unread).length}
                 </span>
               </h3>
@@ -814,8 +814,8 @@ export default function SellerDashboardV2() {
           {/* Pipeline Stats */}
           <motion.div className="grid grid-cols-2 lg:grid-cols-4 gap-4" variants={itemVariants}>
             {[
-              { label: 'In Interest', value: 3, color: '#3B82F6' },
-              { label: 'In Due Diligence', value: 1, color: '#3B82F6' },
+              { label: 'In Interest', value: 3, color: '#B8956A' },
+              { label: 'In Due Diligence', value: 1, color: '#B8956A' },
               { label: 'In Negotiation', value: 1, color: '#F59E0B' },
               { label: 'Closed', value: 0, color: '#10B981' },
             ].map((stat) => (

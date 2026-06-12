@@ -17,7 +17,7 @@ const ST: Record<string, { bg: string; color: string; label: string }> = {
   PENDING: { bg: '#FEF3C7', color: '#92400E', label: 'Pending' },
   APPROVED: { bg: '#EAF5F0', color: '#2D7A5F', label: 'Verified' },
   REJECTED: { bg: '#FEE2E2', color: '#991B1B', label: 'Rejected' },
-  NEEDS_INFO: { bg: '#EFF6FF', color: '#1D4ED8', label: 'Needs info' },
+  NEEDS_INFO: { bg: '#EFF6FF', color: '#8C6D45', label: 'Needs info' },
 }
 
 export default function AdminVerificationsPage() {

@@ -12,7 +12,7 @@ import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_
 const CATEGORIES: (ArticleCategory | 'All')[] = ['All', 'Buying', 'Selling', 'Financing', 'Valuation', 'Legal & Deal-Making']
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Buying: '#3B82F6', Selling: '#2D7A5F', Financing: '#B45309',
+  Buying: '#B8956A', Selling: '#2D7A5F', Financing: '#B45309',
   Valuation: '#7C3AED', 'Legal & Deal-Making': '#0EA5E9',
 }
 

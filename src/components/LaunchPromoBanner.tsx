@@ -30,7 +30,7 @@ export function LaunchPromoBanner() {
     <Link
       href="/pricing"
       className="block w-full text-center text-white text-sm font-semibold py-2 px-4 hover:opacity-95 transition-opacity"
-      style={{ background: 'linear-gradient(90deg, #2563EB, #3B82F6)' }}
+      style={{ background: 'linear-gradient(90deg, #A3805A, #B8956A)' }}
     >
       <span className="inline-flex items-center gap-2 flex-wrap justify-center">
         <Sparkles size={15} />

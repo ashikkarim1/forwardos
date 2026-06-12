@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
         innerHtml: `
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E5E7EB;border-radius:12px;margin:8px 0 16px">
             <tr><td style="padding:18px 22px">
-              <p style="margin:0 0 6px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.18em;color:#3B82F6;text-transform:uppercase;font-weight:800">Listing of interest</p>
+              <p style="margin:0 0 6px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.18em;color:#B8956A;text-transform:uppercase;font-weight:800">Listing of interest</p>
               <p style="margin:0 0 8px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:17px;font-weight:800;color:#1A1A1A">Confidential ${indLabel} Business</p>
               <p style="margin:0;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:13px;color:#717171">${region} · Asking ${askRange}</p>
               <p style="margin:8px 0 0;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:11px;color:#9A9A9A">Reference · ${refId}</p>
@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
           innerHtml: `
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E5E7EB;border-radius:12px;margin:8px 0 16px">
               <tr><td style="padding:18px 22px">
-                <p style="margin:0 0 10px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.18em;color:#3B82F6;text-transform:uppercase;font-weight:800">Buyer profile (Forward-verified)</p>
+                <p style="margin:0 0 10px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.18em;color:#B8956A;text-transform:uppercase;font-weight:800">Buyer profile (Forward-verified)</p>
                 <div style="font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.7;color:#717171">
                   <div style="margin:0 0 5px"><span style="color:#9A9A9A;display:inline-block;width:128px">Buyer type</span><strong style="color:#1A1A1A">${escapeHtml(humanizeBuyerType(String(buyerType)))}</strong></div>
                   <div style="margin:0 0 5px"><span style="color:#9A9A9A;display:inline-block;width:128px">Country</span><strong style="color:#1A1A1A">${escapeHtml(String(country))}</strong></div>
@@ -188,8 +188,8 @@ export async function POST(request: NextRequest) {
                 </div>
               </td></tr>
             </table>
-            <p style="margin:0 0 8px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:11px;color:#3B82F6;font-weight:800;text-transform:uppercase;letter-spacing:0.12em">Their message</p>
-            <p style="margin:0 0 16px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#1A1A1A;padding-left:14px;border-left:3px solid #3B82F6">${escapeHtml(String(message))}</p>
+            <p style="margin:0 0 8px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:11px;color:#B8956A;font-weight:800;text-transform:uppercase;letter-spacing:0.12em">Their message</p>
+            <p style="margin:0 0 16px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#1A1A1A;padding-left:14px;border-left:3px solid #B8956A">${escapeHtml(String(message))}</p>
             <p style="margin:0 0 12px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:13px;color:#717171">Open your dashboard to view buyer contact details and accept or decline the introduction.</p>`,
           cta: { label: 'Review inquiry in dashboard', href: reviewHref },
           footerNote: 'For your security, Forward never shares your contact details with buyers until you choose to engage.',
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
             </td></tr>
           </table>
           <p style="margin:0 0 6px;font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#717171;font-weight:bold;letter-spacing:0.06em;text-transform:uppercase">Buyer message</p>
-          <p style="margin:0;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#1A1A1A;padding-left:14px;border-left:2px solid #3B82F6">${escapeHtml(String(message))}</p>`,
+          <p style="margin:0;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#1A1A1A;padding-left:14px;border-left:2px solid #B8956A">${escapeHtml(String(message))}</p>`,
         cta: { label: 'Open the listing', href: listingHref },
       }),
     }).catch((e) => console.error('[enquiry/audit-email]', e))
