@@ -53,6 +53,7 @@ export async function POST(_request: NextRequest) {
           preheader: `${matches.length} new opportunity matches for "${search.name}".`,
           eyebrow: 'Curated for you',
           title: `${matches.length} new ${matches.length === 1 ? 'opportunity' : 'opportunities'} matched your saved search`,
+          greetingName: (search.user.name || '').split(' ')[0] || undefined,
           intro: `Ranked by Forward Intelligence — strongest opportunities first. Identities are revealed to qualified buyers through Forward.`,
           innerHtml: cards,
           cta: { label: 'Browse all matches on Forward', href: `${SITE}/marketplace` },

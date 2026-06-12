@@ -138,23 +138,24 @@ export async function POST(request: NextRequest) {
         preheader: `Forward is verifying your details and facilitating the introduction. Reference ${refId}.`,
         eyebrow: 'Introduction received',
         title: 'Thank you — your introduction is being verified.',
+        greetingName: String(firstName).trim(),
         intro: `Forward Intelligence has received your inquiry on a confidential ${indLabel} business in ${region}. We facilitate every introduction personally to protect both sides.`,
         innerHtml: `
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E8E4DC;border-radius:4px;margin:8px 0 16px">
-            <tr><td style="padding:20px 24px">
-              <p style="margin:0 0 6px;font-family:Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.22em;color:#B8956A;text-transform:uppercase;font-weight:bold">Listing of interest</p>
-              <p style="margin:0 0 8px;font-family:Georgia,'Times New Roman',serif;font-size:18px;color:#1A1A1A">Confidential ${indLabel} Business</p>
-              <p style="margin:0;font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#6B6760">${region} · Asking ${askRange}</p>
-              <p style="margin:8px 0 0;font-family:Helvetica,Arial,sans-serif;font-size:11px;color:#9A938A">Reference · ${refId}</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E5E7EB;border-radius:12px;margin:8px 0 16px">
+            <tr><td style="padding:18px 22px">
+              <p style="margin:0 0 6px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.18em;color:#3B82F6;text-transform:uppercase;font-weight:800">Listing of interest</p>
+              <p style="margin:0 0 8px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:17px;font-weight:800;color:#1A1A1A">Confidential ${indLabel} Business</p>
+              <p style="margin:0;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:13px;color:#717171">${region} · Asking ${askRange}</p>
+              <p style="margin:8px 0 0;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:11px;color:#9A9A9A">Reference · ${refId}</p>
             </td></tr>
           </table>
-          <p style="margin:0 0 12px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#4A463F">What happens next:</p>
-          <ol style="margin:0 0 16px;padding-left:18px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#4A463F">
+          <p style="margin:0 0 12px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#1A1A1A;font-weight:700">What happens next:</p>
+          <ol style="margin:0 0 16px;padding-left:18px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#717171">
             <li style="margin-bottom:6px">A Forward analyst verifies your details (typically within 24 hours).</li>
             <li style="margin-bottom:6px">We notify the seller and present your profile.</li>
             <li style="margin-bottom:6px">If the seller agrees to engage, we open a confidential channel and share next steps.</li>
           </ol>
-          <p style="margin:0 0 16px;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:1.7;color:#6B6760;font-style:italic">By submitting this request, you acknowledged that Forward facilitates the introduction and a success fee applies if the transaction closes through Forward.</p>`,
+          <p style="margin:0 0 16px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.7;color:#9A9A9A">By submitting this request, you acknowledged that Forward facilitates the introduction and a success fee applies if the transaction closes through Forward.</p>`,
         cta: { label: 'View listing on Forward', href: listingHref },
         secondaryCta: { label: 'Manage your account →', href: `${SITE}/saved` },
         footerNote: 'You are receiving this because you submitted an introduction request on Forward Intelligence.',
@@ -171,37 +172,25 @@ export async function POST(request: NextRequest) {
           preheader: `A qualified buyer has expressed interest. Review in your dashboard.`,
           eyebrow: 'Verified buyer inquiry',
           title: 'A qualified buyer has requested an introduction.',
+          greetingName: (deal.seller?.name || '').split(' ')[0] || undefined,
           intro: 'Forward Intelligence has received and validated a new inquiry on your confidential listing. Open your dashboard to review the buyer profile and decide whether to engage.',
           innerHtml: `
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E8E4DC;border-radius:4px;margin:8px 0 16px">
-              <tr><td style="padding:20px 24px">
-                <p style="margin:0 0 6px;font-family:Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.22em;color:#B8956A;text-transform:uppercase;font-weight:bold">Buyer profile (Forward-verified)</p>
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-                  <td style="font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#4A463F;padding:8px 16px 8px 0">
-                    <strong style="color:#1A1A1A">Buyer type</strong><br>${escapeHtml(humanizeBuyerType(String(buyerType)))}
-                  </td>
-                  <td style="font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#4A463F;padding:8px 16px 8px 0">
-                    <strong style="color:#1A1A1A">Country</strong><br>${escapeHtml(String(country))}
-                  </td>
-                  <td style="font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#4A463F;padding:8px 0">
-                    <strong style="color:#1A1A1A">Timeline</strong><br>${escapeHtml(humanizeTimeline(String(timeline)))}
-                  </td>
-                </tr><tr>
-                  <td style="font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#4A463F;padding:8px 16px 8px 0">
-                    <strong style="color:#1A1A1A">Capital available</strong><br>${escapeHtml(String(capitalAvailableRange || 'Not specified'))}
-                  </td>
-                  <td style="font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#4A463F;padding:8px 16px 8px 0">
-                    <strong style="color:#1A1A1A">Financing</strong><br>${escapeHtml(humanizeFinancing(String(financingNeed || 'maybe')))}
-                  </td>
-                  <td style="font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#4A463F;padding:8px 0">
-                    <strong style="color:#1A1A1A">Reference</strong><br>${refId}
-                  </td>
-                </tr></table>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E5E7EB;border-radius:12px;margin:8px 0 16px">
+              <tr><td style="padding:18px 22px">
+                <p style="margin:0 0 10px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.18em;color:#3B82F6;text-transform:uppercase;font-weight:800">Buyer profile (Forward-verified)</p>
+                <div style="font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:13px;line-height:1.7;color:#717171">
+                  <div style="margin:0 0 5px"><span style="color:#9A9A9A;display:inline-block;width:128px">Buyer type</span><strong style="color:#1A1A1A">${escapeHtml(humanizeBuyerType(String(buyerType)))}</strong></div>
+                  <div style="margin:0 0 5px"><span style="color:#9A9A9A;display:inline-block;width:128px">Country</span><strong style="color:#1A1A1A">${escapeHtml(String(country))}</strong></div>
+                  <div style="margin:0 0 5px"><span style="color:#9A9A9A;display:inline-block;width:128px">Timeline</span><strong style="color:#1A1A1A">${escapeHtml(humanizeTimeline(String(timeline)))}</strong></div>
+                  <div style="margin:0 0 5px"><span style="color:#9A9A9A;display:inline-block;width:128px">Capital available</span><strong style="color:#1A1A1A">${escapeHtml(String(capitalAvailableRange || 'Not specified'))}</strong></div>
+                  <div style="margin:0 0 5px"><span style="color:#9A9A9A;display:inline-block;width:128px">Financing</span><strong style="color:#1A1A1A">${escapeHtml(humanizeFinancing(String(financingNeed || 'maybe')))}</strong></div>
+                  <div style="margin:0 0 5px"><span style="color:#9A9A9A;display:inline-block;width:128px">Reference</span><strong style="color:#1A1A1A">${refId}</strong></div>
+                </div>
               </td></tr>
             </table>
-            <p style="margin:0 0 8px;font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#6B6760;font-weight:bold;text-transform:uppercase;letter-spacing:0.08em">Their message</p>
-            <p style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.7;color:#1A1A1A;font-style:italic;padding-left:14px;border-left:2px solid #B8956A">${escapeHtml(String(message))}</p>
-            <p style="margin:0 0 12px;font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#6B6760">Open your dashboard to view buyer contact details and accept or decline the introduction.</p>`,
+            <p style="margin:0 0 8px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:11px;color:#3B82F6;font-weight:800;text-transform:uppercase;letter-spacing:0.12em">Their message</p>
+            <p style="margin:0 0 16px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#1A1A1A;padding-left:14px;border-left:3px solid #3B82F6">${escapeHtml(String(message))}</p>
+            <p style="margin:0 0 12px;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:13px;color:#717171">Open your dashboard to view buyer contact details and accept or decline the introduction.</p>`,
           cta: { label: 'Review inquiry in dashboard', href: reviewHref },
           footerNote: 'For your security, Forward never shares your contact details with buyers until you choose to engage.',
         }),
@@ -217,8 +206,8 @@ export async function POST(request: NextRequest) {
         title: `New binding introduction · Ref ${refId}`,
         intro: 'A new buyer-seller introduction has been recorded. This is the Forward audit copy — used to track binding intros and downstream success fees.',
         innerHtml: `
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E8E4DC;border-radius:4px;margin:8px 0 16px">
-            <tr><td style="padding:20px 24px;font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#4A463F;line-height:1.8">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E5E7EB;border-radius:4px;margin:8px 0 16px">
+            <tr><td style="padding:20px 24px;font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#717171;line-height:1.8">
               <p style="margin:0 0 10px"><strong style="color:#1A1A1A">Listing:</strong> ${escapeHtml(indLabel)} · ${escapeHtml(region)} · Asking ${escapeHtml(askRange)} · ${escapeHtml(deal.id)}</p>
               <p style="margin:0 0 10px"><strong style="color:#1A1A1A">Seller:</strong> ${escapeHtml(deal.seller?.name || '—')} · ${escapeHtml(deal.seller?.email || '—')}</p>
               <p style="margin:0 0 10px"><strong style="color:#1A1A1A">Buyer:</strong> ${escapeHtml(buyerName)} · ${escapeHtml(normalizedEmail)} · ${escapeHtml(String(phone))} · ${escapeHtml(String(country))}</p>
@@ -229,8 +218,8 @@ export async function POST(request: NextRequest) {
               <p style="margin:0 0 0"><strong style="color:#1A1A1A">Reference:</strong> ${refId} · Acknowledged: ✓</p>
             </td></tr>
           </table>
-          <p style="margin:0 0 6px;font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#6B6760;font-weight:bold;letter-spacing:0.06em;text-transform:uppercase">Buyer message</p>
-          <p style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:14px;line-height:1.7;color:#1A1A1A;padding-left:14px;border-left:2px solid #B8956A">${escapeHtml(String(message))}</p>`,
+          <p style="margin:0 0 6px;font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#717171;font-weight:bold;letter-spacing:0.06em;text-transform:uppercase">Buyer message</p>
+          <p style="margin:0;font-family:-apple-system,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#1A1A1A;padding-left:14px;border-left:2px solid #3B82F6">${escapeHtml(String(message))}</p>`,
         cta: { label: 'Open the listing', href: listingHref },
       }),
     }).catch((e) => console.error('[enquiry/audit-email]', e))

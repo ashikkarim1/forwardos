@@ -68,44 +68,74 @@ function LocalizedHomePageContent() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8" style={{ background: COLOR_PRIMARY + '05' }}>
-        <div className="max-w-5xl mx-auto text-center">
+      {/* ─── Hero — cinematic "freedom after the sale" ─────────────────────
+          Full-bleed imagery (the morning after you sign), dark ink gradient,
+          editorial typography matching the listing pages. The site sells
+          life-changing transactions — the hero should feel like one. */}
+      <section className="relative overflow-hidden" style={{ background: '#0F1419', minHeight: '88vh' }}>
+        <div className="absolute inset-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=2400&q=80&fit=crop"
+            alt=""
+            aria-hidden
+            className="w-full h-full object-cover"
+            style={{ opacity: 0.55 }}
+          />
+          {/* Ink gradient: readable type up top, image breathing at the bottom */}
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(15,20,25,0.82) 0%, rgba(15,20,25,0.45) 55%, rgba(15,20,25,0.75) 100%)' }} />
+        </div>
+
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center text-center" style={{ minHeight: '88vh' }}>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
           >
-            <h1 className="text-5xl md:text-6xl font-black mb-6" style={{ color: COLOR_PRIMARY }}>
+            <p className="text-[11px] md:text-xs font-bold tracking-[0.32em] mb-6" style={{ color: '#B8956A' }}>
+              THE MARKETPLACE FOR LIFE&apos;S BIGGEST EXIT
+            </p>
+            <h1 className="text-5xl md:text-7xl font-black mb-6 text-white leading-[1.05] tracking-tight">
               {t('hero.title', locale)}
             </h1>
 
-            <p className="text-xl mb-12" style={{ color: COLOR_TEXT_SECONDARY }}>
+            <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto" style={{ color: 'rgba(255,255,255,0.78)' }}>
               {t('hero.subtitle', locale)}
             </p>
 
-            <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-12 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
+            <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-10 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
               <Link
                 href="/list"
-                className="px-8 py-4 rounded-lg font-bold text-white text-center hover:opacity-90 transition-all flex items-center justify-center gap-2"
-                style={{ background: COLOR_ACCENT }}
+                className="px-9 py-4 rounded-lg font-bold text-center hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                style={{ background: 'white', color: '#0F1419' }}
               >
                 {t('hero.cta1', locale)}
-                <ArrowRight size={20} style={{ transform: isRTL ? 'scaleX(-1)' : 'none' }} />
+                <ArrowRight size={18} style={{ transform: isRTL ? 'scaleX(-1)' : 'none' }} />
               </Link>
               <Link
                 href="/marketplace"
-                className="px-8 py-4 rounded-lg font-bold border text-center hover:bg-gray-50 transition-all"
-                style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
+                className="px-9 py-4 rounded-lg font-bold text-center text-white transition-all hover:bg-white/10"
+                style={{ border: '1px solid rgba(255,255,255,0.35)', backdropFilter: 'blur(6px)' }}
               >
                 {t('hero.cta2', locale)}
               </Link>
             </div>
 
-            <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
+            <p className="text-xs md:text-sm" style={{ color: 'rgba(255,255,255,0.55)' }}>
               {t('hero.trust', locale)}
             </p>
           </motion.div>
+
+          {/* Quiet bottom strip — the promise, in one line */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9, duration: 1 }}
+            className="absolute bottom-8 left-0 right-0 text-center text-[11px] tracking-[0.22em] font-semibold"
+            style={{ color: 'rgba(255,255,255,0.45)' }}
+          >
+            CONFIDENTIAL · VERIFIED · USA · CANADA · UAE
+          </motion.p>
         </div>
       </section>
 
