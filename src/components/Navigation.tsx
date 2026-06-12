@@ -122,7 +122,7 @@ export function PublicHeader() {
 
           {/* Account Button */}
           <Link
-            href="/login"
+            href="/auth/login"
             className="px-6 py-2 rounded-lg font-semibold text-white transition-all hover:opacity-90"
             style={{ background: COLOR_ACCENT }}
           >

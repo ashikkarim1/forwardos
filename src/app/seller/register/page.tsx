@@ -294,7 +294,7 @@ function SellerRegisterPageInner() {
           <div className="mt-6 pt-6 border-t text-center" style={{ borderColor: COLOR_BORDER }}>
             <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
               Already have an account?{' '}
-              <Link href="/login" className="font-bold" style={{ color: COLOR_ACCENT }}>
+              <Link href="/auth/login" className="font-bold" style={{ color: COLOR_ACCENT }}>
                 Sign In
               </Link>
             </p>

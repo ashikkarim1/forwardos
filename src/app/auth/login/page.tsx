@@ -47,7 +47,16 @@ export default function LoginPage() {
       // Auth is handled by the httpOnly session cookie set by /api/auth/login.
       // Do NOT store tokens in localStorage (XSS-exposable).
 
-      // Redirect based on role
+      // Honor ?redirect= (e.g. the contact-seller gate sends the buyer back
+      // to the form they were filling). Only same-origin relative paths are
+      // accepted — never an absolute URL — to prevent open-redirect abuse.
+      const redirectParam = new URLSearchParams(window.location.search).get('redirect')
+      if (redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')) {
+        router.push(redirectParam)
+        return
+      }
+
+      // Otherwise: role-based dashboard
       if (data.user.role === 'SELLER') {
         router.push('/dashboard/seller')
       } else if (data.user.role === 'BUYER') {

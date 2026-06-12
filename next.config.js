@@ -47,6 +47,11 @@ const nextConfig = {
       // Editorial layout graduated from its preview route into the main
       // marketplace — proper edge-level redirect with a Location header.
       { source: '/marketplace/editorial', destination: '/marketplace', permanent: true },
+      // Bare auth paths — people type/link these; the pages live under /auth.
+      { source: '/login', destination: '/auth/login', permanent: false },
+      { source: '/signin', destination: '/auth/login', permanent: false },
+      { source: '/signup', destination: '/auth/signup', permanent: false },
+      { source: '/register', destination: '/auth/signup', permanent: false },
     ]
   },
 }
