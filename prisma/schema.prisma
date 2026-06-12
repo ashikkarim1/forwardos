@@ -847,6 +847,15 @@ model Enquiry {
   inquiryType           String    // e.g., "general", "data_room_access", "meeting_request"
   message               String    @db.Text
 
+  // Structured buyer profile captured at contact time — phone, country,
+  // capital available range, timeline, financing need, buyer type. JSON blob
+  // so we can evolve the form without further migrations.
+  buyerDetails          String?   @db.Text
+
+  // Explicit acknowledgment that the introduction is binding (success-fee
+  // applies if the deal closes). Audit-trail requirement.
+  bindingAcknowledged   Boolean   @default(false)
+
   status                String    @default("pending") // "pending", "responded", "closed"
   respondedAt           DateTime?
   response              String?   @db.Text
