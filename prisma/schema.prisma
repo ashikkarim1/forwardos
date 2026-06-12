@@ -202,6 +202,13 @@ model User {
   website               String?
   linkedinUrl           String?
 
+  // Referral mechanic: each user gets a stable code shareable as ?ref=CODE;
+  // referredById links new sellers back to whoever referred them.
+  referralCode          String?   @unique
+  referredById          String?
+  referredBy            User?     @relation("UserReferrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals             User[]    @relation("UserReferrals")
+
   // Buyer specific
   investmentCriteria    String?   @db.Text // JSON: industries, deal sizes, geographies
   investmentAmount      BigInt?   // Total capital available in cents
@@ -405,7 +412,7 @@ model Deal {
   // Basic Information
   title                 String
   description           String?   @db.Text
-  slug                  String?   // For SEO
+  slug                  String?   @unique // For SEO — stable, kebab-case derived from title + id suffix
 
   // Seller
   seller                User      @relation("SellerDeals", fields: [sellerId], references: [id], onDelete: Cascade)
@@ -450,6 +457,11 @@ model Deal {
   // Nullable for backward-compat with deals seeded before the column existed.
   sellerType            SellerType?
   sellerMotivation      SellerMotivation?
+
+  // Confidential / anonymous listing mode. When true, the public API masks the
+  // seller name, exact city (rounded to region), and any company-identifying
+  // details. The seller can flip this off in their dashboard at any time.
+  isConfidential        Boolean   @default(false)
 
   // Deal Characteristics
   keyStrengths          String?   @db.Text // JSON array

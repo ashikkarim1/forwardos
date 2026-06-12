@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { maskCity, confidentialTitle } from '@/lib/listing-helpers'
 
 /**
  * GET /api/deals — published marketplace listings from the database, mapped to
@@ -73,12 +74,21 @@ export async function GET(_request: NextRequest) {
       const position: 'underpriced' | 'fair' | 'premium' =
         d.pricingMultiple != null ? (d.pricingMultiple < 3 ? 'underpriced' : d.pricingMultiple > 4.5 ? 'premium' : 'fair') : 'fair'
 
+      // Confidential listings mask the seller's title (replaced with a
+      // generic "Confidential X in Y" headline) and the city (rounded to the
+      // broader metro region). All financial ranges stay public — that's how
+      // buyers decide whether to inquire.
+      const publicTitle = d.isConfidential ? confidentialTitle(d.industry, d.country, d.id) : d.title
+      const publicLocation = d.isConfidential ? maskCity(d.city, d.country) : (d.city || d.country)
+
       return {
         id: d.id,
-        title: d.title,
-        location: d.city || d.country,
+        slug: d.slug,
+        title: publicTitle,
+        location: publicLocation,
         country: d.country,
         image: IMAGE_BY_INDUSTRY[d.industry] || IMAGE_BY_INDUSTRY.DEFAULT,
+        isConfidential: d.isConfidential,
         askingPrice,
         askingPriceCurrency: 'USD',
         annualRevenue,

@@ -212,7 +212,7 @@ function LocalizedHomePageContent() {
                   {t(`users.${user.key}.desc`, locale)}
                 </p>
                 <Link
-                  href={user.key === 'sellers' ? '/auth/signup-seller' : user.href}
+                  href={user.key === 'sellers' ? '/list' : user.href}
                   className="inline-block px-4 py-2 rounded-lg font-bold transition-all hover:opacity-90"
                   style={{ background: COLOR_ACCENT + '20', color: COLOR_ACCENT }}
                 >

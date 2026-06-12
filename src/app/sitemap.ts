@@ -18,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/learning-center/glossary', '/market-insights', '/pricing', '/saved-searches',
     '/privacy', '/terms', '/security', '/compliance',
     '/franchises-for-sale', '/sell-your-business', '/business-brokers',
+    '/list', '/valuation',
   ].map((p) => ({
     url: `${SITE_URL}${p}`,
     lastModified: now,
@@ -59,15 +60,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const deals = await prisma.deal.findMany({
       where: { status: { in: ['ACTIVE', 'PUBLISHED'] } },
-      select: { id: true, updatedAt: true },
+      select: { id: true, slug: true, updatedAt: true },
       take: 5000,
     })
-    dealPaths = deals.map((d) => ({
-      url: `${SITE_URL}/deal/${d.id}`,
-      lastModified: d.updatedAt ?? now,
-      changeFrequency: 'daily' as const,
-      priority: 0.7,
-    }))
+    // Each deal gets two entries: the canonical SEO /listing/[slug] (when slug
+    // exists) and the legacy /deal/[id] for backward-compat links.
+    for (const d of deals) {
+      if (d.slug) {
+        dealPaths.push({
+          url: `${SITE_URL}/listing/${d.slug}`,
+          lastModified: d.updatedAt ?? now,
+          changeFrequency: 'daily' as const,
+          priority: 0.8,
+        })
+      }
+      dealPaths.push({
+        url: `${SITE_URL}/deal/${d.id}`,
+        lastModified: d.updatedAt ?? now,
+        changeFrequency: 'daily' as const,
+        priority: 0.6,
+      })
+    }
   } catch {
     // No DB — ship the static + content sitemap.
   }
