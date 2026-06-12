@@ -207,7 +207,7 @@ function BusinessSubmittedPageInner() {
           </div>
 
           {/* Get verified prompt */}
-          <div className="rounded-lg border p-4 mb-4 flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+          <div className="rounded-lg border p-4 mb-4 flex items-center justify-between gap-3 flex-wrap" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
             <p className="text-sm font-semibold" style={{ color: COLOR_PRIMARY }}>
               🛡️ Next: verify your business to earn the trust badge &amp; more buyer interest.
             </p>

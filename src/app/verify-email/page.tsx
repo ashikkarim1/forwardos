@@ -63,7 +63,7 @@ function VerifyEmailInner() {
       <div className="max-w-md mx-auto px-6 py-20 text-center">
         {state === 'idle' && token && (
           <>
-            <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4" style={{ background: '#EFF6FF' }}>
+            <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4" style={{ background: '#FAF6EF' }}>
               <Mail size={32} style={{ color: COLOR_ACCENT }} />
             </div>
             <h1 className="text-3xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>Confirm your email</h1>

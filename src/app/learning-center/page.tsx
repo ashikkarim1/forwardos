@@ -25,7 +25,7 @@ export default function LearningCenterPage() {
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }} dir={isRTL ? 'rtl' : 'ltr'}>
       <PublicHeader />
 
-      <section className="px-6 py-12 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-6 py-12 border-b" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
         <div className="max-w-6xl mx-auto">
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4" style={{ background: COLOR_ACCENT, color: 'white' }}>
             LEARNING CENTER

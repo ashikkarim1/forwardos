@@ -132,7 +132,7 @@ export default function BrokerProfilePage() {
               <h3 className="font-bold mb-3" style={{ color: COLOR_PRIMARY }}>Specialties</h3>
               <div className="flex flex-wrap gap-2">
                 {broker.specialties.map((s) => (
-                  <span key={s} className="px-2 py-1 rounded-md text-xs font-semibold" style={{ background: '#EFF6FF', color: COLOR_ACCENT }}>{s}</span>
+                  <span key={s} className="px-2 py-1 rounded-md text-xs font-semibold" style={{ background: '#FAF6EF', color: COLOR_ACCENT }}>{s}</span>
                 ))}
               </div>
               <h3 className="font-bold mt-4 mb-2" style={{ color: COLOR_PRIMARY }}>Regions</h3>

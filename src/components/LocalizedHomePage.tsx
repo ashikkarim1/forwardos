@@ -105,10 +105,13 @@ function LocalizedHomePageContent() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      {/* Features Section — editorial cream stage */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8" style={{ background: '#FAF6EF' }}>
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-black text-center mb-12" style={{ color: COLOR_PRIMARY }}>
+          <p className="text-[11px] font-bold tracking-[0.28em] text-center mb-4" style={{ color: '#B8956A' }}>
+            WHY FORWARD
+          </p>
+          <h2 className="text-3xl md:text-4xl font-black text-center mb-14" style={{ color: COLOR_PRIMARY }}>
             {t('features.title', locale)}
           </h2>
 
@@ -132,14 +135,14 @@ function LocalizedHomePageContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className="p-8 rounded-lg border text-center hover:shadow-lg transition-all"
-                style={{ borderColor: COLOR_BORDER }}
+                className="p-8 rounded-2xl text-center bg-white hover:shadow-lg transition-all"
+                style={{ border: '1px solid #EDE6D8' }}
               >
-                <feature.Icon size={40} style={{ color: COLOR_ACCENT }} className="mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
+                <feature.Icon size={36} style={{ color: '#B8956A' }} className="mx-auto mb-4" />
+                <h3 className="text-xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>
                   {t(`features.${feature.key}.title`, locale)}
                 </h3>
-                <p style={{ color: COLOR_TEXT_SECONDARY }}>
+                <p className="text-sm leading-relaxed" style={{ color: COLOR_TEXT_SECONDARY }}>
                   {t(`features.${feature.key}.desc`, locale)}
                 </p>
               </motion.div>
@@ -148,19 +151,16 @@ function LocalizedHomePageContent() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section
-        className="py-16 px-4 sm:px-6 lg:px-8 border-t border-b"
-        style={{ borderColor: COLOR_BORDER, background: COLOR_ACCENT + '05' }}
-      >
+      {/* Stats Section — ink cinematic band */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8" style={{ background: '#0F1419' }}>
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {stats.map((stat, idx) => (
               <div key={idx}>
-                <p className="text-3xl font-black" style={{ color: COLOR_ACCENT }}>
+                <p className="text-3xl md:text-4xl font-black text-white">
                   {stat.value}
                 </p>
-                <p style={{ color: COLOR_TEXT_SECONDARY }}>{stat.label}</p>
+                <p className="text-[11px] font-bold tracking-[0.18em] uppercase mt-2" style={{ color: '#B8956A' }}>{stat.label}</p>
               </div>
             ))}
           </div>
@@ -168,9 +168,12 @@ function LocalizedHomePageContent() {
       </section>
 
       {/* User Types Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-black text-center mb-12" style={{ color: COLOR_PRIMARY }}>
+          <p className="text-[11px] font-bold tracking-[0.28em] text-center mb-4" style={{ color: '#B8956A' }}>
+            BUYERS · SELLERS · BROKERS
+          </p>
+          <h2 className="text-3xl md:text-4xl font-black text-center mb-14" style={{ color: COLOR_PRIMARY }}>
             {t('users.title', locale)}
           </h2>
 
@@ -197,20 +200,20 @@ function LocalizedHomePageContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className="p-8 rounded-lg border hover:shadow-lg transition-all"
+                className="p-8 rounded-2xl border hover:shadow-lg transition-all flex flex-col"
                 style={{ borderColor: COLOR_BORDER }}
               >
-                <user.Icon size={40} style={{ color: COLOR_ACCENT }} className="mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
+                <user.Icon size={36} style={{ color: '#B8956A' }} className="mx-auto mb-4" />
+                <h3 className="text-xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>
                   {t(`users.${user.key}.title`, locale)}
                 </h3>
-                <p className="mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
+                <p className="mb-6 text-sm leading-relaxed flex-1" style={{ color: COLOR_TEXT_SECONDARY }}>
                   {t(`users.${user.key}.desc`, locale)}
                 </p>
                 <Link
                   href={user.key === 'sellers' ? '/list' : user.href}
-                  className="inline-block px-4 py-2 rounded-lg font-bold transition-all hover:opacity-90"
-                  style={{ background: COLOR_ACCENT + '20', color: COLOR_ACCENT }}
+                  className="inline-block px-5 py-2.5 rounded-lg font-bold text-sm text-white transition-all hover:opacity-90"
+                  style={{ background: '#1A1A1A' }}
                 >
                   {user.key === 'sellers' ? t('cta.listBusiness', locale) : t(`users.${user.key}.cta`, locale) + ' →'}
                 </Link>
@@ -220,74 +223,39 @@ function LocalizedHomePageContent() {
         </div>
       </section>
 
-      {/* Value Proposition Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 border-t" style={{ borderColor: COLOR_BORDER }}>
+      {/* Value Proposition Section — cream editorial */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8" style={{ background: '#FAF6EF' }}>
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-black text-center mb-12" style={{ color: COLOR_PRIMARY }}>
+          <h2 className="text-3xl md:text-4xl font-black text-center mb-14" style={{ color: COLOR_PRIMARY }}>
             {t('roi.title', locale)}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0 }}
-              className="p-8 rounded-lg border text-center"
-              style={{ borderColor: COLOR_BORDER, background: COLOR_PRIMARY + '02' }}
-            >
-              <p className="text-4xl font-black mb-2" style={{ color: COLOR_ACCENT }}>
-                $685
-              </p>
-              <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-                {t('roi.savings', locale)}
-              </p>
-              <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-3">
-                {t('roi.savingsNote', locale)}
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="p-8 rounded-lg border text-center"
-              style={{ borderColor: COLOR_BORDER, background: COLOR_PRIMARY + '02' }}
-            >
-              <p className="text-4xl font-black mb-2" style={{ color: COLOR_ACCENT }}>
-                180+
-              </p>
-              <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-                {t('roi.hours', locale)}
-              </p>
-              <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-3">
-                {t('roi.hoursNote', locale)}
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="p-8 rounded-lg border text-center"
-              style={{ borderColor: COLOR_BORDER, background: COLOR_PRIMARY + '02' }}
-            >
-              <p className="text-4xl font-black mb-2" style={{ color: COLOR_ACCENT }}>
-                1 Deal
-              </p>
-              <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-                {t('roi.breakeven', locale)}
-              </p>
-              <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-3">
-                {t('roi.breakEvenNote', locale)}
-              </p>
-            </motion.div>
+            {[
+              { value: '$685', label: t('roi.savings', locale), note: t('roi.savingsNote', locale) },
+              { value: '180+', label: t('roi.hours', locale), note: t('roi.hoursNote', locale) },
+              { value: '1 Deal', label: t('roi.breakeven', locale), note: t('roi.breakEvenNote', locale) },
+            ].map((card, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="p-8 rounded-2xl text-center bg-white"
+                style={{ border: '1px solid #EDE6D8' }}
+              >
+                <p className="text-4xl font-black mb-2" style={{ color: '#B8956A' }}>{card.value}</p>
+                <p style={{ color: COLOR_PRIMARY }} className="text-sm font-bold">{card.label}</p>
+                <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-3">{card.note}</p>
+              </motion.div>
+            ))}
           </div>
 
-          <div className="p-8 rounded-lg border-2 text-center" style={{ borderColor: COLOR_ACCENT, background: COLOR_ACCENT + '08' }}>
+          <div className="p-8 rounded-2xl text-center" style={{ border: '2px solid #D6C5A8', background: 'white' }}>
             <p style={{ color: COLOR_TEXT_SECONDARY }} className="mb-2">
               {t('roi.description', locale)}
             </p>
-            <p className="font-semibold" style={{ color: COLOR_PRIMARY }}>
+            <p className="font-bold" style={{ color: COLOR_PRIMARY }}>
               {t('roi.trial', locale)}
             </p>
           </div>
@@ -304,30 +272,30 @@ function LocalizedHomePageContent() {
       {/* Help Contact Widget */}
       <HelpContactWidget />
 
-      {/* CTA Section */}
-      <section
-        className="py-20 px-4 sm:px-6 lg:px-8 border-t text-center"
-        style={{ borderColor: COLOR_BORDER, background: COLOR_PRIMARY + '02' }}
-      >
+      {/* CTA Section — ink cinematic closer */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 text-center" style={{ background: '#0F1419' }}>
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-4xl font-black mb-6" style={{ color: COLOR_PRIMARY }}>
+          <p className="text-[11px] font-bold tracking-[0.28em] mb-5" style={{ color: '#B8956A' }}>
+            YOUR EXIT STARTS HERE
+          </p>
+          <h2 className="text-4xl md:text-5xl font-black mb-6 text-white leading-tight">
             {t('cta.title', locale)}
           </h2>
-          <p className="text-lg mb-8" style={{ color: COLOR_TEXT_SECONDARY }}>
+          <p className="text-lg mb-9" style={{ color: 'rgba(255,255,255,0.72)' }}>
             {t('cta.subtitle', locale)}
           </p>
           <div className={`flex flex-col sm:flex-row gap-4 justify-center ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
             <Link
               href="/list"
-              className="px-8 py-4 rounded-lg font-bold text-white hover:opacity-90 transition-all"
-              style={{ background: COLOR_ACCENT }}
+              className="px-9 py-4 rounded-lg font-bold hover:opacity-90 transition-all"
+              style={{ background: 'white', color: '#0F1419' }}
             >
               {t('cta.button1', locale)}
             </Link>
             <Link
               href="/contact-sales"
-              className="px-8 py-4 rounded-lg font-bold border hover:bg-gray-50 transition-all"
-              style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
+              className="px-9 py-4 rounded-lg font-bold text-white transition-all hover:bg-white/10"
+              style={{ border: '1px solid rgba(255,255,255,0.35)' }}
             >
               {t('cta.button2', locale)}
             </Link>

@@ -53,7 +53,7 @@ export default async function IndustryPage({ params }: { params: { industry: str
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(itemListLd(deals)) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(faqLd(faqs)) }} />
 
-      <section className="px-6 py-12 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-6 py-12 border-b" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
         <div className="max-w-6xl mx-auto">
           <nav className="text-sm mb-3" style={{ color: COLOR_TEXT_SECONDARY }}>
             <Link href="/" style={{ color: COLOR_ACCENT }}>Home</Link> ›{' '}

@@ -38,7 +38,7 @@ export default function SellYourBusinessPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(faqLd(faqs)) }} />
 
       {/* ─── Hero ──────────────────────────────────────────────────────────── */}
-      <section className="px-6 py-14 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-6 py-14 border-b" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
         <div className="max-w-5xl mx-auto text-center">
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white mb-4" style={{ background: '#2D7A5F' }}>
             LIST FREE · 90 SECONDS · ANONYMOUS BY DEFAULT

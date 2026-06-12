@@ -87,22 +87,22 @@ export function WorldClassFooter() {
   return (
     <footer
       className="border-t"
-      style={{ borderColor: COLOR_BORDER, background: COLOR_PRIMARY + '02' }}
+      style={{ borderColor: 'rgba(255,255,255,0.12)', background: '#0F1419' }}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Top Section - Logo & Description */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 pb-12 border-b" style={{ borderColor: COLOR_BORDER }}>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 pb-12 border-b" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles size={28} style={{ color: COLOR_ACCENT }} />
-              <span className="text-xl font-black" style={{ color: COLOR_PRIMARY }}>
-                Forward OS
+              <Sparkles size={28} style={{ color: '#B8956A' }} />
+              <span className="text-xl font-black" style={{ color: 'white' }}>
+                Forward Intelligence
               </span>
             </div>
-            <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm leading-relaxed">
+            <p style={{ color: 'rgba(255,255,255,0.6)' }} className="text-sm leading-relaxed">
               The M&A platform built for intelligent deals. AI-powered intelligence, institutional network, professional services.
             </p>
             {/* Social Links */}
@@ -115,11 +115,11 @@ export function WorldClassFooter() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg border hover:bg-gray-100 transition-colors"
-                    style={{ borderColor: COLOR_BORDER }}
+                    className="p-2 rounded-lg border hover:bg-white/10 transition-colors"
+                    style={{ borderColor: 'rgba(255,255,255,0.12)' }}
                     aria-label={social.label}
                   >
-                    <Icon size={18} style={{ color: COLOR_PRIMARY }} />
+                    <Icon size={18} style={{ color: 'white' }} />
                   </a>
                 )
               })}
@@ -131,7 +131,7 @@ export function WorldClassFooter() {
             <div key={category}>
               <h4
                 className="font-bold text-sm uppercase tracking-wide mb-4"
-                style={{ color: COLOR_PRIMARY }}
+                style={{ color: 'white' }}
               >
                 {category === 'product'
                   ? 'Product'
@@ -147,7 +147,7 @@ export function WorldClassFooter() {
                     <Link
                       href={link.href}
                       className="text-sm hover:opacity-75 transition-opacity"
-                      style={{ color: COLOR_TEXT_SECONDARY }}
+                      style={{ color: 'rgba(255,255,255,0.6)' }}
                     >
                       {link.label}
                     </Link>
@@ -159,8 +159,8 @@ export function WorldClassFooter() {
         </div>
 
         {/* Office Locations */}
-        <div className="mb-16 pb-12 border-b" style={{ borderColor: COLOR_BORDER }}>
-          <h3 className="text-xl font-bold mb-8" style={{ color: COLOR_PRIMARY }}>
+        <div className="mb-16 pb-12 border-b" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+          <h3 className="text-xl font-bold mb-8" style={{ color: 'white' }}>
             🌍 Global Offices
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -168,47 +168,47 @@ export function WorldClassFooter() {
               <div
                 key={idx}
                 className="p-6 rounded-xl border"
-                style={{ borderColor: COLOR_BORDER, background: 'white' }}
+                style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'white' }}
               >
-                <h4 className="font-bold text-lg mb-3" style={{ color: COLOR_PRIMARY }}>
+                <h4 className="font-bold text-lg mb-3" style={{ color: 'white' }}>
                   {office.region}
                 </h4>
 
                 <div className="space-y-3">
                   <div>
-                    <p className="text-xs font-bold uppercase mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>
+                    <p className="text-xs font-bold uppercase mb-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
                       Location
                     </p>
-                    <p style={{ color: COLOR_PRIMARY }} className="text-sm font-semibold">
+                    <p style={{ color: 'white' }} className="text-sm font-semibold">
                       {office.city}
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-xs font-bold uppercase mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>
+                    <p className="text-xs font-bold uppercase mb-1" style={{ color: 'rgba(255,255,255,0.6)' }}>
                       Address
                     </p>
-                    <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
+                    <p style={{ color: 'rgba(255,255,255,0.6)' }} className="text-sm">
                       {office.address}
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t" style={{ borderColor: COLOR_BORDER }}>
+                  <div className="pt-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
                     <div className="flex items-center gap-2 mb-2">
-                      <Phone size={14} style={{ color: COLOR_ACCENT }} />
-                      <a href={`tel:${office.phone}`} style={{ color: COLOR_PRIMARY }} className="text-sm font-semibold hover:opacity-75">
+                      <Phone size={14} style={{ color: '#B8956A' }} />
+                      <a href={`tel:${office.phone}`} style={{ color: 'white' }} className="text-sm font-semibold hover:opacity-75">
                         {office.phone}
                       </a>
                     </div>
                     <div className="flex items-center gap-2 mb-2">
-                      <Mail size={14} style={{ color: COLOR_ACCENT }} />
-                      <a href={`mailto:${office.email}`} style={{ color: COLOR_PRIMARY }} className="text-sm font-semibold hover:opacity-75">
+                      <Mail size={14} style={{ color: '#B8956A' }} />
+                      <a href={`mailto:${office.email}`} style={{ color: 'white' }} className="text-sm font-semibold hover:opacity-75">
                         {office.email}
                       </a>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Globe size={14} style={{ color: COLOR_ACCENT }} />
-                      <span style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
+                      <Globe size={14} style={{ color: '#B8956A' }} />
+                      <span style={{ color: 'rgba(255,255,255,0.6)' }} className="text-sm">
                         {office.timezone}
                       </span>
                     </div>
@@ -220,8 +220,8 @@ export function WorldClassFooter() {
         </div>
 
         {/* Terms & Conditions Section */}
-        <div className="mb-12 pb-12 border-b" style={{ borderColor: COLOR_BORDER }}>
-          <h3 className="text-xl font-bold mb-6" style={{ color: COLOR_PRIMARY }}>
+        <div className="mb-12 pb-12 border-b" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+          <h3 className="text-xl font-bold mb-6" style={{ color: 'white' }}>
             📋 Terms & Conditions
           </h3>
 
@@ -229,7 +229,7 @@ export function WorldClassFooter() {
             {[
               {
                 title: 'User Agreement',
-                desc: 'Our terms of service outline the rules and guidelines for using Forward OS. By accessing our platform, you agree to comply with these terms.',
+                desc: 'Our terms of service outline the rules and guidelines for using Forward Intelligence. By accessing our platform, you agree to comply with these terms.',
               },
               {
                 title: 'Privacy & Data Protection',
@@ -237,7 +237,7 @@ export function WorldClassFooter() {
               },
               {
                 title: 'Seller Verification',
-                desc: 'All sellers on Forward OS undergo rigorous verification. We verify identity, financial statements, and legal standing.',
+                desc: 'All sellers on Forward Intelligence undergo rigorous verification. We verify identity, financial statements, and legal standing.',
               },
               {
                 title: 'Buyer Protection',
@@ -245,18 +245,18 @@ export function WorldClassFooter() {
               },
               {
                 title: 'Payment & Billing',
-                desc: 'Forward OS processes payments securely through Stripe. We support multiple currencies and offer flexible billing options.',
+                desc: 'Forward Intelligence processes payments securely through Stripe. We support multiple currencies and offer flexible billing options.',
               },
               {
                 title: 'Dispute Resolution',
                 desc: 'We have a clear dispute resolution process. Contact our support team for any issues or concerns.',
               },
             ].map((item, idx) => (
-              <div key={idx} className="p-4 rounded-lg border" style={{ borderColor: COLOR_BORDER, background: 'white' }}>
-                <h4 className="font-bold text-sm mb-2" style={{ color: COLOR_PRIMARY }}>
+              <div key={idx} className="p-4 rounded-lg border" style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'white' }}>
+                <h4 className="font-bold text-sm mb-2" style={{ color: 'white' }}>
                   {item.title}
                 </h4>
-                <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   {item.desc}
                 </p>
               </div>
@@ -265,8 +265,8 @@ export function WorldClassFooter() {
         </div>
 
         {/* Security & Compliance */}
-        <div className="mb-12 pb-12 border-b" style={{ borderColor: COLOR_BORDER }}>
-          <h3 className="text-xl font-bold mb-6" style={{ color: COLOR_PRIMARY }}>
+        <div className="mb-12 pb-12 border-b" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+          <h3 className="text-xl font-bold mb-6" style={{ color: 'white' }}>
             🔒 Security & Compliance
           </h3>
 
@@ -278,10 +278,10 @@ export function WorldClassFooter() {
               { title: '24/7 Monitoring', desc: 'Continuous monitoring and threat detection to protect our platform and your data.' },
             ].map((item, idx) => (
               <div key={idx} className="p-4 rounded-lg" style={{ background: COLOR_ACCENT + '05', borderLeft: `4px solid ${COLOR_ACCENT}` }}>
-                <h4 className="font-bold text-sm mb-1" style={{ color: COLOR_PRIMARY }}>
+                <h4 className="font-bold text-sm mb-1" style={{ color: 'white' }}>
                   {item.title}
                 </h4>
-                <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
+                <p className="text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
                   {item.desc}
                 </p>
               </div>
@@ -293,46 +293,46 @@ export function WorldClassFooter() {
       {/* Bottom Bar */}
       <div
         className="border-t py-8"
-        style={{ borderColor: COLOR_BORDER, background: COLOR_PRIMARY + '05' }}
+        style={{ borderColor: 'rgba(255,255,255,0.12)', background: COLOR_PRIMARY + '05' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-              © {currentYear} Forward OS. All rights reserved.
+            <p style={{ color: 'rgba(255,255,255,0.6)' }} className="text-sm">
+              © {currentYear} Forward Intelligence. All rights reserved.
             </p>
 
             <div className="flex items-center gap-6 text-sm">
               <Link
                 href="/privacy"
                 className="hover:opacity-75 transition-opacity"
-                style={{ color: COLOR_TEXT_SECONDARY }}
+                style={{ color: 'rgba(255,255,255,0.6)' }}
               >
                 Privacy
               </Link>
               <Link
                 href="/terms"
                 className="hover:opacity-75 transition-opacity"
-                style={{ color: COLOR_TEXT_SECONDARY }}
+                style={{ color: 'rgba(255,255,255,0.6)' }}
               >
                 Terms
               </Link>
               <Link
                 href="/cookies"
                 className="hover:opacity-75 transition-opacity"
-                style={{ color: COLOR_TEXT_SECONDARY }}
+                style={{ color: 'rgba(255,255,255,0.6)' }}
               >
                 Cookies
               </Link>
               <Link
                 href="/security"
                 className="hover:opacity-75 transition-opacity"
-                style={{ color: COLOR_TEXT_SECONDARY }}
+                style={{ color: 'rgba(255,255,255,0.6)' }}
               >
                 Security
               </Link>
             </div>
 
-            <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
+            <p style={{ color: 'rgba(255,255,255,0.6)' }} className="text-sm">
               Made with ❤️ for the M&A community
             </p>
           </div>

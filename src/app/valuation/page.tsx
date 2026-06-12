@@ -53,7 +53,7 @@ export default function ValuationPage() {
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
       <PublicHeader />
 
-      <section className="px-6 py-10 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-6 py-10 border-b" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
         <div className="max-w-3xl mx-auto text-center">
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white mb-3" style={{ background: COLOR_ACCENT }}>
             FREE VALUATION · NO SIGNUP
@@ -123,7 +123,7 @@ export default function ValuationPage() {
                 {result.rationale.map((line, i) => <li key={i} className="pl-3 border-l-2" style={{ borderColor: COLOR_ACCENT }} dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') }} />)}
               </ul>
             </div>
-            <div className="rounded-lg p-4" style={{ background: '#EFF6FF' }}>
+            <div className="rounded-lg p-4" style={{ background: '#FAF6EF' }}>
               <p className="text-sm font-bold mb-2" style={{ color: COLOR_PRIMARY }}>Want to test the market at this number?</p>
               <p className="text-sm mb-3" style={{ color: COLOR_TEXT_SECONDARY }}>Publish a confidential listing in 90 seconds — anonymous by default, no commission, no credit card. We'll pre-fill the form from your answers.</p>
               <Link href={listingLink} className="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-bold text-white hover:opacity-90" style={{ background: COLOR_ACCENT }}>
@@ -169,7 +169,7 @@ function NumberInput({ value, onChange, placeholder }: { value: string; onChange
 
 function Estimate({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className="rounded-lg border p-4 text-center" style={{ borderColor: highlight ? COLOR_ACCENT : COLOR_BORDER, background: highlight ? '#EFF6FF' : 'white', borderWidth: highlight ? 2 : 1 }}>
+    <div className="rounded-lg border p-4 text-center" style={{ borderColor: highlight ? COLOR_ACCENT : COLOR_BORDER, background: highlight ? '#FAF6EF' : 'white', borderWidth: highlight ? 2 : 1 }}>
       <p className="text-xs font-semibold mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>{label}</p>
       <p className="text-xl md:text-2xl font-black" style={{ color: highlight ? COLOR_ACCENT : COLOR_PRIMARY }}>{value}</p>
     </div>

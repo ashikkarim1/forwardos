@@ -49,7 +49,7 @@ export default function ArticlePage() {
               )}
             </div>
 
-            <div className="mt-10 p-5 rounded-xl" style={{ background: '#EFF6FF' }}>
+            <div className="mt-10 p-5 rounded-xl" style={{ background: '#FAF6EF' }}>
               <p className="font-bold mb-1" style={{ color: COLOR_PRIMARY }}>Ready to act on this?</p>
               <p className="text-sm mb-3" style={{ color: COLOR_TEXT_SECONDARY }}>
                 Browse live listings, model financing, or find a verified broker.

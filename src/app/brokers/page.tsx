@@ -35,7 +35,7 @@ export default function BrokersPage() {
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }} dir={isRTL ? 'rtl' : 'ltr'}>
       <PublicHeader />
 
-      <section className="px-6 py-12 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-6 py-12 border-b" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
         <div className="max-w-6xl mx-auto">
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4" style={{ background: COLOR_ACCENT, color: 'white' }}>
             BROKER DIRECTORY
@@ -117,7 +117,7 @@ export default function BrokersPage() {
                         </span>
                       ))}
                       {b.languages.map((l) => (
-                        <span key={l} className="px-2 py-1 rounded-md text-xs font-semibold" style={{ background: '#EFF6FF', color: COLOR_ACCENT }}>
+                        <span key={l} className="px-2 py-1 rounded-md text-xs font-semibold" style={{ background: '#FAF6EF', color: COLOR_ACCENT }}>
                           {LANGUAGE_LABELS[l]}
                         </span>
                       ))}

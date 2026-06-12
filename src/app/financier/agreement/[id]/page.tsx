@@ -84,7 +84,7 @@ export default function AgreementPage() {
 
   return (
     <Shell>
-      <section className="px-6 py-8 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-6 py-8 border-b" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
         <div className="max-w-3xl mx-auto">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold mb-3 text-white" style={{ background: COLOR_ACCENT }}>
             <FileSignature size={13} /> REFERRAL AGREEMENT

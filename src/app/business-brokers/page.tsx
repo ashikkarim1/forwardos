@@ -26,7 +26,7 @@ export default function BusinessBrokersPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Business Brokers', path: '/business-brokers' }])) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(faqLd(faqs)) }} />
 
-      <section className="px-6 py-12 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-6 py-12 border-b" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
         <div className="max-w-6xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>Business Brokers in the USA, Canada & the UAE</h1>
           <p className="text-lg max-w-3xl mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
@@ -51,7 +51,7 @@ export default function BusinessBrokersPage() {
                 <p className="text-sm mb-3" style={{ color: COLOR_PRIMARY }}>{b.headline}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {b.regions.map((r) => <span key={r} className="text-xs px-2 py-0.5 rounded-md" style={{ background: '#F3F4F6', color: COLOR_PRIMARY }}>{REGION_FLAGS[r]} {r === 'CANADA' ? 'Canada' : 'UAE'}</span>)}
-                  {b.languages.map((l) => <span key={l} className="text-xs px-2 py-0.5 rounded-md" style={{ background: '#EFF6FF', color: COLOR_ACCENT }}>{LANGUAGE_LABELS[l]}</span>)}
+                  {b.languages.map((l) => <span key={l} className="text-xs px-2 py-0.5 rounded-md" style={{ background: '#FAF6EF', color: COLOR_ACCENT }}>{LANGUAGE_LABELS[l]}</span>)}
                 </div>
               </Link>
             ))}

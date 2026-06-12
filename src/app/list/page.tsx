@@ -69,7 +69,7 @@ function ListInner() {
           <p className="mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
             Verified buyers can already discover it on the Forward marketplace — fully anonymous until you choose to reveal more.
           </p>
-          <div className="rounded-xl border p-5 text-left mb-6" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+          <div className="rounded-xl border p-5 text-left mb-6" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
             <p className="text-xs font-semibold mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>Confidential listing published as:</p>
             <p className="font-bold" style={{ color: COLOR_PRIMARY }}>{success.title}</p>
           </div>
@@ -94,7 +94,7 @@ function ListInner() {
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
       <PublicHeader />
 
-      <section className="px-6 py-10 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-6 py-10 border-b" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
         <div className="max-w-3xl mx-auto text-center">
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold text-white mb-3" style={{ background: '#2D7A5F' }}>
             LIST FREE · 90 SECONDS · ANONYMOUS BY DEFAULT

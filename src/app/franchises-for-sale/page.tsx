@@ -29,7 +29,7 @@ export default async function FranchisesPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(itemListLd(deals)) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(faqLd(faqs)) }} />
 
-      <section className="px-6 py-12 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-6 py-12 border-b" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
         <div className="max-w-6xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>Franchises for Sale</h1>
           <p className="text-lg max-w-3xl" style={{ color: COLOR_TEXT_SECONDARY }}>

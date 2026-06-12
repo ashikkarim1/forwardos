@@ -32,7 +32,7 @@ export default function SavedDealsPage() {
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
       <PublicHeader />
 
-      <section className="px-4 md:px-8 py-6 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-4 md:px-8 py-6 border-b" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
         <div className="max-w-7xl mx-auto">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-white mb-2" style={{ background: COLOR_ACCENT }}>
             <Heart size={12} className="fill-current" /> SAVED
@@ -55,7 +55,7 @@ export default function SavedDealsPage() {
           </div>
         ) : hydratedAndEmpty ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20 px-6">
-            <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6" style={{ background: '#EFF6FF' }}>
+            <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6" style={{ background: '#FAF6EF' }}>
               <Heart size={32} style={{ color: COLOR_ACCENT }} />
             </div>
             <h2 className="text-2xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>No saved listings yet</h2>

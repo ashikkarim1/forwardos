@@ -230,3 +230,28 @@ export const COLOR_BADGE_BG = '#F0EFED'
  * Firmology-inspired: Softer, more refined shadows
  */
 export const COLOR_SHADOW = 'rgba(0, 0, 0, 0.05)'
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// EDITORIAL THEME — the cinematic "life's biggest exit" palette born on the
+// homepage hero and listing pages. Champagne eyebrows, ink stages, cream
+// surfaces. Use these for landing/marketing surfaces; keep COLOR_ACCENT
+// (blue) for interactive product chrome (nav, links, form focus).
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/** Champagne — eyebrow labels, ribbons, editorial accents. */
+export const COLOR_CHAMPAGNE = '#B8956A'
+
+/** Champagne border — card borders on highlighted/premium surfaces. */
+export const COLOR_CHAMPAGNE_BORDER = '#D6C5A8'
+
+/** Cream — warm surface behind premium callouts and editorial sections. */
+export const COLOR_CREAM = '#FAF6EF'
+
+/** Deep ink — cinematic hero stages and the footer. */
+export const COLOR_INK = '#0F1419'
+
+/** Soft white on ink — body copy over dark stages. */
+export const COLOR_INK_MUTED = 'rgba(255,255,255,0.72)'
+
+/** Faint white on ink — captions/strips over dark stages. */
+export const COLOR_INK_FAINT = 'rgba(255,255,255,0.45)'

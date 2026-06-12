@@ -71,7 +71,7 @@ export default function SavedSearchesPage() {
             <p style={{ color: COLOR_TEXT_SECONDARY }}>Loading…</p>
           ) : searches.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-2xl border" style={{ borderColor: COLOR_BORDER }}>
-              <div className="w-14 h-14 mx-auto rounded-full flex items-center justify-center mb-4" style={{ background: '#EFF6FF' }}>
+              <div className="w-14 h-14 mx-auto rounded-full flex items-center justify-center mb-4" style={{ background: '#FAF6EF' }}>
                 <Search size={26} style={{ color: COLOR_ACCENT }} />
               </div>
               <h2 className="text-xl font-bold mb-2" style={{ color: COLOR_PRIMARY }}>No saved searches yet</h2>
