@@ -329,7 +329,7 @@ export default function LandingPage() {
                   '🎯 Scenario modeling for negotiation',
                 ],
                 cta: 'Create Account',
-                link: '/seller/register',
+                link: '/list',
               },
               {
                 icon: BuyerIcon,
@@ -473,7 +473,7 @@ export default function LandingPage() {
 
           {/* Buttons - All in one row, no wrap */}
           <div className="flex items-center justify-center gap-6 flex-nowrap overflow-x-auto sm:overflow-visible pb-4 sm:pb-0">
-            <Link href="/seller/register" className="px-8 py-4 rounded-lg font-bold text-white text-lg transition-all hover:opacity-90 flex items-center gap-2 whitespace-nowrap flex-shrink-0" style={{ background: COLOR_ACCENT }}>
+            <Link href="/list" className="px-8 py-4 rounded-lg font-bold text-white text-lg transition-all hover:opacity-90 flex items-center gap-2 whitespace-nowrap flex-shrink-0" style={{ background: COLOR_ACCENT }}>
               Create Account <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/dashboard/buyer" className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90 border-2 whitespace-nowrap flex-shrink-0" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>

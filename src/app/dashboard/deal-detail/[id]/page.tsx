@@ -53,7 +53,7 @@ export default function DealDetailPageV2() {
   useEffect(() => {
     const token = localStorage.getItem('auth_token')
     if (!token) {
-      router.push('/auth/signin?redirect=' + window.location.pathname)
+      router.push('/auth/login?redirect=' + window.location.pathname)
       return
     }
     setIsAuthed(true)

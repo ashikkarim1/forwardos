@@ -18,7 +18,7 @@ export function SellerPricingTiers() {
   }
 
   const handleSelectPlan = (plan: 'freemium' | 'premium') => {
-    router.push(`/seller/register?plan=${plan}`)
+    router.push(`/auth/signup?type=seller`)
   }
 
   const sellerTiers = [

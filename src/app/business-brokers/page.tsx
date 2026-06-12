@@ -35,7 +35,7 @@ export default function BusinessBrokersPage() {
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/brokers" className="px-6 py-3 rounded-lg font-bold text-white hover:opacity-90" style={{ background: COLOR_ACCENT }}>Browse the directory</Link>
-            <Link href="/seller/register?plan=premium" className="px-6 py-3 rounded-lg font-bold border bg-white hover:bg-gray-50" style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}>Join as a broker</Link>
+            <Link href="/auth/signup?type=broker" className="px-6 py-3 rounded-lg font-bold border bg-white hover:bg-gray-50" style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}>Join as a broker</Link>
           </div>
         </div>
       </section>

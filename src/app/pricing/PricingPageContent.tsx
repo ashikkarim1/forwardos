@@ -127,7 +127,7 @@ export function PricingPageContent() {
               Pricing
             </Link>
             <Link
-              href="/auth/signin"
+              href="/auth/login"
               className="px-6 py-2 rounded-lg font-bold text-white hover:opacity-90"
               style={{ background: COLOR_ACCENT }}
             >

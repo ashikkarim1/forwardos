@@ -52,6 +52,11 @@ const nextConfig = {
       { source: '/signin', destination: '/auth/login', permanent: false },
       { source: '/signup', destination: '/auth/signup', permanent: false },
       { source: '/register', destination: '/auth/signup', permanent: false },
+      // Retired duplicates — collapse to the canonical paths to prevent drift.
+      // /auth/signin was a near-duplicate of /auth/login; /seller/register
+      // pre-dated the 90-second /list flow which replaced it.
+      { source: '/auth/signin', destination: '/auth/login', permanent: true },
+      { source: '/seller/register', destination: '/list', permanent: true },
     ]
   },
 }

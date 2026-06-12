@@ -53,7 +53,7 @@ export default function BrokersPage() {
               Are you a broker? List businesses and reach verified buyers.
             </span>
             <Link
-              href="/seller/register?role=broker"
+              href="/auth/signup?type=broker"
               className="px-4 py-2 rounded-lg text-sm font-bold text-white hover:opacity-90"
               style={{ background: COLOR_ACCENT }}
             >
