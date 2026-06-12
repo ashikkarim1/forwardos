@@ -1,13 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   ChevronRight, Lock, ShieldCheck, ArrowLeft, CheckCircle2, Mail,
-  Loader, AlertCircle,
+  Loader, AlertCircle, UserPlus, LogIn, ShieldAlert,
 } from 'lucide-react'
 import { PublicHeader } from '@/components/Navigation'
 import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
+
+interface AuthUser { id: string; name?: string | null; email: string; role?: string }
 
 interface Props {
   dealId: string
@@ -45,14 +48,50 @@ const COUNTRIES = [
 
 export function ContactForm(props: Props) {
   const { dealId, slug, headline, indLabel, region, askDisplay, heatScore, qualityScore } = props
+  const pathname = usePathname()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState<{ reference: string } | null>(null)
+  // null = checking; undefined = no user (anonymous); object = signed in
+  const [authUser, setAuthUser] = useState<AuthUser | null | undefined>(null)
   const [form, setForm] = useState({
     firstName: '', lastName: '', email: '', phone: '', country: '',
     capitalAvailableRange: '', timeline: '', financingNeed: '',
     buyerType: '', message: '', bindingAcknowledged: false,
   })
+
+  // Check whether the visitor has an active session. Sellers vet inquiries
+  // looking for real buyers, not bot traffic — so the form is gated behind
+  // a Forward account. We pre-populate name + email from the session, then
+  // the buyer fills the rest.
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(async (r) => {
+        if (cancelled) return
+        if (r.ok) {
+          const data = await r.json()
+          const user = data?.user as AuthUser | null
+          if (user) {
+            setAuthUser(user)
+            // Pre-populate from session so the buyer doesn't re-type.
+            const [first, ...rest] = (user.name || '').split(' ')
+            setForm((prev) => ({
+              ...prev,
+              firstName: prev.firstName || first || '',
+              lastName: prev.lastName || rest.join(' ') || '',
+              email: prev.email || user.email || '',
+            }))
+          } else {
+            setAuthUser(undefined)
+          }
+        } else {
+          setAuthUser(undefined)
+        }
+      })
+      .catch(() => { if (!cancelled) setAuthUser(undefined) })
+    return () => { cancelled = true }
+  }, [])
 
   function update<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((prev) => ({ ...prev, [k]: v }))
@@ -115,10 +154,79 @@ export function ContactForm(props: Props) {
     )
   }
 
+  // ─── Auth gate ───────────────────────────────────────────────────────
+  // Show a polished modal when the visitor isn't signed in. Sellers are
+  // looking for real buyers, not bot traffic, so we require an account
+  // before any inquiry hits the database. Email/name pre-populate from
+  // the session once they sign in and return.
+  const showAuthGate = authUser === undefined
+  const checkingAuth = authUser === null
+
   // ─── Form ────────────────────────────────────────────────────────────
+  const returnTo = encodeURIComponent(pathname || `/listing/${slug}/contact`)
+
   return (
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
       <PublicHeader />
+
+      {/* Auth-gate modal — non-dismissable; the buyer must sign in or sign up. */}
+      {showAuthGate && (
+        <div role="dialog" aria-modal="true" aria-labelledby="auth-gate-title"
+             className="fixed inset-0 z-50 flex items-center justify-center px-4"
+             style={{ background: 'rgba(15,20,25,0.65)', backdropFilter: 'blur(4px)' }}>
+          <div className="rounded-2xl bg-white shadow-2xl max-w-md w-full overflow-hidden" style={{ border: '1px solid #E8E4DC' }}>
+            <div className="p-7 pb-5 text-center">
+              <div className="w-14 h-14 mx-auto rounded-full flex items-center justify-center mb-4" style={{ background: '#FAF6EF' }}>
+                <ShieldAlert size={24} style={{ color: '#B8956A' }} />
+              </div>
+              <p className="text-[10px] font-bold tracking-[0.22em] uppercase mb-2" style={{ color: '#B8956A' }}>Verified Buyers Only</p>
+              <h2 id="auth-gate-title" className="text-2xl font-black mb-3 leading-tight" style={{ color: COLOR_PRIMARY }}>
+                Sign in to introduce yourself to the seller.
+              </h2>
+              <p className="text-sm leading-relaxed mb-5" style={{ color: COLOR_TEXT_SECONDARY }}>
+                Sellers on Forward are looking for serious, verifiable buyers — not anonymous tire-kickers. Create a free Forward account (60 seconds) and we&apos;ll vouch for you to the seller.
+              </p>
+
+              <div className="text-left rounded-lg p-4 mb-5" style={{ background: '#F4F2EE' }}>
+                <ul className="space-y-2 text-xs" style={{ color: COLOR_PRIMARY }}>
+                  <li className="flex items-start gap-2"><CheckCircle2 size={13} style={{ color: '#2D7A5F' }} className="mt-0.5 flex-shrink-0" /><span>Forward verifies every buyer before introducing</span></li>
+                  <li className="flex items-start gap-2"><CheckCircle2 size={13} style={{ color: '#2D7A5F' }} className="mt-0.5 flex-shrink-0" /><span>Your details stay private — we never share them publicly</span></li>
+                  <li className="flex items-start gap-2"><CheckCircle2 size={13} style={{ color: '#2D7A5F' }} className="mt-0.5 flex-shrink-0" /><span>Track inquiries and saved listings in one dashboard</span></li>
+                </ul>
+              </div>
+
+              <Link
+                href={`/auth/signup?type=buyer&redirect=${returnTo}`}
+                className="block w-full px-5 py-3.5 rounded-lg font-bold text-white text-sm hover:opacity-90 transition-opacity mb-2"
+                style={{ background: COLOR_PRIMARY }}
+              >
+                <UserPlus size={14} className="inline mr-1.5 -mt-0.5" />
+                Create a free buyer account
+              </Link>
+              <Link
+                href={`/auth/login?redirect=${returnTo}`}
+                className="block w-full px-5 py-3 rounded-lg font-bold text-sm border bg-white hover:bg-gray-50 transition-colors"
+                style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
+              >
+                <LogIn size={14} className="inline mr-1.5 -mt-0.5" />
+                I already have an account
+              </Link>
+            </div>
+            <div className="px-7 py-4 border-t text-center" style={{ borderColor: COLOR_BORDER, background: '#FBFAF7' }}>
+              <Link href={`/listing/${slug}`} className="text-xs font-semibold hover:underline" style={{ color: COLOR_TEXT_SECONDARY }}>
+                ← Back to the listing
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightweight overlay while we resolve auth state on first paint. */}
+      {checkingAuth && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center" style={{ background: 'rgba(244,242,238,0.8)' }}>
+          <Loader size={20} className="animate-spin" style={{ color: COLOR_PRIMARY }} />
+        </div>
+      )}
 
       {/* Breadcrumbs */}
       <nav aria-label="Breadcrumb" className="border-b" style={{ borderColor: COLOR_BORDER, background: 'white' }}>

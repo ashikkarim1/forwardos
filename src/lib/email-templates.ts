@@ -74,7 +74,14 @@ export function luxuryEmail(opts: {
 </body></html>`
 }
 
-/** Render a single confidential listing as an inner email block. */
+/**
+ * Render a single confidential listing as an inner email block.
+ *
+ * Layout is single-column by design — every label / value pair is a separate
+ * paragraph so iOS Mail (which collapses email-table column widths to ~80px
+ * on a 414pt iPhone) can't shred the layout into vertical-letter stacks. The
+ * CTA is a full-width button, not an inline link.
+ */
 export function listingBlock(opts: {
   industryLabel: string
   region: string
@@ -84,25 +91,29 @@ export function listingBlock(opts: {
   href: string
 }): string {
   const { industryLabel, region, askingRange, heatScore, qualityScore, href } = opts
+  const hasScore = heatScore != null || qualityScore != null
   return `
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E8E4DC;border-radius:4px;margin:16px 0">
-      <tr><td style="padding:22px 26px">
-        <p style="margin:0 0 4px;font-family:Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.24em;color:#B8956A;text-transform:uppercase;font-weight:bold">Confidential listing</p>
-        <p style="margin:0 0 10px;font-family:Georgia,'Times New Roman',serif;font-size:20px;color:#1A1A1A">${escape(industryLabel)} Business</p>
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-          <td style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#6B6760;padding-right:16px">
-            <strong style="color:#1A1A1A">Region</strong><br>${escape(region)}
-          </td>
-          <td style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#6B6760;padding-right:16px">
-            <strong style="color:#1A1A1A">Asking</strong><br>${escape(askingRange)}
-          </td>
-          ${heatScore != null ? `<td style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#6B6760">
-            <strong style="color:#1A1A1A">Forward score</strong><br>${heatScore}°
-          </td>` : ''}
-        </tr></table>
-        <p style="margin:18px 0 0">
-          <a href="${href}" style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#1A1A1A;text-decoration:underline;font-weight:bold">View on Forward →</a>
-        </p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #E8E4DC;border-radius:4px;margin:0 0 18px;background:#FFFFFF">
+      <tr><td style="padding:22px 24px">
+        <!-- eyebrow -->
+        <div style="font-family:Helvetica,Arial,sans-serif;font-size:10px;letter-spacing:0.24em;color:#B8956A;text-transform:uppercase;font-weight:bold;margin:0 0 6px">Confidential Listing</div>
+        <!-- headline -->
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:22px;line-height:1.25;color:#1A1A1A;margin:0 0 14px">${escape(industryLabel)} Business</div>
+
+        <!-- key-value pairs, single column -->
+        <div style="font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:1.6;color:#4A463F">
+          <div style="margin:0 0 6px"><span style="color:#9A938A;display:inline-block;width:84px">Region</span><strong style="color:#1A1A1A">${escape(region)}</strong></div>
+          <div style="margin:0 0 6px"><span style="color:#9A938A;display:inline-block;width:84px">Asking</span><strong style="color:#1A1A1A">${escape(askingRange)}</strong></div>
+          ${heatScore != null ? `<div style="margin:0 0 6px"><span style="color:#9A938A;display:inline-block;width:84px">Forward score</span><strong style="color:#1A1A1A">${heatScore}°</strong></div>` : ''}
+          ${qualityScore != null ? `<div style="margin:0 0 6px"><span style="color:#9A938A;display:inline-block;width:84px">Quality</span><strong style="color:#1A1A1A">${qualityScore}/100</strong></div>` : ''}
+        </div>
+
+        <!-- full-width CTA — no chance of breaking onto multiple lines -->
+        <div style="margin:18px 0 0">
+          <a href="${href}" style="display:block;background:#1A1A1A;color:#FFFFFF !important;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:bold;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;text-align:center;padding:13px 20px;border-radius:2px">
+            <span style="color:#FFFFFF">View on Forward&nbsp;→</span>
+          </a>
+        </div>
       </td></tr>
     </table>`
 }
