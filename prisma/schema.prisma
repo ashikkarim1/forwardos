@@ -282,6 +282,9 @@ model User {
   buyerPlanTier         BuyerPlanTier   @default(FREE)
   brokerPlanTier        BrokerPlanTier  @default(NONE)
   planActiveUntil       DateTime?       // Paid plan active until this date (null = no active paid plan)
+  // Cached Stripe customer ID, set by the webhook on first checkout completion.
+  // Drives the Customer Portal (/api/billing/portal) so users can self-manage.
+  stripeCustomerId      String?         @unique
   onboardingCompletedAt DateTime?
   listingApprovalStatus ListingApprovalStatus? @default(DRAFT)
   listingApprovedAt     DateTime?
