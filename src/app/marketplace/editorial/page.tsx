@@ -1,13 +1,15 @@
 'use client'
 
 /**
- * DESIGN PREVIEW — editorial marketplace layout, inspired by the
- * Luxury Presence "best agent websites" gallery format:
- *   alternating full-bleed imagery · small-caps eyebrow · oversized
- *   headline · AI narrative writeup · quiet CTA · generous whitespace.
+ * DESIGN PREVIEW — editorial marketplace layout (Luxury Presence-inspired):
+ * alternating full-bleed imagery · small-caps eyebrow · oversized headline ·
+ * AI narrative writeup · quiet CTA · generous whitespace.
  *
- * Company names are masked (blur + lock) for visitors, demonstrating the
- * "reveal for verified buyers" mechanic. Review at /marketplace/editorial.
+ * PRIVACY RULE (hard requirement): the real company / listing name and any
+ * contact details are NEVER rendered on this page — not blurred, not hidden
+ * with CSS, simply never placed in the DOM. Headlines are generated from
+ * non-identifying fields (industry + country + ref code). Identity is only
+ * ever shared after NDA, inside the authenticated deal room.
  */
 
 export const dynamic = 'force-dynamic'
@@ -18,7 +20,7 @@ import { motion } from 'framer-motion'
 import { Lock, ArrowRight, Heart, Sparkles } from 'lucide-react'
 import { PublicHeader } from '@/components/Navigation'
 import { useSavedDeals } from '@/hooks/useSavedDeals'
-import { generateNarrative, narrativeEyebrow, type NarrativeDeal } from '@/lib/listing-narrative'
+import { generateNarrative, narrativeEyebrow, maskedHeadline, type NarrativeDeal } from '@/lib/listing-narrative'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 interface Deal extends NarrativeDeal {
@@ -34,8 +36,6 @@ const fmt = (n: number) =>
 export default function EditorialMarketplacePreview() {
   const [deals, setDeals] = useState<Deal[] | null>(null)
   const savedDeals = useSavedDeals()
-  // Demo toggle so you can preview both visitor tiers from the banner.
-  const [isVerifiedBuyer, setIsVerifiedBuyer] = useState(false)
 
   useEffect(() => {
     fetch('/api/deals')
@@ -54,17 +54,6 @@ export default function EditorialMarketplacePreview() {
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
       <PublicHeader />
 
-      {/* Preview banner with tier toggle */}
-      <div className="px-6 py-3 text-center text-sm font-semibold text-white flex items-center justify-center gap-4 flex-wrap" style={{ background: COLOR_PRIMARY }}>
-        <span>DESIGN PREVIEW — editorial listing layout</span>
-        <button
-          onClick={() => setIsVerifiedBuyer(!isVerifiedBuyer)}
-          className="px-3 py-1 rounded-full text-xs font-bold border border-white/40 hover:bg-white/10"
-        >
-          Viewing as: {isVerifiedBuyer ? 'Verified buyer (names revealed)' : 'Visitor (names masked)'} — click to switch
-        </button>
-      </div>
-
       {/* Editorial hero */}
       <section className="px-6 pt-20 pb-14 text-center">
         <p className="text-xs font-bold tracking-[0.25em] mb-5" style={{ color: COLOR_TEXT_SECONDARY }}>
@@ -74,7 +63,7 @@ export default function EditorialMarketplacePreview() {
           Exceptional businesses, presented exceptionally.
         </h1>
         <p className="text-lg max-w-xl mx-auto" style={{ color: COLOR_TEXT_SECONDARY }}>
-          Each listing analyzed by Forward Intelligence — the story behind the numbers, written for serious buyers.
+          Every listing is confidential by design. The story and the numbers are public — the identity is shared only after an NDA, with verified buyers.
         </p>
       </section>
 
@@ -96,8 +85,8 @@ export default function EditorialMarketplacePreview() {
         )}
 
         {deals?.map((deal, idx) => {
-          const masked = !isVerifiedBuyer
           const narrative = generateNarrative(deal)
+          const headline = maskedHeadline(deal)
           const flip = idx % 2 === 1
           return (
             <motion.article
@@ -114,18 +103,16 @@ export default function EditorialMarketplacePreview() {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={deal.image}
-                    alt={masked ? 'Confidential business listing' : deal.title}
+                    alt="Confidential business listing"
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                   />
                 </div>
-                {/* Floating heat chip */}
                 {deal.heatIndex >= 85 && (
                   <div className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-xs font-bold text-white backdrop-blur" style={{ background: 'rgba(26,26,26,0.75)' }}>
                     <Sparkles size={11} className="inline mr-1.5 -mt-0.5" />
                     Most-watched this week
                   </div>
                 )}
-                {/* Save heart */}
                 <button
                   onClick={() => savedDeals.toggle(deal.id)}
                   aria-label="Save listing"
@@ -145,30 +132,18 @@ export default function EditorialMarketplacePreview() {
                   {narrativeEyebrow(deal)}
                 </p>
 
-                {/* Headline — masked for visitors */}
-                {masked ? (
-                  <div className="mb-5">
-                    <h2
-                      className="text-3xl md:text-4xl font-black leading-tight select-none"
-                      style={{ color: COLOR_PRIMARY, filter: 'blur(10px)' }}
-                      aria-hidden
-                    >
-                      {deal.title}
-                    </h2>
-                    <div className="flex items-center gap-2 mt-3">
-                      <Lock size={13} style={{ color: COLOR_ACCENT }} />
-                      <span className="text-xs font-bold" style={{ color: COLOR_ACCENT }}>
-                        Company name revealed to verified buyers
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <h2 className="text-3xl md:text-4xl font-black leading-tight mb-5" style={{ color: COLOR_PRIMARY }}>
-                    {deal.title}
-                  </h2>
-                )}
+                {/* Generated headline — the real name never enters the DOM */}
+                <h2 className="text-3xl md:text-4xl font-black leading-tight mb-3" style={{ color: COLOR_PRIMARY }}>
+                  {headline}
+                </h2>
+                <div className="flex items-center gap-2 mb-5">
+                  <Lock size={13} style={{ color: COLOR_ACCENT }} />
+                  <span className="text-xs font-bold" style={{ color: COLOR_ACCENT }}>
+                    Identity shared after NDA with verified buyers
+                  </span>
+                </div>
 
-                {/* AI narrative */}
+                {/* AI narrative — built from metrics only, no identifying details */}
                 <p className="text-base leading-relaxed mb-7" style={{ color: COLOR_TEXT_SECONDARY }}>
                   {narrative}
                 </p>
@@ -189,11 +164,9 @@ export default function EditorialMarketplacePreview() {
                   >
                     View listing <ArrowRight size={15} />
                   </Link>
-                  {masked && (
-                    <Link href="/auth/signup" className="text-sm font-bold hover:opacity-70" style={{ color: COLOR_ACCENT }}>
-                      Become a verified buyer →
-                    </Link>
-                  )}
+                  <Link href="/auth/signup" className="text-sm font-bold hover:opacity-70" style={{ color: COLOR_ACCENT }}>
+                    Become a verified buyer →
+                  </Link>
                 </div>
               </div>
             </motion.article>

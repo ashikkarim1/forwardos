@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Search, ChevronLeft, ChevronRight, ChevronDown, Building2, MapPin, Users, Target, DollarSign, TrendingUp, Zap, CheckCircle2 } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, ChevronDown, X, SlidersHorizontal } from 'lucide-react'
 import ListingCard from '@/components/listing/ListingCard'
 import { BusinessPhotoGallery } from '@/components/BusinessPhotoGallery'
 import { SaveSearchButton } from '@/components/SaveSearchButton'
@@ -15,69 +14,49 @@ interface Deal {
   id: string; title: string; location: string; country: string; image: string; askingPrice: number; askingPriceCurrency: string; annualRevenue: number; cashFlowMin: number; cashFlowMax: number; ebitda: number; profitMarginPercent: number; dealQualityScore: number; heatIndex: number; roiProjection: number; paybackPeriod: number; growthRate: number; status: 'NEW' | 'FEATURED' | 'STANDARD'; category: string; dealType: 'SALE' | 'LEASE' | 'QUICK_SALE'; employeeCount: number; sellerVerified: boolean; sellerTrustScore: number; marketTrend: 'up' | 'down' | 'stable'; marketPosition: 'underpriced' | 'fair' | 'premium'; daysOnMarket: number; location_country: string; sellerType: string; sellerMotivation: string; upcomingAuction?: boolean
 }
 
-// Pretty-print enum-style values for filter checkboxes.
-//  - REAL_ESTATE  -> "Real Estate"
-//  - SAAS         -> "SaaS"
-//  - USA/UAE/KSA  -> preserve all-caps country/abbreviation
-//  - HEALTHCARE   -> "Healthcare"
+// Pretty-print enum-style values for filter options.
 const SPECIAL_LABELS: Record<string, string> = {
-  SAAS: 'SaaS',
-  USA: 'USA',
-  UAE: 'UAE',
-  KSA: 'KSA',
-  UK: 'UK',
-  EDTECH: 'EdTech',
-  FINTECH: 'FinTech',
-  ECOMMERCE: 'E-Commerce',
+  SAAS: 'SaaS', USA: 'USA', UAE: 'UAE', KSA: 'KSA', UK: 'UK',
+  EDTECH: 'EdTech', FINTECH: 'FinTech', ECOMMERCE: 'E-Commerce',
 }
 const formatCategoryName = (name: string) => {
   if (!name) return ''
   const upper = name.toUpperCase()
   if (SPECIAL_LABELS[upper]) return SPECIAL_LABELS[upper]
-  return upper
-    .split('_')
-    .map((part) => part.charAt(0) + part.slice(1).toLowerCase())
-    .join(' ')
+  return upper.split('_').map((p) => p.charAt(0) + p.slice(1).toLowerCase()).join(' ')
 }
-
-const FILTER_SECTIONS = [
-  { id: 'industry', label: 'Industry', icon: Building2 },
-  { id: 'location', label: 'Location', icon: MapPin },
-  { id: 'sellerType', label: 'Seller Type', icon: Users },
-  { id: 'sellerMotivation', label: 'Seller Motivation', icon: Target },
-]
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.03 },
-  },
+  visible: { opacity: 1, transition: { staggerChildren: 0.03 } },
 }
+
+// Default ranges — used both as initial state and to detect "untouched".
+const DEFAULT_VALUATION = { min: 0.1, max: 100 }
+const DEFAULT_REVENUE = { min: 0, max: 50 }
+const DEFAULT_HEAT = { min: 0, max: 100 }
+const DEFAULT_QUALITY = { min: 0, max: 100 }
 
 export default function MarketplacePage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState('premium')
-  const [expandedFilters, setExpandedFilters] = useState<string[]>(['industry'])
   const [photoModalOpen, setPhotoModalOpen] = useState(false)
   const [selectedDealPhotos, setSelectedDealPhotos] = useState<string[]>([])
+  // Which filter pill's popover is open (one at a time, click-outside closes).
+  const [openMenu, setOpenMenu] = useState<string | null>(null)
 
-  const [valuation, setValuation] = useState({ min: 0.1, max: 100 })
-  const [revenue, setRevenue] = useState({ min: 0, max: 50 })
-  const [heatScore, setHeatScore] = useState({ min: 0, max: 100 })
-  const [successProb, setSuccessProb] = useState({ min: 0, max: 100 })
+  const [valuation, setValuation] = useState(DEFAULT_VALUATION)
+  const [revenue, setRevenue] = useState(DEFAULT_REVENUE)
+  const [heatScore, setHeatScore] = useState(DEFAULT_HEAT)
+  const [successProb, setSuccessProb] = useState(DEFAULT_QUALITY)
   const [selectedIndustries, setSelectedIndustries] = useState<string[]>([])
   const [selectedLocations, setSelectedLocations] = useState<string[]>([])
   const [selectedSellerTypes, setSelectedSellerTypes] = useState<string[]>([])
   const [selectedMotivations, setSelectedMotivations] = useState<string[]>([])
 
-  // Live deals from the database. We deliberately do NOT fall back to a
-  // hardcoded sample set — that fallback caused a real bug where, when the
-  // API hadn't responded yet (or hung), filtering would apply to fake
-  // listings ("Fintech Lending Platform", "TechFlow SaaS Platform") that
-  // don't exist in the DB. Now: loading state until data arrives, error
-  // state on failure, real data only.
+  // Live deals from the database — no hardcoded fallback (see git history:
+  // the old sample-data fallback caused filters to apply to fake listings).
   const [dbDeals, setDbDeals] = useState<Deal[] | null>(null)
   const [loadError, setLoadError] = useState(false)
   useEffect(() => {
@@ -95,16 +74,26 @@ export default function MarketplacePage() {
   const activeDeals = dbDeals ?? []
   const isLoading = dbDeals === null && !loadError
 
-  // Saved-deals (heart button) — localStorage-backed, works for anonymous users.
   const savedDeals = useSavedDeals()
 
-  const industries = Array.from(new Set(activeDeals.map(d => d.category)))
-  const locations = Array.from(new Set(activeDeals.map(d => d.location_country)))
-  const sellerTypes = Array.from(new Set(activeDeals.map(d => d.sellerType)))
-  const motivations = Array.from(new Set(activeDeals.map(d => d.sellerMotivation)))
+  // Option lists + per-option deal counts (shown next to each checkbox so the
+  // user knows what a filter will do BEFORE clicking it — key usability win).
+  const countBy = (key: keyof Deal) => {
+    const m = new Map<string, number>()
+    for (const d of activeDeals) {
+      const v = String(d[key] ?? '')
+      if (!v) continue
+      m.set(v, (m.get(v) || 0) + 1)
+    }
+    return m
+  }
+  const industryCounts = useMemo(() => countBy('category'), [activeDeals])   // eslint-disable-line react-hooks/exhaustive-deps
+  const locationCounts = useMemo(() => countBy('location_country'), [activeDeals])  // eslint-disable-line react-hooks/exhaustive-deps
+  const sellerTypeCounts = useMemo(() => countBy('sellerType'), [activeDeals])      // eslint-disable-line react-hooks/exhaustive-deps
+  const motivationCounts = useMemo(() => countBy('sellerMotivation'), [activeDeals]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const filteredListings = useMemo(() => {
-    let results = activeDeals.filter(deal => {
+    const results = activeDeals.filter((deal) => {
       const matchesSearch = deal.title.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesIndustry = selectedIndustries.length === 0 || selectedIndustries.includes(deal.category)
       const matchesLocation = selectedLocations.length === 0 || selectedLocations.includes(deal.location_country)
@@ -117,9 +106,8 @@ export default function MarketplacePage() {
       return matchesSearch && matchesIndustry && matchesLocation && matchesSellerType && matchesMotivation && matchesValuation && matchesRevenue && matchesHeat && matchesSuccess
     })
 
-    const featured = results.filter(d => d.status === 'FEATURED')
-    const nonFeatured = results.filter(d => d.status !== 'FEATURED')
-
+    const featured = results.filter((d) => d.status === 'FEATURED')
+    const nonFeatured = results.filter((d) => d.status !== 'FEATURED')
     const sortResults = (arr: Deal[]) => {
       if (sortBy === 'newest') return arr.sort((a, b) => a.daysOnMarket - b.daysOnMarket)
       if (sortBy === 'oldest') return arr.sort((a, b) => b.daysOnMarket - a.daysOnMarket)
@@ -128,39 +116,35 @@ export default function MarketplacePage() {
       if (sortBy === 'valuation') return arr.sort((a, b) => a.askingPrice - b.askingPrice)
       return arr.sort((a, b) => b.dealQualityScore - a.dealQualityScore)
     }
-
-    if (sortBy === 'premium') {
-      return [...sortResults(featured), ...sortResults(nonFeatured)]
-    }
+    if (sortBy === 'premium') return [...sortResults(featured), ...sortResults(nonFeatured)]
     return sortResults(results)
   }, [activeDeals, searchTerm, selectedIndustries, selectedLocations, selectedSellerTypes, selectedMotivations, valuation, revenue, heatScore, successProb, sortBy])
 
+  // Trending rail — deliberately UNFILTERED. It's an editorial discovery
+  // surface showing the 4 hottest listings platform-wide; filters only
+  // affect the main grid below.
   const hotDeals = useMemo(() => [...activeDeals].sort((a, b) => b.heatIndex - a.heatIndex).slice(0, 4), [activeDeals])
 
-  // Active filter tally — counts every dimension that's been narrowed away
-  // from its default, so the sidebar pill and the empty-state copy are honest.
+  const rangesActive = {
+    valuation: valuation.min !== DEFAULT_VALUATION.min || valuation.max !== DEFAULT_VALUATION.max,
+    revenue: revenue.min !== DEFAULT_REVENUE.min || revenue.max !== DEFAULT_REVENUE.max,
+    heat: heatScore.min !== DEFAULT_HEAT.min || heatScore.max !== DEFAULT_HEAT.max,
+    quality: successProb.min !== DEFAULT_QUALITY.min || successProb.max !== DEFAULT_QUALITY.max,
+  }
   const activeFiltersCount =
     selectedIndustries.length + selectedLocations.length + selectedSellerTypes.length + selectedMotivations.length
-    + (valuation.min !== 0.1 || valuation.max !== 100 ? 1 : 0)
-    + (revenue.min !== 0 || revenue.max !== 50 ? 1 : 0)
-    + (heatScore.min !== 0 || heatScore.max !== 100 ? 1 : 0)
-    + (successProb.min !== 0 || successProb.max !== 100 ? 1 : 0)
+    + (rangesActive.valuation ? 1 : 0) + (rangesActive.revenue ? 1 : 0)
+    + (rangesActive.heat ? 1 : 0) + (rangesActive.quality ? 1 : 0)
     + (searchTerm.trim() ? 1 : 0)
 
-  const CARDS_PER_PAGE = 20
+  const CARDS_PER_PAGE = 21
   const totalPages = Math.ceil(filteredListings.length / CARDS_PER_PAGE)
-
-  // Snap currentPage back into [1, totalPages] when filters narrow results so
-  // the user never ends up stranded on a page past the end of the result set.
   useEffect(() => {
     if (totalPages > 0 && currentPage > totalPages) setCurrentPage(1)
     if (totalPages === 0 && currentPage !== 1) setCurrentPage(1)
   }, [totalPages, currentPage])
-
   const startIdx = (currentPage - 1) * CARDS_PER_PAGE
   const currentListings = filteredListings.slice(startIdx, startIdx + CARDS_PER_PAGE)
-
-  const toggleFilter = (id: string) => setExpandedFilters(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id])
 
   const handlePageChange = (page: number) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)))
@@ -169,17 +153,33 @@ export default function MarketplacePage() {
 
   const clearAllFilters = () => {
     setSearchTerm('')
-    setSortBy('premium')
     setSelectedIndustries([])
     setSelectedLocations([])
     setSelectedSellerTypes([])
     setSelectedMotivations([])
-    setValuation({ min: 0.1, max: 100 })
-    setRevenue({ min: 0, max: 50 })
-    setHeatScore({ min: 0, max: 100 })
-    setSuccessProb({ min: 0, max: 100 })
+    setValuation(DEFAULT_VALUATION)
+    setRevenue(DEFAULT_REVENUE)
+    setHeatScore(DEFAULT_HEAT)
+    setSuccessProb(DEFAULT_QUALITY)
     setCurrentPage(1)
   }
+
+  const toggleValue = (value: string, selected: string[], setSelected: (v: string[]) => void) => {
+    setSelected(selected.includes(value) ? selected.filter((v) => v !== value) : [...selected, value])
+    setCurrentPage(1)
+  }
+
+  // Removable chips for every active filter — one tap to undo any of them.
+  const chips: { label: string; remove: () => void }[] = []
+  if (searchTerm.trim()) chips.push({ label: `“${searchTerm.trim()}”`, remove: () => setSearchTerm('') })
+  for (const v of selectedLocations) chips.push({ label: formatCategoryName(v), remove: () => toggleValue(v, selectedLocations, setSelectedLocations) })
+  for (const v of selectedIndustries) chips.push({ label: formatCategoryName(v), remove: () => toggleValue(v, selectedIndustries, setSelectedIndustries) })
+  for (const v of selectedSellerTypes) chips.push({ label: v, remove: () => toggleValue(v, selectedSellerTypes, setSelectedSellerTypes) })
+  for (const v of selectedMotivations) chips.push({ label: v, remove: () => toggleValue(v, selectedMotivations, setSelectedMotivations) })
+  if (rangesActive.valuation) chips.push({ label: `Price $${valuation.min}M–$${valuation.max}M`, remove: () => setValuation(DEFAULT_VALUATION) })
+  if (rangesActive.revenue) chips.push({ label: `Revenue $${revenue.min}M–$${revenue.max}M`, remove: () => setRevenue(DEFAULT_REVENUE) })
+  if (rangesActive.heat) chips.push({ label: `Heat ${heatScore.min}–${heatScore.max}`, remove: () => setHeatScore(DEFAULT_HEAT) })
+  if (rangesActive.quality) chips.push({ label: `Quality ${successProb.min}–${successProb.max}`, remove: () => setSuccessProb(DEFAULT_QUALITY) })
 
   return (
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
@@ -192,228 +192,384 @@ export default function MarketplacePage() {
           </span>
           <h1 className="text-3xl md:text-4xl font-black mb-1" style={{ color: COLOR_PRIMARY }}>Global Marketplace</h1>
           <p className="text-base" style={{ color: COLOR_TEXT_SECONDARY }}>
-            {filteredListings.length} verified businesses for sale across the USA, Canada &amp; the UAE
+            {activeDeals.length || '—'} verified businesses for sale across the USA, Canada &amp; the UAE
           </p>
         </div>
       </section>
 
-      {/* Trending rail is deliberately UNFILTERED — it's an editorial
-          discovery surface, always showing the 4 hottest listings platform-
-          wide. Filters below only affect the main grid. Hidden only while
-          the deal data is still loading. */}
+      {/* Trending rail — unfiltered, always visible once data loads */}
       {!isLoading && activeDeals.length > 0 && (
-      <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="border-b" style={{ borderColor: COLOR_BORDER, background: 'white' }}>
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-          <div className="flex items-center gap-2 mb-6">
-            <span className="text-2xl">🔥</span>
-            <h2 className="text-2xl font-black" style={{ color: COLOR_PRIMARY }}>Trending Deals Right Now</h2>
-            <span className="text-xs font-bold px-3 py-1 rounded-full text-white" style={{ background: COLOR_ACCENT }}>HOTTEST</span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {hotDeals.map(deal => (
-              <motion.div key={deal.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border hover:shadow-md transition-shadow cursor-pointer bg-white" style={{ borderColor: COLOR_BORDER }}>
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <h3 className="font-bold text-sm line-clamp-1" style={{ color: COLOR_PRIMARY }}>{deal.title}</h3>
-                    <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>{deal.location}</p>
+        <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="border-b" style={{ borderColor: COLOR_BORDER, background: 'white' }}>
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-2xl">🔥</span>
+              <h2 className="text-2xl font-black" style={{ color: COLOR_PRIMARY }}>Trending Deals Right Now</h2>
+              <span className="text-xs font-bold px-3 py-1 rounded-full text-white" style={{ background: COLOR_ACCENT }}>HOTTEST</span>
+            </div>
+            <p className="text-xs mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>Platform-wide — not affected by your filters below.</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {hotDeals.map((deal) => (
+                <motion.div key={deal.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border hover:shadow-md transition-shadow cursor-pointer bg-white" style={{ borderColor: COLOR_BORDER }}>
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-sm line-clamp-1" style={{ color: COLOR_PRIMARY }}>{deal.title}</h3>
+                      <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>{deal.location}</p>
+                    </div>
+                    <div className="px-2 py-1 rounded text-xs font-bold text-white flex-shrink-0" style={{ background: '#DC2626' }}>{deal.heatIndex}🔥</div>
                   </div>
-                  <div className="px-2 py-1 rounded text-xs font-bold text-white flex-shrink-0" style={{ background: '#DC2626' }}>{deal.heatIndex}🔥</div>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <span style={{ color: COLOR_TEXT_SECONDARY }}>${(deal.askingPrice / 1000000).toFixed(1)}M</span>
-                  <span style={{ color: '#10B981', fontWeight: 'bold' }}>{deal.growthRate}% growth</span>
-                </div>
-              </motion.div>
-            ))}
+                  <div className="flex items-center justify-between text-xs">
+                    <span style={{ color: COLOR_TEXT_SECONDARY }}>${(deal.askingPrice / 1000000).toFixed(1)}M</span>
+                    <span style={{ color: '#10B981', fontWeight: 'bold' }}>{deal.growthRate}% growth</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </motion.section>
+        </motion.section>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-1">
-            <div className="sticky top-24 space-y-3">
-              <div className="relative">
-                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: COLOR_TEXT_SECONDARY }} />
-                <input type="text" placeholder="Search businesses..." value={searchTerm} onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1) }} className="w-full pl-10 pr-4 py-2.5 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2" style={{ borderColor: COLOR_BORDER, outlineColor: COLOR_ACCENT }} />
-              </div>
-
-              <select value={sortBy} onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1) }} className="w-full px-3 py-2.5 rounded-lg border text-sm bg-white focus:outline-none focus:ring-2 font-semibold" style={{ borderColor: COLOR_BORDER, outlineColor: COLOR_ACCENT }}>
-                <option value="premium">⭐ Premium First</option>
-                <option value="newest">✨ Newest First</option>
-                <option value="oldest">📅 Oldest First</option>
-                <option value="heat">🔥 Hottest First</option>
-                <option value="roi">💰 Highest ROI</option>
-                <option value="valuation">💵 Lowest Price</option>
-                <option value="relevant">Most Relevant</option>
-              </select>
-
-              <SaveSearchButton
-                filters={{
-                  industries: selectedIndustries,
-                  country: selectedLocations[0],
-                  minPrice: valuation.min !== 0.1 ? Math.round(valuation.min * 1_000_000 * 100) : undefined,
-                  maxPrice: valuation.max !== 100 ? Math.round(valuation.max * 1_000_000 * 100) : undefined,
-                  minHeatScore: heatScore.min !== 0 ? heatScore.min : undefined,
-                }}
+      {/* ─── Filter bar: search + pill popovers + sort, sticky ─────────────── */}
+      <div className="sticky top-0 z-30 border-b bg-white/95 backdrop-blur" style={{ borderColor: COLOR_BORDER }}>
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="relative flex-shrink-0 w-full sm:w-56">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: COLOR_TEXT_SECONDARY }} />
+              <input
+                type="text"
+                placeholder="Search businesses…"
+                value={searchTerm}
+                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1) }}
+                className="w-full pl-9 pr-3 py-2 rounded-full border text-sm bg-white focus:outline-none focus:ring-2"
+                style={{ borderColor: COLOR_BORDER, outlineColor: COLOR_ACCENT }}
               />
-
-              {activeFiltersCount > 0 && (
-                <div className="p-3 rounded-xl border flex items-center justify-between" style={{ background: '#EFF6FF', borderColor: COLOR_BORDER }}>
-                  <span className="text-xs font-semibold" style={{ color: COLOR_PRIMARY }}>{activeFiltersCount} active filters</span>
-                  <button onClick={clearAllFilters} className="text-xs font-bold hover:opacity-70 transition-opacity" style={{ color: COLOR_ACCENT }}>Clear All</button>
-                </div>
-              )}
-
-              {FILTER_SECTIONS.map(section => {
-                const isExpanded = expandedFilters.includes(section.id)
-                const Icon = section.icon
-                const values = section.id === 'industry' ? industries : section.id === 'location' ? locations : section.id === 'sellerType' ? sellerTypes : motivations
-                const selected = section.id === 'industry' ? selectedIndustries : section.id === 'location' ? selectedLocations : section.id === 'sellerType' ? selectedSellerTypes : selectedMotivations
-                const setSelected = section.id === 'industry' ? setSelectedIndustries : section.id === 'location' ? setSelectedLocations : section.id === 'sellerType' ? setSelectedSellerTypes : setSelectedMotivations
-
-                return (
-                  <motion.div key={section.id} className="rounded-lg border overflow-hidden hover:shadow-sm transition-shadow bg-white" style={{ borderColor: COLOR_BORDER }}>
-                    <button onClick={() => toggleFilter(section.id)} className="w-full px-3 py-3 flex items-center justify-between hover:opacity-80 transition-opacity">
-                      <div className="flex items-center gap-2">
-                        <Icon size={20} style={{ color: COLOR_ACCENT }} />
-                        <span className="font-semibold text-sm" style={{ color: COLOR_PRIMARY }}>{section.label}</span>
-                      </div>
-                      <ChevronDown size={16} style={{ color: COLOR_PRIMARY, transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
-                    </button>
-                    {isExpanded && (
-                      <div className="p-3 space-y-2 border-t max-h-64 overflow-y-auto" style={{ borderColor: COLOR_BORDER, background: COLOR_BG_PRIMARY }}>
-                        {values.map(value => (
-                          <label key={value} className="flex items-center gap-2.5 cursor-pointer hover:opacity-70 transition-opacity">
-                            <input type="checkbox" checked={selected.includes(value)} onChange={() => { const newSelected = selected.includes(value) ? selected.filter(v => v !== value) : [...selected, value]; setSelected(newSelected); setCurrentPage(1) }} className="w-3.5 h-3.5 rounded cursor-pointer" />
-                            <span className="text-sm" style={{ color: COLOR_PRIMARY }}>{formatCategoryName(value)}</span>
-                          </label>
-                        ))}
-                      </div>
-                    )}
-                  </motion.div>
-                )
-              })}
-
-              <div className="space-y-3 pt-1">
-                {[
-                  { label: 'Valuation', icon: DollarSign, min: valuation.min, max: valuation.max, setRange: setValuation, minMax: { min: 0.1, max: 100 }, suffix: 'M' },
-                  { label: 'Annual Revenue', icon: TrendingUp, min: revenue.min, max: revenue.max, setRange: setRevenue, minMax: { min: 0, max: 50 }, suffix: 'M' },
-                  { label: 'Deal Heat Score', icon: Zap, min: heatScore.min, max: heatScore.max, setRange: setHeatScore, minMax: { min: 0, max: 100 }, suffix: '°' },
-                  { label: 'Success Probability', icon: CheckCircle2, min: successProb.min, max: successProb.max, setRange: setSuccessProb, minMax: { min: 0, max: 100 }, suffix: '%' },
-                ].map((range, i) => {
-                  const Icon = range.icon
-                  // Reset pagination on slider change so users don't get stranded on
-                  // an empty page after narrowing the result set.
-                  const updateMin = (v: number) => { range.setRange({ min: v, max: range.max }); setCurrentPage(1) }
-                  const updateMax = (v: number) => { range.setRange({ min: range.min, max: v }); setCurrentPage(1) }
-                  return (
-                    <motion.div key={i} className="rounded-lg border p-3 hover:shadow-sm transition-shadow bg-white" style={{ borderColor: COLOR_BORDER }}>
-                      <div className="flex items-center gap-2 mb-3">
-                        <Icon size={18} style={{ color: COLOR_ACCENT }} />
-                        <span className="font-semibold text-sm" style={{ color: COLOR_PRIMARY }}>{range.label}</span>
-                      </div>
-                      <div className="space-y-2">
-                        <div>
-                          <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>Min: {range.min}{range.suffix}</span>
-                          <input type="range" min={range.minMax.min} max={range.minMax.max} step="0.1" value={range.min} onChange={(e) => updateMin(parseFloat(e.target.value))} className="w-full" />
-                        </div>
-                        <div>
-                          <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>Max: {range.max}{range.suffix}</span>
-                          <input type="range" min={range.minMax.min} max={range.minMax.max} step="0.1" value={range.max} onChange={(e) => updateMax(parseFloat(e.target.value))} className="w-full" />
-                        </div>
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </div>
-            </div>
-          </motion.div>
-
-          <div className="lg:col-span-3">
-            {/* Clear section header so the user never confuses the main grid
-                for any other rail (trending, recently viewed, etc). */}
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-black" style={{ color: COLOR_PRIMARY }}>
-                {activeFiltersCount > 0
-                  ? `${filteredListings.length} ${filteredListings.length === 1 ? 'listing matches' : 'listings match'} your ${activeFiltersCount} filter${activeFiltersCount === 1 ? '' : 's'}`
-                  : isLoading
-                    ? 'Loading listings…'
-                    : `All ${activeDeals.length} verified listings`}
-              </h2>
             </div>
 
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8" aria-busy="true">
-                {[0, 1, 2, 3].map((i) => (
-                  <div key={i} className="rounded-xl border bg-white animate-pulse" style={{ borderColor: COLOR_BORDER, height: 360 }} />
-                ))}
-              </div>
-            ) : loadError ? (
-              <div className="text-center py-20 px-6">
-                <p className="text-2xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>Couldn't load listings</p>
-                <p className="text-base mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>Network hiccup. Try refreshing the page.</p>
-                <button onClick={() => window.location.reload()} className="px-5 py-3 rounded-lg font-bold text-white hover:opacity-90" style={{ background: COLOR_ACCENT }}>Refresh</button>
-              </div>
-            ) : currentListings.length > 0 ? (
-              <>
-                <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                  {currentListings.map(deal => (
-                    <motion.div key={deal.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                      <ListingCard
-                        {...deal}
-                        isSaved={savedDeals.isSaved(deal.id)}
-                        onSave={() => savedDeals.toggle(deal.id)}
-                        onViewPhotos={() => {
-                          setSelectedDealPhotos([deal.image])
-                          setPhotoModalOpen(true)
-                        }}
-                      />
-                    </motion.div>
-                  ))}
-                </motion.div>
+            <FilterPill
+              id="region" label="Region" count={selectedLocations.length}
+              openMenu={openMenu} setOpenMenu={setOpenMenu}
+            >
+              <OptionList
+                options={Array.from(locationCounts.keys()).sort()}
+                counts={locationCounts}
+                selected={selectedLocations}
+                onToggle={(v) => toggleValue(v, selectedLocations, setSelectedLocations)}
+              />
+            </FilterPill>
 
-                {totalPages > 1 && (
-                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-2 py-8">
-                    <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="p-2 rounded-lg border transition-all hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}><ChevronLeft size={20} /></button>
-                    {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
-                      let pageNum = currentPage <= 3 ? i + 1 : currentPage >= totalPages - 2 ? totalPages - 4 + i : currentPage - 2 + i
-                      return (
-                        <button key={pageNum} onClick={() => handlePageChange(pageNum)} className={`px-4 py-2 rounded-lg font-semibold transition-all ${currentPage === pageNum ? 'text-white' : 'border hover:bg-gray-50'}`} style={currentPage === pageNum ? { background: COLOR_ACCENT } : { borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}>{pageNum}</button>
-                      )
-                    })}
-                    <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="p-2 rounded-lg border transition-all hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}><ChevronRight size={20} /></button>
-                    <span className="ml-4 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>Page {currentPage} of {totalPages}</span>
-                  </motion.div>
-                )}
-              </>
-            ) : (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20 px-6">
-                <p className="text-2xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>
-                  No listings match {activeFiltersCount > 0 ? `your ${activeFiltersCount} filter${activeFiltersCount === 1 ? '' : 's'}` : 'your search'}
-                </p>
-                <p className="text-base mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  {activeFiltersCount > 0
-                    ? `Try widening a range or removing an industry / location. ${activeDeals.length} listings total.`
-                    : 'No listings published yet.'}
-                </p>
-                {activeFiltersCount > 0 && (
-                  <button
-                    onClick={clearAllFilters}
-                    className="px-5 py-3 rounded-lg font-bold text-white hover:opacity-90"
-                    style={{ background: COLOR_ACCENT }}
-                  >
-                    Clear all filters → show {activeDeals.length} listings
-                  </button>
-                )}
-              </motion.div>
-            )}
+            <FilterPill
+              id="industry" label="Industry" count={selectedIndustries.length}
+              openMenu={openMenu} setOpenMenu={setOpenMenu}
+            >
+              <OptionList
+                options={Array.from(industryCounts.keys()).sort()}
+                counts={industryCounts}
+                selected={selectedIndustries}
+                onToggle={(v) => toggleValue(v, selectedIndustries, setSelectedIndustries)}
+              />
+            </FilterPill>
+
+            <FilterPill
+              id="price" label="Price" count={rangesActive.valuation ? 1 : 0}
+              openMenu={openMenu} setOpenMenu={setOpenMenu}
+            >
+              <RangeControl
+                label="Asking price" suffix="M" minMax={DEFAULT_VALUATION}
+                value={valuation} onChange={(v) => { setValuation(v); setCurrentPage(1) }}
+              />
+            </FilterPill>
+
+            <FilterPill
+              id="seller" label="Seller" count={selectedSellerTypes.length + selectedMotivations.length}
+              openMenu={openMenu} setOpenMenu={setOpenMenu} wide
+            >
+              <p className="text-[10px] font-bold tracking-widest uppercase mb-2" style={{ color: COLOR_TEXT_SECONDARY }}>Seller type</p>
+              <OptionList
+                options={Array.from(sellerTypeCounts.keys()).sort()}
+                counts={sellerTypeCounts}
+                selected={selectedSellerTypes}
+                onToggle={(v) => toggleValue(v, selectedSellerTypes, setSelectedSellerTypes)}
+                raw
+              />
+              <p className="text-[10px] font-bold tracking-widest uppercase mt-4 mb-2" style={{ color: COLOR_TEXT_SECONDARY }}>Motivation</p>
+              <OptionList
+                options={Array.from(motivationCounts.keys()).sort()}
+                counts={motivationCounts}
+                selected={selectedMotivations}
+                onToggle={(v) => toggleValue(v, selectedMotivations, setSelectedMotivations)}
+                raw
+              />
+            </FilterPill>
+
+            <FilterPill
+              id="more" label="More" icon={<SlidersHorizontal size={13} />}
+              count={(rangesActive.revenue ? 1 : 0) + (rangesActive.heat ? 1 : 0) + (rangesActive.quality ? 1 : 0)}
+              openMenu={openMenu} setOpenMenu={setOpenMenu} wide
+            >
+              <RangeControl label="Annual revenue" suffix="M" minMax={DEFAULT_REVENUE} value={revenue} onChange={(v) => { setRevenue(v); setCurrentPage(1) }} />
+              <div className="mt-4"><RangeControl label="Heat score" suffix="°" minMax={DEFAULT_HEAT} value={heatScore} onChange={(v) => { setHeatScore(v); setCurrentPage(1) }} /></div>
+              <div className="mt-4"><RangeControl label="Quality score" suffix="%" minMax={DEFAULT_QUALITY} value={successProb} onChange={(v) => { setSuccessProb(v); setCurrentPage(1) }} /></div>
+            </FilterPill>
+
+            <div className="flex-1" />
+
+            <select
+              value={sortBy}
+              onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1) }}
+              className="px-3 py-2 rounded-full border text-sm bg-white font-semibold focus:outline-none"
+              style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
+            >
+              <option value="premium">⭐ Premium first</option>
+              <option value="newest">✨ Newest</option>
+              <option value="oldest">📅 Oldest</option>
+              <option value="heat">🔥 Hottest</option>
+              <option value="roi">💰 Highest ROI</option>
+              <option value="valuation">💵 Lowest price</option>
+            </select>
+
+            <SaveSearchButton
+              filters={{
+                industries: selectedIndustries,
+                country: selectedLocations[0],
+                minPrice: rangesActive.valuation ? Math.round(valuation.min * 1_000_000 * 100) : undefined,
+                maxPrice: rangesActive.valuation ? Math.round(valuation.max * 1_000_000 * 100) : undefined,
+                minHeatScore: heatScore.min !== 0 ? heatScore.min : undefined,
+              }}
+            />
           </div>
+
+          {/* Active filter chips — one tap to remove any individual filter */}
+          {chips.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap pt-3">
+              {chips.map((chip, i) => (
+                <button
+                  key={`${chip.label}-${i}`}
+                  onClick={chip.remove}
+                  className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full text-xs font-bold border hover:bg-gray-50 transition-colors"
+                  style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT, background: '#EFF6FF' }}
+                >
+                  {chip.label}
+                  <X size={12} />
+                </button>
+              ))}
+              <button onClick={clearAllFilters} className="text-xs font-bold hover:opacity-70 ml-1" style={{ color: COLOR_TEXT_SECONDARY }}>
+                Clear all
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
+      {/* ─── Main grid (full width — this is the ONLY section filters touch) ── */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+        <div className="mb-5 flex items-baseline justify-between">
+          <h2 className="text-lg font-black" style={{ color: COLOR_PRIMARY }}>
+            {isLoading
+              ? 'Loading listings…'
+              : activeFiltersCount > 0
+                ? `${filteredListings.length} ${filteredListings.length === 1 ? 'listing' : 'listings'}`
+                : `All ${activeDeals.length} verified listings`}
+          </h2>
+          {activeFiltersCount > 0 && !isLoading && (
+            <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+              filtered from {activeDeals.length}
+            </span>
+          )}
+        </div>
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8" aria-busy="true">
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="rounded-xl border bg-white animate-pulse" style={{ borderColor: COLOR_BORDER, height: 360 }} />
+            ))}
+          </div>
+        ) : loadError ? (
+          <div className="text-center py-20 px-6">
+            <p className="text-2xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>Couldn&apos;t load listings</p>
+            <p className="text-base mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>Network hiccup. Try refreshing the page.</p>
+            <button onClick={() => window.location.reload()} className="px-5 py-3 rounded-lg font-bold text-white hover:opacity-90" style={{ background: COLOR_ACCENT }}>Refresh</button>
+          </div>
+        ) : currentListings.length > 0 ? (
+          <>
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              {currentListings.map((deal) => (
+                <motion.div key={deal.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                  <ListingCard
+                    {...deal}
+                    isSaved={savedDeals.isSaved(deal.id)}
+                    onSave={() => savedDeals.toggle(deal.id)}
+                    onViewPhotos={() => {
+                      setSelectedDealPhotos([deal.image])
+                      setPhotoModalOpen(true)
+                    }}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {totalPages > 1 && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-2 py-8">
+                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="p-2 rounded-lg border transition-all hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}><ChevronLeft size={20} /></button>
+                {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
+                  const pageNum = currentPage <= 3 ? i + 1 : currentPage >= totalPages - 2 ? totalPages - 4 + i : currentPage - 2 + i
+                  return (
+                    <button key={pageNum} onClick={() => handlePageChange(pageNum)} className={`px-4 py-2 rounded-lg font-semibold transition-all ${currentPage === pageNum ? 'text-white' : 'border hover:bg-gray-50'}`} style={currentPage === pageNum ? { background: COLOR_ACCENT } : { borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}>{pageNum}</button>
+                  )
+                })}
+                <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="p-2 rounded-lg border transition-all hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}><ChevronRight size={20} /></button>
+                <span className="ml-4 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>Page {currentPage} of {totalPages}</span>
+              </motion.div>
+            )}
+          </>
+        ) : (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20 px-6">
+            <p className="text-2xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>
+              No listings match {activeFiltersCount > 0 ? `your ${activeFiltersCount} filter${activeFiltersCount === 1 ? '' : 's'}` : 'your search'}
+            </p>
+            <p className="text-base mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
+              {activeFiltersCount > 0
+                ? `Try removing a filter chip above. ${activeDeals.length} listings total.`
+                : 'No listings published yet.'}
+            </p>
+            {activeFiltersCount > 0 && (
+              <button onClick={clearAllFilters} className="px-5 py-3 rounded-lg font-bold text-white hover:opacity-90" style={{ background: COLOR_ACCENT }}>
+                Clear all filters → show {activeDeals.length} listings
+              </button>
+            )}
+          </motion.div>
+        )}
+      </div>
+
       <BusinessPhotoGallery isOpen={photoModalOpen} onClose={() => setPhotoModalOpen(false)} photos={selectedDealPhotos} businessType="Business" />
+    </div>
+  )
+}
+
+/* ─── Filter bar building blocks ──────────────────────────────────────────── */
+
+function FilterPill({
+  id, label, count, icon, openMenu, setOpenMenu, wide, children,
+}: {
+  id: string
+  label: string
+  count: number
+  icon?: React.ReactNode
+  openMenu: string | null
+  setOpenMenu: (v: string | null) => void
+  wide?: boolean
+  children: React.ReactNode
+}) {
+  const isOpen = openMenu === id
+  const active = count > 0
+  return (
+    <div className="relative flex-shrink-0">
+      <button
+        onClick={() => setOpenMenu(isOpen ? null : id)}
+        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-sm font-bold transition-colors hover:bg-gray-50"
+        style={{
+          borderColor: active || isOpen ? COLOR_ACCENT : COLOR_BORDER,
+          color: active ? COLOR_ACCENT : COLOR_PRIMARY,
+          background: active ? '#EFF6FF' : 'white',
+        }}
+        aria-expanded={isOpen}
+      >
+        {icon}
+        {label}
+        {active && (
+          <span className="w-5 h-5 rounded-full text-[10px] font-black text-white flex items-center justify-center" style={{ background: COLOR_ACCENT }}>
+            {count}
+          </span>
+        )}
+        <ChevronDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }} />
+      </button>
+      {isOpen && (
+        <>
+          {/* click-outside catcher */}
+          <div className="fixed inset-0 z-30" onClick={() => setOpenMenu(null)} />
+          <div
+            className={`absolute z-40 mt-2 ${wide ? 'w-80' : 'w-64'} max-h-[26rem] overflow-y-auto rounded-2xl border bg-white shadow-xl p-4 left-0`}
+            style={{ borderColor: COLOR_BORDER }}
+          >
+            {children}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function OptionList({
+  options, counts, selected, onToggle, raw,
+}: {
+  options: string[]
+  counts: Map<string, number>
+  selected: string[]
+  onToggle: (v: string) => void
+  raw?: boolean
+}) {
+  if (options.length === 0) {
+    return <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>No options yet.</p>
+  }
+  return (
+    <div className="space-y-1">
+      {options.map((value) => {
+        const checked = selected.includes(value)
+        return (
+          <label
+            key={value}
+            className="flex items-center justify-between gap-3 px-2 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+          >
+            <span className="flex items-center gap-2.5">
+              <input type="checkbox" checked={checked} onChange={() => onToggle(value)} className="w-4 h-4 rounded cursor-pointer accent-blue-500" />
+              <span className="text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
+                {raw ? value : formatLabel(value)}
+              </span>
+            </span>
+            <span className="text-xs tabular-nums" style={{ color: COLOR_TEXT_SECONDARY }}>{counts.get(value) ?? 0}</span>
+          </label>
+        )
+      })}
+    </div>
+  )
+}
+
+function formatLabel(name: string): string {
+  const SPECIAL: Record<string, string> = { SAAS: 'SaaS', USA: 'USA', UAE: 'UAE', KSA: 'KSA', EDTECH: 'EdTech', FINTECH: 'FinTech', ECOMMERCE: 'E-Commerce' }
+  const upper = name.toUpperCase()
+  if (SPECIAL[upper]) return SPECIAL[upper]
+  return upper.split('_').map((p) => p.charAt(0) + p.slice(1).toLowerCase()).join(' ')
+}
+
+function RangeControl({
+  label, suffix, minMax, value, onChange,
+}: {
+  label: string
+  suffix: string
+  minMax: { min: number; max: number }
+  value: { min: number; max: number }
+  onChange: (v: { min: number; max: number }) => void
+}) {
+  return (
+    <div>
+      <div className="flex items-baseline justify-between mb-2">
+        <p className="text-sm font-bold" style={{ color: COLOR_PRIMARY }}>{label}</p>
+        <p className="text-xs tabular-nums" style={{ color: COLOR_TEXT_SECONDARY }}>
+          {value.min}{suffix} – {value.max}{suffix}
+        </p>
+      </div>
+      <div className="space-y-2">
+        <input
+          type="range" min={minMax.min} max={minMax.max} step="0.1" value={value.min}
+          onChange={(e) => onChange({ min: Math.min(parseFloat(e.target.value), value.max), max: value.max })}
+          className="w-full accent-blue-500"
+          aria-label={`${label} minimum`}
+        />
+        <input
+          type="range" min={minMax.min} max={minMax.max} step="0.1" value={value.max}
+          onChange={(e) => onChange({ min: value.min, max: Math.max(parseFloat(e.target.value), value.min) })}
+          className="w-full accent-blue-500"
+          aria-label={`${label} maximum`}
+        />
+      </div>
     </div>
   )
 }

@@ -52,6 +52,26 @@ const INDUSTRY_PHRASE: Record<string, string> = {
 const fmtMoney = (n: number) =>
   n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(1)}M` : n >= 1_000 ? `$${Math.round(n / 1_000)}K` : `$${Math.round(n)}`
 
+const INDUSTRY_LABEL: Record<string, string> = {
+  SAAS: 'SaaS', FINTECH: 'FinTech', ECOMMERCE: 'E-Commerce', EDTECH: 'EdTech',
+  REAL_ESTATE: 'Real Estate', CPG: 'Consumer Goods',
+}
+export function industryLabel(industry: string): string {
+  if (INDUSTRY_LABEL[industry]) return INDUSTRY_LABEL[industry]
+  return industry.split('_').map((w) => w[0] + w.slice(1).toLowerCase()).join(' ')
+}
+
+/**
+ * Privacy-safe display headline. The REAL listing title must never be sent
+ * to or rendered for unverified visitors — CSS blurring leaks the name via
+ * the DOM. This generates a generic-but-distinct headline from non-
+ * identifying fields only (industry + country + an id-derived ref code).
+ */
+export function maskedHeadline(d: Pick<NarrativeDeal, 'category' | 'country'> & { id: string }): string {
+  const ref = d.id.replace(/[^a-z0-9]/gi, '').slice(-4).toUpperCase()
+  return `A Confidential ${industryLabel(d.category)} Company · Ref ${ref}`
+}
+
 /** One-line eyebrow label, e.g. "SAAS · TORONTO, CANADA" */
 export function narrativeEyebrow(d: NarrativeDeal): string {
   const ind = d.category.replace(/_/g, ' ')
