@@ -176,6 +176,24 @@ enum SellerPlanTier {
   PREMIUM
 }
 
+// Buyer-side subscription tier.
+enum BuyerPlanTier {
+  FREE
+  PREMIUM_BUYER
+}
+
+// Broker-side subscription tier.
+enum BrokerPlanTier {
+  NONE
+  BROKER_PRO
+}
+
+// Per-listing tier — sellers can upgrade or downgrade individual listings.
+enum DealPlan {
+  BASIC
+  PREMIUM
+}
+
 enum ListingApprovalStatus {
   DRAFT
   PENDING_VERIFICATION
@@ -241,6 +259,9 @@ model User {
   // Seller Onboarding (only for SELLER role)
   onboardingStatus      OnboardingStatus? @default(NOT_STARTED)
   sellerPlanTier        SellerPlanTier?
+  buyerPlanTier         BuyerPlanTier   @default(FREE)
+  brokerPlanTier        BrokerPlanTier  @default(NONE)
+  planActiveUntil       DateTime?       // Paid plan active until this date (null = no active paid plan)
   onboardingCompletedAt DateTime?
   listingApprovalStatus ListingApprovalStatus? @default(DRAFT)
   listingApprovedAt     DateTime?
@@ -462,6 +483,12 @@ model Deal {
   // seller name, exact city (rounded to region), and any company-identifying
   // details. The seller can flip this off in their dashboard at any time.
   isConfidential        Boolean   @default(false)
+
+  // Per-listing plan — sellers can upgrade or downgrade individual deals
+  // (e.g. featured placement for the listing they care about most while
+  // keeping others on free). Independent of the seller's account-level plan.
+  dealPlan              DealPlan  @default(BASIC)
+  dealPlanActiveUntil   DateTime? // Premium-listing window; null = on basic
 
   // Deal Characteristics
   keyStrengths          String?   @db.Text // JSON array

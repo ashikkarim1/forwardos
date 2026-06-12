@@ -15,6 +15,7 @@ import { KYCStatusCard } from '@/components/KYCStatusCard'
 import { SellerDashboardSummary } from '@/components/SellerDashboardSummary'
 import { DailyIntelligenceDashboard } from '@/components/DailyIntelligenceDashboard'
 import { DashboardHeader } from '@/components/DashboardHeader'
+import { MyListings } from '@/components/MyListings'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -764,167 +765,21 @@ export default function SellerDashboardV2() {
 
       {/* ==================== DEALS TAB ==================== */}
       {activeTab === 'deals' && (
-        <motion.div className="space-y-8" initial="hidden" animate="visible" variants={containerVariants}>
-          {/* Published Deals */}
+        <motion.div className="space-y-6" initial="hidden" animate="visible" variants={containerVariants}>
           <motion.div variants={itemVariants}>
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2" style={{ color: COLOR_PRIMARY }}>
-              <CheckCircle2 className="w-6 h-6" style={{ color: '#10B981' }} />
-              Published Deals ({publishedDeals.length})
-            </h2>
-
-            <div className="space-y-4">
-              {publishedDeals.map((deal) => (
-                <motion.div
-                  key={deal.id}
-                  className="p-6 rounded-lg border-2 hover:shadow-lg transition-all"
-                  style={{ borderColor: COLOR_BORDER, background: 'white' }}
-                  variants={itemVariants}
-                >
-                  <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start mb-4">
-                    {/* Left: Deal Info */}
-                    <div>
-                      <p className="font-bold text-lg" style={{ color: COLOR_PRIMARY }}>
-                        {deal.name}
-                      </p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="px-3 py-1 rounded-full text-xs font-bold text-white" style={{ background: COLOR_ACCENT }}>
-                          {deal.industry}
-                        </span>
-                        <span className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-                          {deal.revenue}
-                        </span>
-                      </div>
-                      {deal.activeViewers && deal.activeViewers > 0 && (
-                        <div className="mt-3 p-2 rounded-lg" style={{ background: '#10B981' + '20' }}>
-                          <p className="text-xs font-bold" style={{ color: '#10B981' }}>
-                            ✓ {deal.activeViewers} active viewer{deal.activeViewers > 1 ? 's' : ''}
-                          </p>
-                          <p className="text-xs mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
-                            {deal.lastEngagement}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Metrics */}
-                    <div className="text-center">
-                      <Eye className="w-5 h-5 mx-auto mb-2" style={{ color: COLOR_ACCENT }} />
-                      <p className="text-xs font-semibold mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>
-                        Views
-                      </p>
-                      <p className="text-2xl font-black" style={{ color: COLOR_PRIMARY }}>
-                        {deal.views}
-                      </p>
-                      <p className="text-xs mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
-                        {deal.uniqueVisitors} unique
-                      </p>
-                    </div>
-
-                    <div className="text-center">
-                      <Clock className="w-5 h-5 mx-auto mb-2" style={{ color: COLOR_ACCENT }} />
-                      <p className="text-xs font-semibold mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>
-                        Data Room
-                      </p>
-                      <p className="text-2xl font-black" style={{ color: COLOR_PRIMARY }}>
-                        {Math.floor(deal.dataRoomTime / 60)}h
-                      </p>
-                      <p className="text-xs mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
-                        {deal.dataRoomPages} pages
-                      </p>
-                    </div>
-
-                    <div className="text-center">
-                      <Users className="w-5 h-5 mx-auto mb-2" style={{ color: COLOR_ACCENT }} />
-                      <p className="text-xs font-semibold mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>
-                        Returning
-                      </p>
-                      <p className="text-2xl font-black" style={{ color: COLOR_PRIMARY }}>
-                        {deal.returningVisitors}
-                      </p>
-                      <p className="text-xs mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
-                        visitors
-                      </p>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-2">
-                      <button className="flex-1 p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                        <Edit2 className="w-5 h-5 mx-auto" style={{ color: COLOR_ACCENT }} />
-                      </button>
-                      <button className="flex-1 p-2 rounded-lg hover:bg-red-100 transition-colors">
-                        <Trash2 className="w-5 h-5 mx-auto" style={{ color: '#ef4444' }} />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* KYC Pending Deals */}
-          {pendingDeals.length > 0 && (
-            <motion.div variants={itemVariants}>
-              <h2 className="text-xl font-bold mb-6 flex items-center gap-2" style={{ color: COLOR_PRIMARY }}>
-                <Clock className="w-6 h-6" style={{ color: COLOR_ACCENT }} />
-                KYC Pending ({pendingDeals.length})
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-black flex items-center gap-2" style={{ color: COLOR_PRIMARY }}>
+                <FileText className="w-5 h-5" /> My listings
               </h2>
-
-              <div className="space-y-4">
-                {pendingDeals.map((deal) => (
-                  <motion.div
-                    key={deal.id}
-                    className="p-6 rounded-lg border-2 hover:shadow-lg transition-all"
-                    style={{ borderColor: COLOR_BORDER, background: '#FFFBEB' }}
-                    variants={itemVariants}
-                  >
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-                      <div>
-                        <p className="font-bold text-lg" style={{ color: COLOR_PRIMARY }}>
-                          {deal.name}
-                        </p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <span className="px-3 py-1 rounded-full text-xs font-bold text-white" style={{ background: COLOR_ACCENT }}>
-                            {deal.industry}
-                          </span>
-                          <span className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-                            {deal.revenue}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="lg:col-span-2 space-y-2">
-                        {[
-                          { name: 'Identity Verification', done: deal.kycProgress?.identity },
-                          { name: 'Document Scan', done: deal.kycProgress?.documents },
-                          { name: 'AI Verification', done: deal.kycProgress?.aiVerification },
-                        ].map((item) => (
-                          <div key={item.name} className="flex items-center gap-2">
-                            {item.done ? (
-                              <CheckCircle2 className="w-5 h-5" style={{ color: '#10B981' }} />
-                            ) : (
-                              <AlertCircle className="w-5 h-5" style={{ color: '#F59E0B' }} />
-                            )}
-                            <span className="text-sm" style={{ color: item.done ? COLOR_PRIMARY : COLOR_TEXT_SECONDARY }}>
-                              {item.name}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex gap-2">
-                        <button className="flex-1 p-3 rounded-lg text-sm font-bold text-white transition-all hover:opacity-90" style={{ background: COLOR_ACCENT }}>
-                          Complete KYC
-                        </button>
-                        <button className="p-3 rounded-lg hover:bg-red-100 transition-colors">
-                          <Trash2 className="w-5 h-5" style={{ color: '#ef4444' }} />
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
+              <Link href="/list" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg font-bold text-white text-sm hover:opacity-90" style={{ background: COLOR_PRIMARY }}>
+                <Plus className="w-4 h-4" /> New listing
+              </Link>
+            </div>
+            <p className="text-sm mb-5" style={{ color: COLOR_TEXT_SECONDARY }}>
+              Edit, unlist, relist, mark sold, cancel, or upgrade any listing to Premium ($199/mo) for featured placement + analytics + lead management + outbound emails. No charges accrue while a paid listing is unlisted.
+            </p>
+            <MyListings />
+          </motion.div>
         </motion.div>
       )}
 
