@@ -29,7 +29,7 @@ export function SeoDealGrid({ deals }: { deals: SeoDeal[] }) {
           style={{ borderColor: COLOR_BORDER }}
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="px-2 py-0.5 rounded-md text-xs font-semibold" style={{ background: '#EFF6FF', color: COLOR_ACCENT }}>
+            <span className="px-2 py-0.5 rounded-md text-xs font-semibold" style={{ background: '#FAF6EF', color: COLOR_ACCENT }}>
               {titleCase(d.industry)}
             </span>
             {d.financingEligible && (

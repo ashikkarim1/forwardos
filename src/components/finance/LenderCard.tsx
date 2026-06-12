@@ -59,7 +59,7 @@ export function LenderCard({ lender, onInquire }: { lender: LenderView; onInquir
             <span
               key={t}
               className="px-2 py-1 rounded-md text-xs font-semibold"
-              style={{ background: '#EFF6FF', color: COLOR_ACCENT }}
+              style={{ background: '#FAF6EF', color: COLOR_ACCENT }}
             >
               {FINANCING_TYPE_LABELS[t]}
             </span>
