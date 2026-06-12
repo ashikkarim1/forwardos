@@ -8,6 +8,7 @@ import ListingCard from '@/components/listing/ListingCard'
 import { BusinessPhotoGallery } from '@/components/BusinessPhotoGallery'
 import { SaveSearchButton } from '@/components/SaveSearchButton'
 import { PublicHeader } from '@/components/Navigation'
+import { useSavedDeals } from '@/hooks/useSavedDeals'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 interface Deal {
@@ -93,6 +94,9 @@ export default function MarketplacePage() {
   }, [])
   const activeDeals = dbDeals ?? []
   const isLoading = dbDeals === null && !loadError
+
+  // Saved-deals (heart button) — localStorage-backed, works for anonymous users.
+  const savedDeals = useSavedDeals()
 
   const industries = Array.from(new Set(activeDeals.map(d => d.category)))
   const locations = Array.from(new Set(activeDeals.map(d => d.location_country)))
@@ -359,7 +363,8 @@ export default function MarketplacePage() {
                     <motion.div key={deal.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                       <ListingCard
                         {...deal}
-                        onSave={() => {}}
+                        isSaved={savedDeals.isSaved(deal.id)}
+                        onSave={() => savedDeals.toggle(deal.id)}
                         onViewPhotos={() => {
                           setSelectedDealPhotos([deal.image])
                           setPhotoModalOpen(true)

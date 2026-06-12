@@ -3,7 +3,8 @@
 import Link from 'next/link'
 import { COLOR_ACCENT, COLOR_BORDER } from '@/styles/forward-colors'
 
-import { Bell } from 'lucide-react'
+import { Bell, Heart } from 'lucide-react'
+import { useSavedDeals } from '@/hooks/useSavedDeals'
 
 /**
  * Minimal public header for landing, pricing, login pages
@@ -11,6 +12,7 @@ import { Bell } from 'lucide-react'
  */
 export function PublicHeader() {
   const unreadCount = 2 // Mock unread count
+  const { count: savedCount, hydrated: savedHydrated } = useSavedDeals()
 
   return (
     <header className="border-b sticky top-0 z-30 bg-white" style={{ borderColor: COLOR_BORDER }}>
@@ -85,6 +87,23 @@ export function PublicHeader() {
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-4">
+          {/* Saved Listings */}
+          <Link
+            href="/saved"
+            className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="Saved listings"
+          >
+            <Heart className="w-6 h-6" style={{ color: '#1a1a1a' }} />
+            {savedHydrated && savedCount > 0 && (
+              <div
+                className="absolute top-0 right-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                style={{ background: COLOR_ACCENT }}
+              >
+                {savedCount}
+              </div>
+            )}
+          </Link>
+
           {/* Notification Bell */}
           <Link
             href="/notifications"

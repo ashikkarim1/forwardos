@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Heart, Zap, ArrowRight, TrendingUp, TrendingDown, Award, CheckCircle2 } from 'lucide-react'
@@ -130,10 +130,12 @@ export default function ListingCard({
   upcomingAuction = false,
   financingEligible = false,
 }: ListingCardProps) {
-  const [saved, setSaved] = useState(isSaved)
+  // Fully controlled by the parent — the `isSaved` prop is the source of truth
+  // so toggling from the marketplace updates the icon everywhere this card
+  // appears, and navigating back to the page reflects the persisted state.
+  const saved = isSaved
 
   const handleSave = () => {
-    setSaved(!saved)
     onSave?.()
   }
 
