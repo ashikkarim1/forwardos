@@ -9,9 +9,9 @@
  * Tradeoffs: screenshot-based, so it never goes out of sync with the dashboard
  * IF we refresh the images. Storage in /public/demo/ (Vercel CDN, free).
  */
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { X, Lock, ArrowRight, UserPlus } from 'lucide-react'
+import { X, Lock, ArrowRight, UserPlus, Image as ImageIcon } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 export type DemoRole = 'seller' | 'buyer' | 'broker'
@@ -65,6 +65,7 @@ const ROLE: Record<DemoRole, RoleConfig> = {
 
 export function DashboardTour({ role, onClose }: { role: DemoRole; onClose: () => void }) {
   const cfg = ROLE[role]
+  const [imgFailed, setImgFailed] = useState(false)
 
   // ESC closes; lock body scroll while open.
   useEffect(() => {
@@ -119,25 +120,29 @@ export function DashboardTour({ role, onClose }: { role: DemoRole; onClose: () =
             {/* Screenshot */}
             <div className="md:col-span-2 p-6" style={{ background: '#F4F2EE' }}>
               <div className="rounded-xl overflow-hidden shadow-lg border bg-white" style={{ borderColor: COLOR_BORDER }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={cfg.screenshot}
-                  alt={`${cfg.label} preview`}
-                  className="w-full h-auto block"
-                  onError={(e) => {
-                    // If the screenshot hasn't been added to /public/demo yet,
-                    // render a clear placeholder rather than a broken image.
-                    const img = e.currentTarget
-                    img.style.display = 'none'
-                    const parent = img.parentElement
-                    if (parent && !parent.querySelector('.placeholder')) {
-                      const ph = document.createElement('div')
-                      ph.className = 'placeholder p-16 text-center'
-                      ph.innerHTML = `<p style="color:#717171;font-size:13px">Screenshot of the live ${cfg.label.toLowerCase()} will load here.<br><span style="font-size:11px;opacity:.7">Drop a PNG at public${cfg.screenshot}</span></p>`
-                      parent.appendChild(ph)
-                    }
-                  }}
-                />
+                {imgFailed ? (
+                  // Editorial fallback when no screenshot is on disk yet —
+                  // looks intentional, not broken. Champagne icon on cream,
+                  // visitor-facing copy (no dev paths).
+                  <div className="aspect-[16/10] flex flex-col items-center justify-center text-center px-8" style={{ background: '#FAF6EF' }}>
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ background: 'white', border: '1px solid #E8E4DC' }}>
+                      <ImageIcon size={22} style={{ color: '#B8956A' }} />
+                    </div>
+                    <p className="text-[10px] font-bold tracking-[0.22em] uppercase mb-2" style={{ color: '#B8956A' }}>Preview Refresh in Progress</p>
+                    <p className="text-sm font-bold mb-1" style={{ color: COLOR_PRIMARY }}>A live tour of the {cfg.label.toLowerCase()} is on the way.</p>
+                    <p className="text-xs max-w-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
+                      In the meantime, create a free account — you&apos;ll see it in 60 seconds.
+                    </p>
+                  </div>
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={cfg.screenshot}
+                    alt={`${cfg.label} preview`}
+                    className="w-full h-auto block"
+                    onError={() => setImgFailed(true)}
+                  />
+                )}
               </div>
               <p className="text-[11px] mt-3 flex items-center gap-1.5" style={{ color: COLOR_TEXT_SECONDARY }}>
                 <Lock size={11} /> Demo data only · all confidential signals masked
