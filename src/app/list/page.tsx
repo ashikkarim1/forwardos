@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { CheckCircle2, ChevronRight, Loader, ShieldCheck, Eye, Sparkles, Zap } from 'lucide-react'
 import { PublicHeader } from '@/components/Navigation'
+import { ImageUploader, type UploadedPhoto } from '@/components/ImageUploader'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 import {
   QUICK_LIST_INDUSTRIES, QUICK_LIST_COUNTRIES,
@@ -24,6 +25,8 @@ function ListInner() {
   const [headline, setHeadline] = useState(params?.get('headline') || '')
   const [city, setCity] = useState('')
   const [email, setEmail] = useState('')
+  const [photos, setPhotos] = useState<UploadedPhoto[]>([])
+  const [coverIndex, setCoverIndex] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState<{ slug: string; title: string } | null>(null)
@@ -45,6 +48,8 @@ function ListInner() {
           industry, country, revenueRange, askingRange,
           headline: headline.trim(), email: email.trim(), city: city.trim(),
           referralCode,
+          photos: photos.map((p) => ({ url: p.url, name: p.name })),
+          coverIndex,
         }),
       })
       const data = await r.json()
@@ -146,6 +151,10 @@ function ListInner() {
         <Field label="One-line headline (optional)" hint="Auto-generated if blank. Don't include identifying details.">
           <input type="text" value={headline} onChange={(e) => setHeadline(e.target.value)} maxLength={140} placeholder="e.g. Profitable B2B SaaS, 70% recurring, growing 40% YoY" className="w-full px-3 py-3 rounded-lg border bg-white text-sm" style={{ borderColor: COLOR_BORDER }} />
         </Field>
+
+        <div>
+          <ImageUploader photos={photos} setPhotos={setPhotos} coverIndex={coverIndex} setCoverIndex={setCoverIndex} />
+        </div>
 
         <Field label="Your email *" hint="We email a link to manage your listing. We do not share this.">
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full px-3 py-3 rounded-lg border bg-white text-sm" style={{ borderColor: COLOR_BORDER }} />

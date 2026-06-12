@@ -46,6 +46,18 @@ export async function POST(request: NextRequest) {
       industry, country, revenueRange, askingRange, headline,
       email, city, referralCode,
     } = body as Record<string, string>
+    // Optional photo uploads (max 5; pre-uploaded via /api/upload, so we
+    // just persist the URLs and pick the cover).
+    const rawPhotos = Array.isArray((body as Record<string, unknown>).photos)
+      ? ((body as Record<string, unknown>).photos as { url?: unknown; name?: unknown }[])
+      : []
+    const photos = rawPhotos
+      .filter((p) => typeof p.url === 'string' && (p.url as string).startsWith('https://'))
+      .slice(0, 5)
+      .map((p) => ({ url: p.url as string, name: typeof p.name === 'string' ? p.name.slice(0, 200) : 'photo' }))
+    const coverIndexRaw = (body as Record<string, unknown>).coverIndex
+    const coverIndex = typeof coverIndexRaw === 'number' && coverIndexRaw >= 0 && coverIndexRaw < photos.length
+      ? coverIndexRaw : 0
 
     // ─── validate ──────────────────────────────────────────────────────────
     const errors: string[] = []
@@ -130,6 +142,26 @@ export async function POST(request: NextRequest) {
       },
       select: { id: true, slug: true, title: true },
     })
+
+    // ─── persist uploaded photos (best-effort; do not block listing) ──────
+    if (photos.length > 0) {
+      try {
+        await prisma.businessPhoto.createMany({
+          data: photos.map((p, i) => ({
+            sellerId: user.id,
+            dealId: deal.id,
+            photoUrl: p.url,
+            photoName: p.name,
+            isFeatured: i === coverIndex,
+            displayOrder: i,
+          })),
+        })
+      } catch (e) {
+        // Don't fail the whole listing if a photo write hiccups — the deal
+        // is already live and the seller can add photos later from /list.
+        console.error('[quick-list] photo persist failed:', e)
+      }
+    }
 
     // ─── confirmation email ────────────────────────────────────────────────
     const listingUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.forwardos.ai'}/listing/${deal.slug}`

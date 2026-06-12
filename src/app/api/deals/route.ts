@@ -57,6 +57,15 @@ export async function GET(_request: NextRequest) {
       where: { status: { in: ['ACTIVE', 'PUBLISHED'] } },
       orderBy: [{ heatScore: 'desc' }, { publishedAt: 'desc' }],
       take: 200,
+      include: {
+        // Cover photo if uploaded; else fall back to industry stock image.
+        photos: {
+          where: { isFeatured: true },
+          orderBy: { displayOrder: 'asc' },
+          take: 1,
+          select: { photoUrl: true },
+        },
+      },
     })
 
     if (rows.length === 0) throw new Error('no-db-rows')
@@ -88,7 +97,7 @@ export async function GET(_request: NextRequest) {
         title: publicTitle,
         location: publicLocation,
         country: d.country,
-        image: IMAGE_BY_INDUSTRY[d.industry] || IMAGE_BY_INDUSTRY.DEFAULT,
+        image: d.photos[0]?.photoUrl || IMAGE_BY_INDUSTRY[d.industry] || IMAGE_BY_INDUSTRY.DEFAULT,
         isConfidential: d.isConfidential,
         askingPrice,
         askingPriceCurrency: 'USD',

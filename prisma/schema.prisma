@@ -342,11 +342,18 @@ model BusinessPhoto {
   seller                User      @relation("SellerPhotos", fields: [sellerId], references: [id], onDelete: Cascade)
   sellerId              String
 
-  photoUrl              String    @db.Text // S3 URL
+  // Per-listing scope — every listing has its own photo set (max 5). When
+  // null, the photo is a generic seller-profile photo (legacy + pooled use).
+  deal                  Deal?     @relation("DealPhotos", fields: [dealId], references: [id], onDelete: Cascade)
+  dealId                String?
+
+  photoUrl              String    @db.Text // Vercel Blob / S3 URL
   photoName             String
   photoCaption          String?
 
-  isFeatured            Boolean   @default(false) // One featured photo per seller
+  // The cover photo shown on the marketplace card + listing hero. Exactly
+  // one per (deal, seller) pair should be true; enforced in the API.
+  isFeatured            Boolean   @default(false)
   displayOrder          Int       @default(0)
 
   uploadedAt            DateTime  @default(now())
@@ -354,6 +361,7 @@ model BusinessPhoto {
   updatedAt             DateTime  @updatedAt
 
   @@index([sellerId])
+  @@index([dealId])
   @@index([isFeatured])
 }
 
@@ -526,6 +534,7 @@ model Deal {
   // Relationships
   pipeline              DealPipeline?
   savedBy               SavedDeal[]
+  photos                BusinessPhoto[] @relation("DealPhotos")
   messages              Message[] @relation("DealMessages")
   dataRoom              DataRoom?
   enquiries             Enquiry[]
