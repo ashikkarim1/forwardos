@@ -42,6 +42,13 @@ const nextConfig = {
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }]
   },
+  async redirects() {
+    return [
+      // Editorial layout graduated from its preview route into the main
+      // marketplace — proper edge-level redirect with a Location header.
+      { source: '/marketplace/editorial', destination: '/marketplace', permanent: true },
+    ]
+  },
 }
 
 module.exports = nextConfig
