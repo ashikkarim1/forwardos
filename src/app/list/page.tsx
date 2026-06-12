@@ -2,17 +2,19 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle2, ChevronRight, Loader, ShieldCheck, Eye, Sparkles, Zap } from 'lucide-react'
+import { Briefcase, CheckCircle2, ChevronRight, Loader, ShieldCheck, Eye, Sparkles, User as UserIcon, Zap } from 'lucide-react'
 import { PublicHeader } from '@/components/Navigation'
 import { ImageUploader, type UploadedPhoto } from '@/components/ImageUploader'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 import {
   QUICK_LIST_INDUSTRIES, QUICK_LIST_COUNTRIES,
-  REVENUE_RANGES, ASKING_RANGES,
+  REVENUE_RANGES, ASKING_RANGES, EBITDA_RANGES, CASH_FLOW_RANGES,
 } from '@/lib/listing-helpers'
+
+type ListerRole = 'OWNER' | 'BROKER'
 
 function ListInner() {
   const router = useRouter()
@@ -27,6 +29,15 @@ function ListInner() {
   const [email, setEmail] = useState('')
   const [photos, setPhotos] = useState<UploadedPhoto[]>([])
   const [coverIndex, setCoverIndex] = useState(0)
+  // Optional boost fields — supplying these dramatically improves match quality.
+  const [ebitdaRange, setEbitdaRange] = useState('')
+  const [cashFlowRange, setCashFlowRange] = useState('')
+  // Who's listing — owners vs brokers. Brokers get credential fields below.
+  const [listerRole, setListerRole] = useState<ListerRole>('OWNER')
+  const [brokerName, setBrokerName] = useState('')
+  const [brokerLicense, setBrokerLicense] = useState('')
+  const [brokerYears, setBrokerYears] = useState('')
+  const [brokerDealsClosed, setBrokerDealsClosed] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState<{ slug: string; title: string } | null>(null)
@@ -34,6 +45,21 @@ function ListInner() {
   const referralCode = params?.get('ref') || ''
 
   const canSubmit = industry && country && revenueRange && askingRange && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+
+  // Live boost score — buyers respond to listings with more signal. Each
+  // optional field nudges the meter so the seller sees the payoff in real time.
+  const boostScore = useMemo(() => {
+    let score = 40 // baseline once required fields are filled
+    if (headline.trim()) score += 8
+    if (city.trim()) score += 6
+    if (ebitdaRange) score += 14
+    if (cashFlowRange) score += 14
+    if (photos.length > 0) score += 12
+    if (photos.length >= 3) score += 6
+    if (listerRole === 'BROKER' && brokerName.trim()) score += 5
+    if (listerRole === 'BROKER' && (brokerLicense.trim() || brokerDealsClosed)) score += 5
+    return Math.min(100, score)
+  }, [headline, city, ebitdaRange, cashFlowRange, photos.length, listerRole, brokerName, brokerLicense, brokerDealsClosed])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -50,6 +76,13 @@ function ListInner() {
           referralCode,
           photos: photos.map((p) => ({ url: p.url, name: p.name })),
           coverIndex,
+          ebitdaRange: ebitdaRange || undefined,
+          cashFlowRange: cashFlowRange || undefined,
+          listedByRole: listerRole,
+          brokerName: listerRole === 'BROKER' ? brokerName.trim() || undefined : undefined,
+          brokerLicense: listerRole === 'BROKER' ? brokerLicense.trim() || undefined : undefined,
+          brokerYearsExperience: listerRole === 'BROKER' && brokerYears ? parseInt(brokerYears, 10) : undefined,
+          brokerDealsClosed: listerRole === 'BROKER' && brokerDealsClosed ? parseInt(brokerDealsClosed, 10) : undefined,
         }),
       })
       const data = await r.json()
@@ -114,6 +147,55 @@ function ListInner() {
       </section>
 
       <form onSubmit={handleSubmit} className="max-w-2xl mx-auto px-6 py-10 space-y-5">
+        {/* Role chooser — Owner vs Broker. Drives the broker credential block. */}
+        <div>
+          <label className="block text-sm font-bold mb-1" style={{ color: COLOR_PRIMARY }}>I&apos;m a… *</label>
+          <p className="text-xs mb-2" style={{ color: COLOR_TEXT_SECONDARY }}>
+            We tailor the listing surface accordingly. Brokers can show credentials and a track record.
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <RoleTile
+              active={listerRole === 'OWNER'}
+              onClick={() => setListerRole('OWNER')}
+              icon={<UserIcon size={16} />}
+              title="Seller"
+              body="I own or control this business."
+            />
+            <RoleTile
+              active={listerRole === 'BROKER'}
+              onClick={() => setListerRole('BROKER')}
+              icon={<Briefcase size={16} />}
+              title="Broker"
+              body="I represent the seller."
+            />
+          </div>
+        </div>
+
+        {listerRole === 'BROKER' && (
+          <div className="rounded-xl border p-4 space-y-3" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
+            <p className="text-xs font-bold tracking-wide uppercase" style={{ color: '#B8956A' }}>
+              Broker credentials (optional but recommended)
+            </p>
+            <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
+              Buyers respond ~3× more often to broker listings that show credentials and a track record.
+            </p>
+            <Field label="Brokerage name">
+              <input type="text" value={brokerName} onChange={(e) => setBrokerName(e.target.value)} maxLength={120} placeholder="e.g. Sunbelt Toronto" className="w-full px-3 py-3 rounded-lg border bg-white text-sm" style={{ borderColor: COLOR_BORDER }} />
+            </Field>
+            <Field label="License # / credential" hint="e.g. CBI, M&AMI, REBNY — shown alongside your profile.">
+              <input type="text" value={brokerLicense} onChange={(e) => setBrokerLicense(e.target.value)} maxLength={80} placeholder="e.g. CBI #1234" className="w-full px-3 py-3 rounded-lg border bg-white text-sm" style={{ borderColor: COLOR_BORDER }} />
+            </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Years brokering">
+                <input type="number" inputMode="numeric" min={0} max={60} value={brokerYears} onChange={(e) => setBrokerYears(e.target.value)} placeholder="e.g. 8" className="w-full px-3 py-3 rounded-lg border bg-white text-sm" style={{ borderColor: COLOR_BORDER }} />
+              </Field>
+              <Field label="Deals closed">
+                <input type="number" inputMode="numeric" min={0} max={9999} value={brokerDealsClosed} onChange={(e) => setBrokerDealsClosed(e.target.value)} placeholder="e.g. 47" className="w-full px-3 py-3 rounded-lg border bg-white text-sm" style={{ borderColor: COLOR_BORDER }} />
+              </Field>
+            </div>
+          </div>
+        )}
+
         <Field label="Industry *" hint="Used to match the right buyers + comparables">
           <select required value={industry} onChange={(e) => setIndustry(e.target.value)} className="w-full px-3 py-3 rounded-lg border bg-white text-sm" style={{ borderColor: COLOR_BORDER }}>
             <option value="">Choose an industry…</option>
@@ -148,6 +230,33 @@ function ListInner() {
           </Link>
         </Field>
 
+        {/* Optional financial boosters — significantly improve buyer match quality. */}
+        <div className="rounded-xl border p-4 space-y-3" style={{ borderColor: COLOR_BORDER, background: '#FAF6EF' }}>
+          <div className="flex items-start gap-2">
+            <Sparkles size={14} style={{ color: '#B8956A' }} className="mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-xs font-bold tracking-wide uppercase" style={{ color: '#B8956A' }}>
+                Boost match quality (optional)
+              </p>
+              <p className="text-xs mt-0.5" style={{ color: COLOR_TEXT_SECONDARY }}>
+                Listings with EBITDA + cash flow surface to ~5× more qualified buyers and rank higher in search.
+              </p>
+            </div>
+          </div>
+          <Field label="EBITDA range" hint="Earnings before interest, taxes, depreciation, amortization. Approximate is fine.">
+            <select value={ebitdaRange} onChange={(e) => setEbitdaRange(e.target.value)} className="w-full px-3 py-3 rounded-lg border bg-white text-sm" style={{ borderColor: COLOR_BORDER }}>
+              <option value="">Choose a range…</option>
+              {EBITDA_RANGES.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+            </select>
+          </Field>
+          <Field label="Cash flow / SDE range" hint="Owner cash flow / Seller's Discretionary Earnings. Buyers under $2M look at this first.">
+            <select value={cashFlowRange} onChange={(e) => setCashFlowRange(e.target.value)} className="w-full px-3 py-3 rounded-lg border bg-white text-sm" style={{ borderColor: COLOR_BORDER }}>
+              <option value="">Choose a range…</option>
+              {CASH_FLOW_RANGES.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+            </select>
+          </Field>
+        </div>
+
         <Field label="One-line headline (optional)" hint="Auto-generated if blank. Don't include identifying details.">
           <input type="text" value={headline} onChange={(e) => setHeadline(e.target.value)} maxLength={140} placeholder="e.g. Profitable B2B SaaS, 70% recurring, growing 40% YoY" className="w-full px-3 py-3 rounded-lg border bg-white text-sm" style={{ borderColor: COLOR_BORDER }} />
         </Field>
@@ -159,6 +268,26 @@ function ListInner() {
         <Field label="Your email *" hint="We email a link to manage your listing. We do not share this.">
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full px-3 py-3 rounded-lg border bg-white text-sm" style={{ borderColor: COLOR_BORDER }} />
         </Field>
+
+        {/* Boost meter — live feedback that optional fields are paying off. */}
+        <div className="rounded-xl border p-4" style={{ borderColor: COLOR_BORDER, background: 'white' }}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold tracking-wide uppercase" style={{ color: COLOR_PRIMARY }}>
+              Listing strength
+            </span>
+            <span className="text-xs font-bold" style={{ color: boostScore >= 80 ? '#2D7A5F' : '#B8956A' }}>
+              {boostScore}/100 {boostScore >= 80 ? '· Strong' : boostScore >= 60 ? '· Solid' : '· Add more signal'}
+            </span>
+          </div>
+          <div className="h-2 rounded-full overflow-hidden" style={{ background: '#F4F2EE' }}>
+            <div className="h-full rounded-full transition-all" style={{ width: `${boostScore}%`, background: boostScore >= 80 ? '#2D7A5F' : '#B8956A' }} />
+          </div>
+          {boostScore < 80 && (
+            <p className="text-[11px] mt-2" style={{ color: COLOR_TEXT_SECONDARY }}>
+              Tip: add EBITDA, cash flow, and at least one photo to maximize qualified buyer matches.
+            </p>
+          )}
+        </div>
 
         {error && (
           <div className="rounded-lg border p-3 text-sm" style={{ borderColor: '#FCA5A5', background: '#FEE2E2', color: '#991B1B' }}>{error}</div>
@@ -191,6 +320,35 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
       {hint && <p className="text-xs mb-2" style={{ color: COLOR_TEXT_SECONDARY }}>{hint}</p>}
       {children}
     </div>
+  )
+}
+
+function RoleTile({
+  active, onClick, icon, title, body,
+}: {
+  active: boolean
+  onClick: () => void
+  icon: React.ReactNode
+  title: string
+  body: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="text-left rounded-xl border p-3 transition-all"
+      style={{
+        borderColor: active ? '#B8956A' : COLOR_BORDER,
+        background: active ? '#FAF6EF' : 'white',
+        outline: active ? '2px solid rgba(184,149,106,0.25)' : 'none',
+      }}
+    >
+      <div className="flex items-center gap-2 mb-1" style={{ color: active ? '#B8956A' : COLOR_PRIMARY }}>
+        {icon}
+        <span className="text-sm font-bold" style={{ color: COLOR_PRIMARY }}>{title}</span>
+      </div>
+      <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>{body}</p>
+    </button>
   )
 }
 

@@ -19,6 +19,8 @@ import { sendEmail } from '@/lib/services/email'
 import {
   REVENUE_RANGE_BY_ID,
   ASKING_RANGE_BY_ID,
+  EBITDA_RANGE_BY_ID,
+  CASH_FLOW_RANGE_BY_ID,
   QUICK_LIST_INDUSTRIES,
   QUICK_LIST_COUNTRIES,
   dealSlug,
@@ -58,6 +60,28 @@ export async function POST(request: NextRequest) {
     const coverIndexRaw = (body as Record<string, unknown>).coverIndex
     const coverIndex = typeof coverIndexRaw === 'number' && coverIndexRaw >= 0 && coverIndexRaw < photos.length
       ? coverIndexRaw : 0
+
+    // Optional boost fields — significantly improve marketplace match quality.
+    const ebitdaRangeId = typeof (body as Record<string, unknown>).ebitdaRange === 'string'
+      ? ((body as Record<string, unknown>).ebitdaRange as string) : ''
+    const cashFlowRangeId = typeof (body as Record<string, unknown>).cashFlowRange === 'string'
+      ? ((body as Record<string, unknown>).cashFlowRange as string) : ''
+    const ebitdaPreset = ebitdaRangeId ? EBITDA_RANGE_BY_ID[ebitdaRangeId] : undefined
+    const cashFlowPreset = cashFlowRangeId ? CASH_FLOW_RANGE_BY_ID[cashFlowRangeId] : undefined
+
+    // Lister role + broker credentials. Default OWNER if anything's off.
+    const rawRole = (body as Record<string, unknown>).listedByRole
+    const listedByRole: 'OWNER' | 'BROKER' = rawRole === 'BROKER' ? 'BROKER' : 'OWNER'
+    const brokerName = listedByRole === 'BROKER' && typeof (body as Record<string, unknown>).brokerName === 'string'
+      ? ((body as Record<string, unknown>).brokerName as string).trim().slice(0, 120) || null : null
+    const brokerLicense = listedByRole === 'BROKER' && typeof (body as Record<string, unknown>).brokerLicense === 'string'
+      ? ((body as Record<string, unknown>).brokerLicense as string).trim().slice(0, 80) || null : null
+    const brokerYearsRaw = (body as Record<string, unknown>).brokerYearsExperience
+    const brokerYearsExperience = listedByRole === 'BROKER' && typeof brokerYearsRaw === 'number'
+      && brokerYearsRaw >= 0 && brokerYearsRaw <= 60 ? Math.floor(brokerYearsRaw) : null
+    const brokerDealsRaw = (body as Record<string, unknown>).brokerDealsClosed
+    const brokerDealsClosed = listedByRole === 'BROKER' && typeof brokerDealsRaw === 'number'
+      && brokerDealsRaw >= 0 && brokerDealsRaw <= 9999 ? Math.floor(brokerDealsRaw) : null
 
     // ─── validate ──────────────────────────────────────────────────────────
     const errors: string[] = []
@@ -112,10 +136,14 @@ export async function POST(request: NextRequest) {
 
     const trimmedCity = (city || '').trim().slice(0, 80) || null
 
-    // Roughly back-fill estimated EBITDA at 20% of revenue midpoint — used
-    // for marketplace card math (ROI, payback) until seller adds real numbers.
+    // Prefer the seller-supplied EBITDA range over the 20%-of-revenue fallback.
+    // Cash flow is stored separately — buyers under $2M search on it directly.
     const revenueCents = revRange.midCents
-    const ebitdaCents = revenueCents / 5n
+    const ebitdaCents = ebitdaPreset ? ebitdaPreset.midCents : revenueCents / 5n
+    const cashFlowCents = cashFlowPreset ? cashFlowPreset.midCents : null
+    const ebitdaMarginPct = revenueCents > 0n
+      ? Math.round(Number((ebitdaCents * 100n) / revenueCents))
+      : 20
 
     const deal = await prisma.deal.create({
       data: {
@@ -131,8 +159,14 @@ export async function POST(request: NextRequest) {
         city: trimmedCity,
         revenue: revenueCents,
         ebitda: ebitdaCents,
+        cashFlow: cashFlowCents,
         askingPrice: askRange.midCents,
-        ebitdaMargin: 20,
+        ebitdaMargin: ebitdaMarginPct,
+        listedByRole,
+        brokerName,
+        brokerLicense,
+        brokerYearsExperience,
+        brokerDealsClosed,
         isConfidential: true,
         // sensible defaults — seller refines later
         heatScore: 50,

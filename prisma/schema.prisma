@@ -94,6 +94,14 @@ enum SellerMotivation {
   OTHER
 }
 
+// Who is publishing the listing — drives credential capture + buyer trust.
+// Owners list businesses they own/control; brokers list on behalf of third
+// parties and surface licenses, credentials, and a track record.
+enum ListedByRole {
+  OWNER
+  BROKER
+}
+
 enum DealPipelineStage {
   INTEREST
   QUALIFICATION
@@ -474,6 +482,7 @@ model Deal {
   // Financial Information
   revenue               BigInt?   // LTM revenue in cents
   ebitda                BigInt?   // LTM EBITDA in cents
+  cashFlow              BigInt?   // Owner cash flow / SDE in cents (primary metric for SMB deals)
   grossMargin           Float?    // Percentage: 0-100
   ebitdaMargin          Float?    // Percentage: 0-100
   askingPrice           BigInt?   // In cents
@@ -499,6 +508,16 @@ model Deal {
   // Nullable for backward-compat with deals seeded before the column existed.
   sellerType            SellerType?
   sellerMotivation      SellerMotivation?
+
+  // Whether the person listing is the owner or a broker representing the
+  // owner. Drives the broker-credential block on the public listing page
+  // and the marketplace "Broker-represented" badge. Optional; defaults to
+  // OWNER when null at read time.
+  listedByRole          ListedByRole?
+  brokerName            String?
+  brokerLicense         String?
+  brokerYearsExperience Int?
+  brokerDealsClosed     Int?
 
   // Confidential / anonymous listing mode. When true, the public API masks the
   // seller name, exact city (rounded to region), and any company-identifying

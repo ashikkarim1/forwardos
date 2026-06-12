@@ -99,8 +99,33 @@ export const ASKING_RANGES = [
   { id: 'over-50m',    label: 'Over $50M',     midCents: 7_500_000_000n },
 ] as const
 
+// EBITDA + Cash Flow / SDE — both optional on the quick-list flow, but
+// dramatically improve buyer match quality when supplied (BizBuySell's #1
+// search filter for SMB deals is cash flow, not revenue).
+export const EBITDA_RANGES = [
+  { id: 'ebitda-under-100k', label: 'Under $100K',     midCents: 5_000_000n },
+  { id: 'ebitda-100k-250k',  label: '$100K – $250K',   midCents: 17_500_000n },
+  { id: 'ebitda-250k-500k',  label: '$250K – $500K',   midCents: 37_500_000n },
+  { id: 'ebitda-500k-1m',    label: '$500K – $1M',     midCents: 75_000_000n },
+  { id: 'ebitda-1m-3m',      label: '$1M – $3M',       midCents: 200_000_000n },
+  { id: 'ebitda-3m-5m',      label: '$3M – $5M',       midCents: 400_000_000n },
+  { id: 'ebitda-over-5m',    label: 'Over $5M',        midCents: 750_000_000n },
+] as const
+
+export const CASH_FLOW_RANGES = [
+  { id: 'cf-under-100k', label: 'Under $100K',     midCents: 5_000_000n },
+  { id: 'cf-100k-250k',  label: '$100K – $250K',   midCents: 17_500_000n },
+  { id: 'cf-250k-500k',  label: '$250K – $500K',   midCents: 37_500_000n },
+  { id: 'cf-500k-1m',    label: '$500K – $1M',     midCents: 75_000_000n },
+  { id: 'cf-1m-3m',      label: '$1M – $3M',       midCents: 200_000_000n },
+  { id: 'cf-3m-5m',      label: '$3M – $5M',       midCents: 400_000_000n },
+  { id: 'cf-over-5m',    label: 'Over $5M',        midCents: 750_000_000n },
+] as const
+
 export const REVENUE_RANGE_BY_ID = Object.fromEntries(REVENUE_RANGES.map((r) => [r.id, r])) as Record<string, (typeof REVENUE_RANGES)[number]>
 export const ASKING_RANGE_BY_ID = Object.fromEntries(ASKING_RANGES.map((r) => [r.id, r])) as Record<string, (typeof ASKING_RANGES)[number]>
+export const EBITDA_RANGE_BY_ID = Object.fromEntries(EBITDA_RANGES.map((r) => [r.id, r])) as Record<string, (typeof EBITDA_RANGES)[number]>
+export const CASH_FLOW_RANGE_BY_ID = Object.fromEntries(CASH_FLOW_RANGES.map((r) => [r.id, r])) as Record<string, (typeof CASH_FLOW_RANGES)[number]>
 
 // ─── Industries for quick-list dropdown (matches Prisma IndustryType) ─────────
 
