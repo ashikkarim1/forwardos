@@ -85,14 +85,14 @@ function LocalizedHomePageContent() {
             </p>
 
             <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-12 ${isRTL ? 'sm:flex-row-reverse' : ''}`}>
-              <button
-                onClick={() => setShowUserTypeModal(true)}
+              <Link
+                href="/list"
                 className="px-8 py-4 rounded-lg font-bold text-white text-center hover:opacity-90 transition-all flex items-center justify-center gap-2"
                 style={{ background: COLOR_ACCENT }}
               >
                 {t('hero.cta1', locale)}
                 <ArrowRight size={20} style={{ transform: isRTL ? 'scaleX(-1)' : 'none' }} />
-              </button>
+              </Link>
               <Link
                 href="/marketplace"
                 className="px-8 py-4 rounded-lg font-bold border text-center hover:bg-gray-50 transition-all"

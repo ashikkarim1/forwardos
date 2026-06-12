@@ -9,11 +9,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     'nav.signIn': 'Sign In',
 
     // Hero Section
-    'hero.title': 'The M&A Platform Built for Intelligent Deals',
-    'hero.subtitle': 'AI-powered deal intelligence, institutional network, and professional services. Everything you need to acquire or sell with confidence.',
-    'hero.cta1': 'Get Started Free',
+    'hero.title': 'Sell Your Company with Forward Momentum.',
+    'hero.subtitle': 'Publish a confidential listing in 90 seconds. Reach verified buyers across the USA, Canada & the UAE — anonymous by default, zero commission.',
+    'hero.cta1': 'List my company free',
     'hero.cta2': 'Browse Marketplace',
-    'hero.trust': '✅ No credit card required • ✅ Instant access to 47+ deals • ✅ Bank-level security',
+    'hero.trust': '✅ Anonymous by default • ✅ No credit card • ✅ Zero success commission',
 
     // Features Section
     'features.title': 'Why Forward OS',
@@ -199,11 +199,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     'nav.signIn': 'Se connecter',
 
     // Hero Section
-    'hero.title': 'La plateforme de M&A construite pour les transactions intelligentes',
-    'hero.subtitle': 'Intelligence des transactions alimentée par l\'IA, réseau institutionnel et services professionnels. Tout ce dont vous avez besoin pour acquérir ou vendre en toute confiance.',
-    'hero.cta1': 'Commencer gratuitement',
+    'hero.title': 'Vendez votre entreprise. Avancez avec Forward.',
+    'hero.subtitle': 'Publiez une annonce confidentielle en 90 secondes. Atteignez des acheteurs vérifiés aux États-Unis, au Canada et aux Émirats — anonyme par défaut, sans commission.',
+    'hero.cta1': 'Vendre mon entreprise gratuitement',
     'hero.cta2': 'Parcourir la place de marché',
-    'hero.trust': '✅ Pas de carte de crédit requise • ✅ Accès instantané à 47+ offres • ✅ Sécurité bancaire',
+    'hero.trust': '✅ Anonyme par défaut • ✅ Pas de carte de crédit • ✅ Aucune commission sur la vente',
 
     // Features Section
     'features.title': 'Pourquoi Forward OS',
@@ -380,11 +380,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     'nav.signIn': 'تسجيل الدخول',
 
     // Hero Section
-    'hero.title': 'منصة الاندماج والاستحواذ المبنية للصفقات الذكية',
-    'hero.subtitle': 'ذكاء الصفقات المدفوع بالذكاء الاصطناعي والشبكة المؤسسية والخدمات الاحترافية. كل ما تحتاجه للاستحواذ أو البيع بثقة.',
-    'hero.cta1': 'ابدأ مجاناً',
+    'hero.title': 'بِعْ شركتك بزَخَم Forward.',
+    'hero.subtitle': 'انشر إعلانك السري في 90 ثانية. اعرض شركتك على مشترين موثقين في الولايات المتحدة وكندا والإمارات — مجهول الهوية افتراضياً، بدون أي عمولة.',
+    'hero.cta1': 'بيع شركتي مجاناً',
     'hero.cta2': 'استعرض السوق',
-    'hero.trust': '✅ لا تحتاج إلى بطاقة ائتمان • ✅ وصول فوري إلى 47+ صفقة • ✅ أمان على مستوى البنوك',
+    'hero.trust': '✅ مجهول الهوية افتراضياً • ✅ لا تحتاج إلى بطاقة ائتمان • ✅ بدون عمولة على البيع',
 
     // Features Section
     'features.title': 'لماذا Forward OS',
