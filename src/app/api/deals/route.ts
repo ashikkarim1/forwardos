@@ -74,12 +74,13 @@ export async function GET(_request: NextRequest) {
       const position: 'underpriced' | 'fair' | 'premium' =
         d.pricingMultiple != null ? (d.pricingMultiple < 3 ? 'underpriced' : d.pricingMultiple > 4.5 ? 'premium' : 'fair') : 'fair'
 
-      // Confidential listings mask the seller's title (replaced with a
-      // generic "Confidential X in Y" headline) and the city (rounded to the
-      // broader metro region). All financial ranges stay public — that's how
-      // buyers decide whether to inquire.
-      const publicTitle = d.isConfidential ? confidentialTitle(d.industry, d.country, d.id) : d.title
-      const publicLocation = d.isConfidential ? maskCity(d.city, d.country) : (d.city || d.country)
+      // PRIVACY RULE: titles + cities are masked for EVERYONE in the public
+      // API. The original `isConfidential` flag is now a no-op for masking —
+      // identity is only ever revealed inside an authenticated, NDA-gated
+      // deal room (paid tier). All financial metrics stay public — that's
+      // how buyers decide whether to engage.
+      const publicTitle = confidentialTitle(d.industry, d.country, d.id)
+      const publicLocation = maskCity(d.city, d.country)
 
       return {
         id: d.id,

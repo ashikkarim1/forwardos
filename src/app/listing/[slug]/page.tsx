@@ -27,8 +27,12 @@ async function getDeal(slug: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const deal = await getDeal(params.slug).catch(() => null)
   if (!deal) return { title: 'Listing not found', robots: { index: false, follow: false } }
-  const title = deal.isConfidential ? confidentialTitle(deal.industry, deal.country, deal.id) : deal.title
-  const location = deal.isConfidential ? maskCity(deal.city, deal.country) : (deal.city || deal.country)
+  // PRIVACY RULE: titles, cities, and addresses are never exposed publicly —
+  // the original `isConfidential` opt-in was promoted to a platform-wide
+  // policy. Real identity is shared only inside an authenticated, NDA-gated
+  // deal room (paid tier).
+  const title = confidentialTitle(deal.industry, deal.country, deal.id)
+  const location = maskCity(deal.city, deal.country)
   const ask = deal.askingPrice ? `$${(Number(deal.askingPrice) / 100 / 1_000_000).toFixed(1)}M` : 'price on request'
   return pageMetadata({
     title: `${title} (${location}) — ${ask}`,
@@ -53,8 +57,8 @@ export default async function ListingPage({ params }: Props) {
     notFound()
   }
 
-  const title = deal.isConfidential ? confidentialTitle(deal.industry, deal.country, deal.id) : deal.title
-  const location = deal.isConfidential ? maskCity(deal.city, deal.country) : (deal.city || deal.country)
+  const title = confidentialTitle(deal.industry, deal.country, deal.id)
+  const location = maskCity(deal.city, deal.country)
   const ask = deal.askingPrice ? Number(deal.askingPrice) / 100 : null
   const rev = deal.revenue ? Number(deal.revenue) / 100 : null
   const ebitda = deal.ebitda ? Number(deal.ebitda) / 100 : null

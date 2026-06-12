@@ -12,8 +12,13 @@ import { generateNarrative, narrativeEyebrow, maskedHeadline, industryLabel } fr
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 interface Deal {
-  id: string; title: string; location: string; country: string; image: string; askingPrice: number; askingPriceCurrency: string; annualRevenue: number; cashFlowMin: number; cashFlowMax: number; ebitda: number; profitMarginPercent: number; dealQualityScore: number; heatIndex: number; roiProjection: number; paybackPeriod: number; growthRate: number; status: 'NEW' | 'FEATURED' | 'STANDARD'; category: string; dealType: 'SALE' | 'LEASE' | 'QUICK_SALE'; employeeCount: number; sellerVerified: boolean; sellerTrustScore: number; marketTrend: 'up' | 'down' | 'stable'; marketPosition: 'underpriced' | 'fair' | 'premium'; daysOnMarket: number; location_country: string; sellerType: string; sellerMotivation: string; financingEligible?: boolean; upcomingAuction?: boolean
+  id: string; slug?: string; title: string; location: string; country: string; image: string; askingPrice: number; askingPriceCurrency: string; annualRevenue: number; cashFlowMin: number; cashFlowMax: number; ebitda: number; profitMarginPercent: number; dealQualityScore: number; heatIndex: number; roiProjection: number; paybackPeriod: number; growthRate: number; status: 'NEW' | 'FEATURED' | 'STANDARD'; category: string; dealType: 'SALE' | 'LEASE' | 'QUICK_SALE'; employeeCount: number; sellerVerified: boolean; sellerTrustScore: number; marketTrend: 'up' | 'down' | 'stable'; marketPosition: 'underpriced' | 'fair' | 'premium'; daysOnMarket: number; location_country: string; sellerType: string; sellerMotivation: string; financingEligible?: boolean; upcomingAuction?: boolean
 }
+
+// Canonical detail-page URL — the masked /listing/[slug] route. Falls back to
+// the legacy /deal/[id] only when slug is missing (shouldn't happen for new
+// data — every Deal row has a unique slug now).
+const detailHref = (d: Pick<Deal, 'slug' | 'id'>) => d.slug ? `/listing/${d.slug}` : `/deal/${d.id}`
 
 // Pretty-print enum-style values for filter options.
 const SPECIAL_LABELS: Record<string, string> = {
@@ -211,7 +216,7 @@ export default function MarketplacePage() {
             <p className="text-xs mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>Platform-wide — not affected by your filters below.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {hotDeals.map((deal) => (
-                <Link key={deal.id} href={`/deal/${deal.id}`}>
+                <Link key={deal.id} href={detailHref(deal)}>
                   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border hover:shadow-md transition-shadow cursor-pointer bg-white" style={{ borderColor: COLOR_BORDER }}>
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
@@ -483,7 +488,7 @@ function EditorialRow({
     >
       {/* ── Image panel ── */}
       <div className="[direction:ltr] relative group md:col-span-2">
-        <Link href={`/deal/${deal.id}`} className="block rounded-2xl overflow-hidden shadow-sm" style={{ aspectRatio: '16/11' }}>
+        <Link href={detailHref(deal)} className="block rounded-2xl overflow-hidden shadow-sm" style={{ aspectRatio: '16/11' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={deal.image} alt="Confidential business listing" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
         </Link>
@@ -517,7 +522,7 @@ function EditorialRow({
           {narrativeEyebrow(deal)} · LISTED {deal.daysOnMarket}D AGO
         </p>
 
-        <Link href={`/deal/${deal.id}`} className="block hover:opacity-80 transition-opacity">
+        <Link href={detailHref(deal)} className="block hover:opacity-80 transition-opacity">
           <h3 className="text-2xl md:text-3xl font-black leading-tight mb-2" style={{ color: COLOR_PRIMARY }}>
             {headline}
           </h3>
@@ -560,7 +565,7 @@ function EditorialRow({
         </div>
 
         <div className="flex items-center gap-4">
-          <Link href={`/deal/${deal.id}`} className="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-bold text-white hover:opacity-90 transition-opacity text-sm" style={{ background: COLOR_PRIMARY }}>
+          <Link href={detailHref(deal)} className="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-bold text-white hover:opacity-90 transition-opacity text-sm" style={{ background: COLOR_PRIMARY }}>
             View listing <ArrowRight size={14} />
           </Link>
           <button onClick={onSave} className="text-sm font-bold hover:opacity-70 inline-flex items-center gap-1.5" style={{ color: isSaved ? COLOR_ACCENT : COLOR_TEXT_SECONDARY }}>
