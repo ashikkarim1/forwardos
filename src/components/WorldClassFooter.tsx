@@ -92,8 +92,10 @@ export function WorldClassFooter() {
     >
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Top Section - Logo & Description */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 pb-12 border-b" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+        {/* Top Section — brand block + 4 link columns = 5 columns on one row
+            (md+). The grid was md:grid-cols-4 but housed 5 children, so the
+            last column (Legal) was wrapping under the others. */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 mb-16 pb-12 border-b" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
