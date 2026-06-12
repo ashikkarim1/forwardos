@@ -197,11 +197,11 @@ export default function MarketplacePage() {
         </div>
       </section>
 
-      {/* Trending section is a discovery aid — hide it once the user has
-          expressed intent via filters (so it doesn't visually contradict an
-          empty filtered-results state below) and hide it while data loads
-          (so we never render trending from a stale / empty deal set). */}
-      {activeFiltersCount === 0 && !isLoading && activeDeals.length > 0 && (
+      {/* Trending rail is deliberately UNFILTERED — it's an editorial
+          discovery surface, always showing the 4 hottest listings platform-
+          wide. Filters below only affect the main grid. Hidden only while
+          the deal data is still loading. */}
+      {!isLoading && activeDeals.length > 0 && (
       <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="border-b" style={{ borderColor: COLOR_BORDER, background: 'white' }}>
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
           <div className="flex items-center gap-2 mb-6">
