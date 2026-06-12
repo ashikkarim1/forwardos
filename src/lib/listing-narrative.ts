@@ -6,6 +6,7 @@
  * When a real LLM pipeline is wired later, swap generateNarrative() for an
  * API call and keep this as the zero-cost fallback.
  */
+import { refCode } from '@/lib/listing-helpers'
 
 export interface NarrativeDeal {
   title: string
@@ -65,11 +66,10 @@ export function industryLabel(industry: string): string {
  * Privacy-safe display headline. The REAL listing title must never be sent
  * to or rendered for unverified visitors — CSS blurring leaks the name via
  * the DOM. This generates a generic-but-distinct headline from non-
- * identifying fields only (industry + country + an id-derived ref code).
+ * identifying fields only (industry + country + a hashed ref code).
  */
 export function maskedHeadline(d: Pick<NarrativeDeal, 'category' | 'country'> & { id: string }): string {
-  const ref = d.id.replace(/[^a-z0-9]/gi, '').slice(-4).toUpperCase()
-  return `A Confidential ${industryLabel(d.category)} Company · Ref ${ref}`
+  return `A Confidential ${industryLabel(d.category)} Company · Ref ${refCode(d.id)}`
 }
 
 /** One-line eyebrow label, e.g. "SAAS · TORONTO, CANADA" */

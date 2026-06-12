@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Search, ChevronLeft, ChevronRight, ChevronDown, X, SlidersHorizontal, Heart, ArrowRight, Lock, Sparkles, Camera, CheckCircle2 } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight, ChevronDown, X, SlidersHorizontal, Heart, ArrowRight, Lock, Sparkles, Camera, CheckCircle2, Mail } from 'lucide-react'
 import { BusinessPhotoGallery } from '@/components/BusinessPhotoGallery'
 import { SaveSearchButton } from '@/components/SaveSearchButton'
 import { PublicHeader } from '@/components/Navigation'
@@ -484,35 +484,64 @@ function EditorialRow({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.5 }}
-      className={`grid md:grid-cols-5 gap-8 md:gap-12 items-center ${flip ? 'md:[direction:rtl]' : ''}`}
+      className={`grid md:grid-cols-5 gap-8 md:gap-12 items-start ${flip ? 'md:[direction:rtl]' : ''}`}
     >
-      {/* ── Image panel ── */}
-      <div className="[direction:ltr] relative group md:col-span-2">
-        <Link href={detailHref(deal)} className="block rounded-2xl overflow-hidden shadow-sm" style={{ aspectRatio: '16/11' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={deal.image} alt="Confidential business listing" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
-        </Link>
-        {/* Status chip */}
-        {deal.status !== 'STANDARD' && (
-          <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-black tracking-wide text-white" style={{ background: deal.status === 'FEATURED' ? COLOR_ACCENT : '#2D7A5F' }}>
-            {deal.status === 'FEATURED' ? '★ FEATURED' : 'NEW'}
+      {/* ── Media + actions panel — image top-aligned with the text column,
+            CTA stack directly beneath so actions live with the media. ── */}
+      <div className="[direction:ltr] md:col-span-2">
+        <div className="relative group">
+          <Link href={detailHref(deal)} className="block rounded-2xl overflow-hidden shadow-sm" style={{ aspectRatio: '16/11' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={deal.image} alt="Confidential business listing" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+          </Link>
+          {/* Status chip */}
+          {deal.status !== 'STANDARD' && (
+            <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-black tracking-wide text-white" style={{ background: deal.status === 'FEATURED' ? COLOR_ACCENT : '#2D7A5F' }}>
+              {deal.status === 'FEATURED' ? '★ FEATURED' : 'NEW'}
+            </div>
+          )}
+          {/* Heat chip */}
+          {deal.heatIndex >= 85 && (
+            <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold text-white backdrop-blur" style={{ background: 'rgba(26,26,26,0.75)' }}>
+              <Sparkles size={10} className="inline mr-1 -mt-0.5" />
+              Most-watched · {deal.heatIndex}°
+            </div>
+          )}
+          {/* Photos */}
+          <div className="absolute top-3 right-3 flex gap-2">
+            <button onClick={onViewPhotos} aria-label="View photos" className="p-2 rounded-full bg-white/90 backdrop-blur shadow-md hover:shadow-lg transition-all">
+              <Camera size={14} style={{ color: COLOR_TEXT_SECONDARY }} />
+            </button>
           </div>
-        )}
-        {/* Heat chip */}
-        {deal.heatIndex >= 85 && (
-          <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold text-white backdrop-blur" style={{ background: 'rgba(26,26,26,0.75)' }}>
-            <Sparkles size={10} className="inline mr-1 -mt-0.5" />
-            Most-watched · {deal.heatIndex}°
+        </div>
+
+        {/* CTA stack — Contact seller is the highest-intent action, so it
+            leads. View listing secondary; Save stays quiet. */}
+        <div className="mt-4 space-y-2">
+          <Link
+            href={deal.slug ? `/listing/${deal.slug}/contact` : detailHref(deal)}
+            className="flex items-center justify-center gap-2 w-full px-5 py-3 rounded-lg font-bold text-white hover:opacity-90 transition-opacity text-sm"
+            style={{ background: COLOR_PRIMARY }}
+          >
+            <Mail size={14} /> Contact seller
+          </Link>
+          <div className="flex gap-2">
+            <Link
+              href={detailHref(deal)}
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold border bg-white hover:bg-gray-50 transition-colors text-sm"
+              style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
+            >
+              View listing <ArrowRight size={13} />
+            </Link>
+            <button
+              onClick={onSave}
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg font-bold border bg-white hover:bg-gray-50 transition-colors text-sm"
+              style={{ borderColor: isSaved ? COLOR_ACCENT : COLOR_BORDER, color: isSaved ? COLOR_ACCENT : COLOR_TEXT_SECONDARY }}
+            >
+              <Heart size={13} className={isSaved ? 'fill-current' : ''} />
+              {isSaved ? 'Saved' : 'Save'}
+            </button>
           </div>
-        )}
-        {/* Save + photos */}
-        <div className="absolute top-3 right-3 flex gap-2">
-          <button onClick={onViewPhotos} aria-label="View photos" className="p-2 rounded-full bg-white/90 backdrop-blur shadow-md hover:shadow-lg transition-all">
-            <Camera size={14} style={{ color: COLOR_TEXT_SECONDARY }} />
-          </button>
-          <button onClick={onSave} aria-label="Save listing" className="p-2 rounded-full bg-white/90 backdrop-blur shadow-md hover:shadow-lg transition-all">
-            <Heart size={14} className={isSaved ? 'fill-current' : ''} style={{ color: isSaved ? COLOR_ACCENT : COLOR_TEXT_SECONDARY }} />
-          </button>
         </div>
       </div>
 
@@ -555,23 +584,13 @@ function EditorialRow({
         </div>
 
         {/* Secondary metrics — every remaining data point from the old card */}
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-x-4 gap-y-2 mb-6 text-[11px]">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-x-4 gap-y-2 text-[11px]">
           <MiniStat label="Margin" value={`${deal.profitMarginPercent}%`} />
           <MiniStat label="ROI" value={`${deal.roiProjection}%`} />
           <MiniStat label="Payback" value={`${deal.paybackPeriod}mo`} />
           <MiniStat label="Growth" value={`↗ ${deal.growthRate}%`} positive />
           <MiniStat label="Quality" value={`${deal.dealQualityScore}/100`} />
           <MiniStat label="Team" value={`${deal.employeeCount}`} />
-        </div>
-
-        <div className="flex items-center gap-4">
-          <Link href={detailHref(deal)} className="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-bold text-white hover:opacity-90 transition-opacity text-sm" style={{ background: COLOR_PRIMARY }}>
-            View listing <ArrowRight size={14} />
-          </Link>
-          <button onClick={onSave} className="text-sm font-bold hover:opacity-70 inline-flex items-center gap-1.5" style={{ color: isSaved ? COLOR_ACCENT : COLOR_TEXT_SECONDARY }}>
-            <Heart size={13} className={isSaved ? 'fill-current' : ''} />
-            {isSaved ? 'Saved' : 'Save'}
-          </button>
         </div>
       </div>
     </motion.article>

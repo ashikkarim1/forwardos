@@ -100,7 +100,7 @@ export default function FeedbackWidget() {
                       key={k}
                       onClick={() => setKind(k)}
                       className={`flex flex-col items-center gap-1 py-2.5 rounded-xl border-2 text-[11px] font-semibold transition ${
-                        kind === k ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-500 hover:border-slate-300'
+                        kind === k ? 'border-[#B8956A] bg-[#FAF6EF] text-[#8C6D45]' : 'border-slate-200 text-slate-500 hover:border-slate-300'
                       }`}
                     >
                       <span className="text-base" aria-hidden>{KIND_ICON[k]}</span>
@@ -115,7 +115,7 @@ export default function FeedbackWidget() {
                   placeholder="What would make Forward Intelligence better for you?"
                   rows={4}
                   maxLength={4000}
-                  className="mt-3 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none resize-none"
+                  className="mt-3 w-full rounded-xl border border-slate-300 px-3.5 py-3 text-slate-900 focus:border-[#B8956A] focus:ring-2 focus:ring-[#FAF6EF] outline-none resize-none"
                 />
 
                 {state === 'error' && <p className="mt-2 text-xs font-semibold text-red-700">Something went wrong. Please try again.</p>}
@@ -123,7 +123,7 @@ export default function FeedbackWidget() {
                 <button
                   onClick={submit}
                   disabled={state === 'sending' || message.trim().length < 2}
-                  className="mt-3 w-full px-6 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 transition disabled:opacity-50"
+                  className="mt-3 w-full px-6 py-3 rounded-xl bg-[#1A1A1A] text-white font-bold  transition disabled:opacity-50"
                 >
                   {state === 'sending' ? 'Sending…' : 'Send feedback'}
                 </button>

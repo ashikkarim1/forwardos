@@ -34,7 +34,7 @@ export default function ConsentBanner() {
             <p className="font-bold text-slate-900 mb-1">We value your privacy</p>
             <p className="text-sm text-slate-600">
               We use essential storage to run the site, and—only with your consent—analytics and marketing.
-              Read our <Link href="/privacy" className="font-semibold text-blue-600 hover:underline">Privacy Policy</Link>.
+              Read our <Link href="/privacy" className="font-semibold text-[#B8956A] hover:underline">Privacy Policy</Link>.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -44,7 +44,7 @@ export default function ConsentBanner() {
             <button onClick={() => setCustomize((v) => !v)} className="px-4 py-2 rounded-lg text-sm font-semibold border border-slate-300 text-slate-700 hover:bg-slate-50">
               Customize
             </button>
-            <button onClick={() => choose(true, true)} className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700">
+            <button onClick={() => choose(true, true)} className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-[#1A1A1A] hover:opacity-90">
               Accept all
             </button>
           </div>
@@ -56,7 +56,7 @@ export default function ConsentBanner() {
             <Row label="Analytics" desc="Helps us understand usage to improve the product." checked={analytics} onChange={setAnalytics} />
             <Row label="Marketing" desc="Personalized offers and communications." checked={marketing} onChange={setMarketing} />
             <div className="flex justify-end">
-              <button onClick={() => choose(analytics, marketing)} className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-blue-600 hover:bg-blue-700">
+              <button onClick={() => choose(analytics, marketing)} className="px-4 py-2 rounded-lg text-sm font-bold text-white bg-[#1A1A1A] hover:opacity-90">
                 Save preferences
               </button>
             </div>
@@ -70,7 +70,7 @@ export default function ConsentBanner() {
 function Row({ label, desc, checked, disabled, onChange }: { label: string; desc: string; checked: boolean; disabled?: boolean; onChange?: (v: boolean) => void }) {
   return (
     <label className="flex items-start gap-3 cursor-pointer">
-      <input type="checkbox" checked={checked} disabled={disabled} onChange={(e) => onChange?.(e.target.checked)} className="mt-1 accent-blue-600" />
+      <input type="checkbox" checked={checked} disabled={disabled} onChange={(e) => onChange?.(e.target.checked)} className="mt-1 accent-[#B8956A]" />
       <span>
         <span className="block text-sm font-semibold text-slate-900">{label}{disabled && ' (always on)'}</span>
         <span className="block text-xs text-slate-500">{desc}</span>

@@ -52,14 +52,27 @@ export function maskCity(city: string | null | undefined, country: string): stri
   return REGION_BY_CITY[city] || `${country} (region withheld)`
 }
 
+/**
+ * Deterministic 4-char ref code from a deal id. Hash-based — NOT a substring
+ * of the id, because seeded ids like "deal-ca-saas" end in the industry name
+ * and produced refs like "SAAS" that collided with the headline.
+ */
+export function refCode(dealId: string): string {
+  let h = 0
+  for (let i = 0; i < dealId.length; i++) {
+    h = (h * 31 + dealId.charCodeAt(i)) >>> 0
+  }
+  // Base-36, zero-padded, skip ambiguous look — 4 chars gives 1.7M codes.
+  return h.toString(36).toUpperCase().padStart(4, '0').slice(-4)
+}
+
 /** Build a confidential teaser title from industry + country, without seller name. */
 export function confidentialTitle(industry: string, country: string, dealId: string): string {
-  const ref = dealId.replace(/[^a-z0-9]/gi, '').slice(-4).toUpperCase()
   const ind = industry
     .split('_')
     .map((w) => w[0] + w.slice(1).toLowerCase())
     .join(' ')
-  return `Confidential ${ind} business — ${country} · ref #${ref}`
+  return `Confidential ${ind} business — ${country} · ref #${refCode(dealId)}`
 }
 
 // ─── Revenue / asking range presets (for the quick-list dropdowns) ────────────
