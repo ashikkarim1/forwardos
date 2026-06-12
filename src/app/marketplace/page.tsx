@@ -1,17 +1,18 @@
 'use client'
 
 import { useState, useMemo, useEffect } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Search, ChevronLeft, ChevronRight, ChevronDown, X, SlidersHorizontal } from 'lucide-react'
-import ListingCard from '@/components/listing/ListingCard'
+import { Search, ChevronLeft, ChevronRight, ChevronDown, X, SlidersHorizontal, Heart, ArrowRight, Lock, Sparkles, Camera, CheckCircle2 } from 'lucide-react'
 import { BusinessPhotoGallery } from '@/components/BusinessPhotoGallery'
 import { SaveSearchButton } from '@/components/SaveSearchButton'
 import { PublicHeader } from '@/components/Navigation'
 import { useSavedDeals } from '@/hooks/useSavedDeals'
+import { generateNarrative, narrativeEyebrow, maskedHeadline, industryLabel } from '@/lib/listing-narrative'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
 interface Deal {
-  id: string; title: string; location: string; country: string; image: string; askingPrice: number; askingPriceCurrency: string; annualRevenue: number; cashFlowMin: number; cashFlowMax: number; ebitda: number; profitMarginPercent: number; dealQualityScore: number; heatIndex: number; roiProjection: number; paybackPeriod: number; growthRate: number; status: 'NEW' | 'FEATURED' | 'STANDARD'; category: string; dealType: 'SALE' | 'LEASE' | 'QUICK_SALE'; employeeCount: number; sellerVerified: boolean; sellerTrustScore: number; marketTrend: 'up' | 'down' | 'stable'; marketPosition: 'underpriced' | 'fair' | 'premium'; daysOnMarket: number; location_country: string; sellerType: string; sellerMotivation: string; upcomingAuction?: boolean
+  id: string; title: string; location: string; country: string; image: string; askingPrice: number; askingPriceCurrency: string; annualRevenue: number; cashFlowMin: number; cashFlowMax: number; ebitda: number; profitMarginPercent: number; dealQualityScore: number; heatIndex: number; roiProjection: number; paybackPeriod: number; growthRate: number; status: 'NEW' | 'FEATURED' | 'STANDARD'; category: string; dealType: 'SALE' | 'LEASE' | 'QUICK_SALE'; employeeCount: number; sellerVerified: boolean; sellerTrustScore: number; marketTrend: 'up' | 'down' | 'stable'; marketPosition: 'underpriced' | 'fair' | 'premium'; daysOnMarket: number; location_country: string; sellerType: string; sellerMotivation: string; financingEligible?: boolean; upcomingAuction?: boolean
 }
 
 // Pretty-print enum-style values for filter options.
@@ -137,7 +138,8 @@ export default function MarketplacePage() {
     + (rangesActive.heat ? 1 : 0) + (rangesActive.quality ? 1 : 0)
     + (searchTerm.trim() ? 1 : 0)
 
-  const CARDS_PER_PAGE = 21
+  // Editorial rows are tall — 10 per page keeps scroll length reasonable.
+  const CARDS_PER_PAGE = 10
   const totalPages = Math.ceil(filteredListings.length / CARDS_PER_PAGE)
   useEffect(() => {
     if (totalPages > 0 && currentPage > totalPages) setCurrentPage(1)
@@ -209,19 +211,22 @@ export default function MarketplacePage() {
             <p className="text-xs mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>Platform-wide — not affected by your filters below.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {hotDeals.map((deal) => (
-                <motion.div key={deal.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border hover:shadow-md transition-shadow cursor-pointer bg-white" style={{ borderColor: COLOR_BORDER }}>
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1">
-                      <h3 className="font-bold text-sm line-clamp-1" style={{ color: COLOR_PRIMARY }}>{deal.title}</h3>
-                      <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>{deal.location}</p>
+                <Link key={deal.id} href={`/deal/${deal.id}`}>
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-xl border hover:shadow-md transition-shadow cursor-pointer bg-white" style={{ borderColor: COLOR_BORDER }}>
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        {/* Identity masked platform-wide — industry stands in for the name */}
+                        <h3 className="font-bold text-sm line-clamp-1" style={{ color: COLOR_PRIMARY }}>Confidential {industryLabel(deal.category)}</h3>
+                        <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>{deal.location}</p>
+                      </div>
+                      <div className="px-2 py-1 rounded text-xs font-bold text-white flex-shrink-0" style={{ background: '#DC2626' }}>{deal.heatIndex}🔥</div>
                     </div>
-                    <div className="px-2 py-1 rounded text-xs font-bold text-white flex-shrink-0" style={{ background: '#DC2626' }}>{deal.heatIndex}🔥</div>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span style={{ color: COLOR_TEXT_SECONDARY }}>${(deal.askingPrice / 1000000).toFixed(1)}M</span>
-                    <span style={{ color: '#10B981', fontWeight: 'bold' }}>{deal.growthRate}% growth</span>
-                  </div>
-                </motion.div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span style={{ color: COLOR_TEXT_SECONDARY }}>${(deal.askingPrice / 1000000).toFixed(1)}M</span>
+                      <span style={{ color: '#10B981', fontWeight: 'bold' }}>{deal.growthRate}% growth</span>
+                    </div>
+                  </motion.div>
+                </Link>
               ))}
             </div>
           </div>
@@ -377,9 +382,17 @@ export default function MarketplacePage() {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8" aria-busy="true">
-            {[0, 1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="rounded-xl border bg-white animate-pulse" style={{ borderColor: COLOR_BORDER, height: 360 }} />
+          <div className="space-y-16 mb-8" aria-busy="true">
+            {[0, 1].map((i) => (
+              <div key={i} className="grid md:grid-cols-5 gap-10 items-center">
+                <div className="md:col-span-2 rounded-2xl bg-gray-100 animate-pulse" style={{ height: 320 }} />
+                <div className="md:col-span-3 space-y-4">
+                  <div className="h-3 w-44 bg-gray-100 animate-pulse rounded" />
+                  <div className="h-9 w-80 bg-gray-100 animate-pulse rounded" />
+                  <div className="h-20 w-full bg-gray-100 animate-pulse rounded" />
+                  <div className="h-12 w-2/3 bg-gray-100 animate-pulse rounded" />
+                </div>
+              </div>
             ))}
           </div>
         ) : loadError ? (
@@ -390,19 +403,19 @@ export default function MarketplacePage() {
           </div>
         ) : currentListings.length > 0 ? (
           <>
-            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-              {currentListings.map((deal) => (
-                <motion.div key={deal.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                  <ListingCard
-                    {...deal}
-                    isSaved={savedDeals.isSaved(deal.id)}
-                    onSave={() => savedDeals.toggle(deal.id)}
-                    onViewPhotos={() => {
-                      setSelectedDealPhotos([deal.image])
-                      setPhotoModalOpen(true)
-                    }}
-                  />
-                </motion.div>
+            <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-16 md:space-y-20 mb-8">
+              {currentListings.map((deal, idx) => (
+                <EditorialRow
+                  key={deal.id}
+                  deal={deal}
+                  flip={idx % 2 === 1}
+                  isSaved={savedDeals.isSaved(deal.id)}
+                  onSave={() => savedDeals.toggle(deal.id)}
+                  onViewPhotos={() => {
+                    setSelectedDealPhotos([deal.image])
+                    setPhotoModalOpen(true)
+                  }}
+                />
               ))}
             </motion.div>
 
@@ -440,6 +453,148 @@ export default function MarketplacePage() {
       </div>
 
       <BusinessPhotoGallery isOpen={photoModalOpen} onClose={() => setPhotoModalOpen(false)} photos={selectedDealPhotos} businessType="Business" />
+    </div>
+  )
+}
+
+/* ─── Editorial listing row — full data parity with the old ListingCard ───── */
+
+const fmtMoney = (n: number) =>
+  n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(1)}M` : n >= 1_000 ? `$${Math.round(n / 1_000)}K` : `$${Math.round(n)}`
+
+function EditorialRow({
+  deal, flip, isSaved, onSave, onViewPhotos,
+}: {
+  deal: Deal
+  flip: boolean
+  isSaved: boolean
+  onSave: () => void
+  onViewPhotos: () => void
+}) {
+  const headline = maskedHeadline(deal)
+  const narrative = generateNarrative(deal)
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.5 }}
+      className={`grid md:grid-cols-5 gap-8 md:gap-12 items-center ${flip ? 'md:[direction:rtl]' : ''}`}
+    >
+      {/* ── Image panel ── */}
+      <div className="[direction:ltr] relative group md:col-span-2">
+        <Link href={`/deal/${deal.id}`} className="block rounded-2xl overflow-hidden shadow-sm" style={{ aspectRatio: '16/11' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={deal.image} alt="Confidential business listing" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+        </Link>
+        {/* Status chip */}
+        {deal.status !== 'STANDARD' && (
+          <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-black tracking-wide text-white" style={{ background: deal.status === 'FEATURED' ? COLOR_ACCENT : '#2D7A5F' }}>
+            {deal.status === 'FEATURED' ? '★ FEATURED' : 'NEW'}
+          </div>
+        )}
+        {/* Heat chip */}
+        {deal.heatIndex >= 85 && (
+          <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold text-white backdrop-blur" style={{ background: 'rgba(26,26,26,0.75)' }}>
+            <Sparkles size={10} className="inline mr-1 -mt-0.5" />
+            Most-watched · {deal.heatIndex}°
+          </div>
+        )}
+        {/* Save + photos */}
+        <div className="absolute top-3 right-3 flex gap-2">
+          <button onClick={onViewPhotos} aria-label="View photos" className="p-2 rounded-full bg-white/90 backdrop-blur shadow-md hover:shadow-lg transition-all">
+            <Camera size={14} style={{ color: COLOR_TEXT_SECONDARY }} />
+          </button>
+          <button onClick={onSave} aria-label="Save listing" className="p-2 rounded-full bg-white/90 backdrop-blur shadow-md hover:shadow-lg transition-all">
+            <Heart size={14} className={isSaved ? 'fill-current' : ''} style={{ color: isSaved ? COLOR_ACCENT : COLOR_TEXT_SECONDARY }} />
+          </button>
+        </div>
+      </div>
+
+      {/* ── Text panel ── */}
+      <div className="[direction:ltr] md:col-span-3">
+        <p className="text-[11px] font-bold tracking-[0.22em] mb-3" style={{ color: COLOR_TEXT_SECONDARY }}>
+          {narrativeEyebrow(deal)} · LISTED {deal.daysOnMarket}D AGO
+        </p>
+
+        <Link href={`/deal/${deal.id}`} className="block hover:opacity-80 transition-opacity">
+          <h3 className="text-2xl md:text-3xl font-black leading-tight mb-2" style={{ color: COLOR_PRIMARY }}>
+            {headline}
+          </h3>
+        </Link>
+        <div className="flex items-center gap-2 mb-3">
+          <Lock size={12} style={{ color: COLOR_ACCENT }} />
+          <span className="text-[11px] font-bold" style={{ color: COLOR_ACCENT }}>Identity shared after NDA with verified buyers</span>
+        </div>
+
+        {/* Badge row — trust + position signals from the old card */}
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {deal.sellerVerified && <Badge bg="#EAF5F0" color="#2D7A5F"><CheckCircle2 size={10} className="inline mr-1 -mt-0.5" />Verified · trust {deal.sellerTrustScore}/100</Badge>}
+          {deal.marketPosition === 'underpriced' && <Badge bg="#EAF5F0" color="#2D7A5F">Below market</Badge>}
+          {deal.marketPosition === 'premium' && <Badge bg="#FEF3C7" color="#B45309">Premium positioning</Badge>}
+          {deal.marketTrend === 'up' && <Badge bg="#EFF6FF" color="#1D4ED8">Trending ↑</Badge>}
+          {deal.financingEligible && <Badge bg="#EFF6FF" color="#1D4ED8">Financing eligible</Badge>}
+        </div>
+
+        {/* AI narrative */}
+        <p className="text-sm md:text-base leading-relaxed mb-5" style={{ color: COLOR_TEXT_SECONDARY }}>
+          {narrative}
+        </p>
+
+        {/* Primary stat strip — hairline rules */}
+        <div className="flex divide-x mb-4 overflow-x-auto" style={{ borderColor: COLOR_BORDER }}>
+          <StatCell label="Asking" value={fmtMoney(deal.askingPrice)} first highlight />
+          <StatCell label="Revenue" value={fmtMoney(deal.annualRevenue)} />
+          <StatCell label="EBITDA" value={fmtMoney(deal.ebitda)} />
+          <StatCell label="Cash flow" value={`${fmtMoney(deal.cashFlowMin)}–${fmtMoney(deal.cashFlowMax)}`} />
+        </div>
+
+        {/* Secondary metrics — every remaining data point from the old card */}
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-x-4 gap-y-2 mb-6 text-[11px]">
+          <MiniStat label="Margin" value={`${deal.profitMarginPercent}%`} />
+          <MiniStat label="ROI" value={`${deal.roiProjection}%`} />
+          <MiniStat label="Payback" value={`${deal.paybackPeriod}mo`} />
+          <MiniStat label="Growth" value={`↗ ${deal.growthRate}%`} positive />
+          <MiniStat label="Quality" value={`${deal.dealQualityScore}/100`} />
+          <MiniStat label="Team" value={`${deal.employeeCount}`} />
+        </div>
+
+        <div className="flex items-center gap-4">
+          <Link href={`/deal/${deal.id}`} className="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-bold text-white hover:opacity-90 transition-opacity text-sm" style={{ background: COLOR_PRIMARY }}>
+            View listing <ArrowRight size={14} />
+          </Link>
+          <button onClick={onSave} className="text-sm font-bold hover:opacity-70 inline-flex items-center gap-1.5" style={{ color: isSaved ? COLOR_ACCENT : COLOR_TEXT_SECONDARY }}>
+            <Heart size={13} className={isSaved ? 'fill-current' : ''} />
+            {isSaved ? 'Saved' : 'Save'}
+          </button>
+        </div>
+      </div>
+    </motion.article>
+  )
+}
+
+function Badge({ bg, color, children }: { bg: string; color: string; children: React.ReactNode }) {
+  return (
+    <span className="px-2 py-1 rounded-full text-[10px] font-bold" style={{ background: bg, color }}>
+      {children}
+    </span>
+  )
+}
+
+function StatCell({ label, value, first, highlight }: { label: string; value: string; first?: boolean; highlight?: boolean }) {
+  return (
+    <div className={`${first ? 'pr-4' : 'px-4'} flex-shrink-0`}>
+      <p className="text-[10px] font-bold tracking-widest uppercase mb-0.5" style={{ color: COLOR_TEXT_SECONDARY }}>{label}</p>
+      <p className="text-base md:text-lg font-black whitespace-nowrap" style={{ color: highlight ? COLOR_ACCENT : COLOR_PRIMARY }}>{value}</p>
+    </div>
+  )
+}
+
+function MiniStat({ label, value, positive }: { label: string; value: string; positive?: boolean }) {
+  return (
+    <div>
+      <span className="block font-semibold" style={{ color: COLOR_TEXT_SECONDARY }}>{label}</span>
+      <span className="font-black text-xs" style={{ color: positive ? '#2D7A5F' : COLOR_PRIMARY }}>{value}</span>
     </div>
   )
 }
