@@ -194,6 +194,18 @@ enum DealPlan {
   PREMIUM
 }
 
+// One-time password-reset link tokens. 60-minute expiry, single-use.
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId])
+}
+
 enum ListingApprovalStatus {
   DRAFT
   PENDING_VERIFICATION
@@ -288,6 +300,7 @@ model User {
 
   // BizBuySell-parity features
   savedSearches         SavedSearch[]
+  passwordResetTokens   PasswordResetToken[]
   financingInquiries    FinancingInquiry[]
   brokerProfile         BrokerProfile?
   reviewsAuthored       Review[]  @relation("ReviewAuthor")
