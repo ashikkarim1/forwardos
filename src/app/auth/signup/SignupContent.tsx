@@ -1,255 +1,186 @@
 'use client'
 
+/**
+ * Free account creation — the only signup workflow.
+ *
+ * No plan picker, no checkout, no pricing: accounts are free for buyers,
+ * sellers, and brokers; paid tiers are dashboard upsells later. Honors
+ * ?type=buyer|seller|broker (pre-selects the role) and ?redirect= (where to
+ * land after signup — e.g. back to the contact-seller form). Auto-login via
+ * the session cookie set by /api/auth/register.
+ */
 import { useState } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { useLocale } from '@/context/LocaleContext'
-import { StripeCheckout } from '@/components/StripeCheckout'
-import { ArrowLeft } from 'lucide-react'
-import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { PublicHeader } from '@/components/Navigation'
+import {
+  Briefcase, TrendingUp, Users, Loader, AlertCircle, ArrowRight,
+  ShieldCheck, Lock, CheckCircle2,
+} from 'lucide-react'
+import { PasswordInput } from '@/components/PasswordInput'
+import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 
-interface Plan {
-  id: 'starter' | 'professional' | 'enterprise'
-  name: string
-  description: string
-  basePrice: number
-  features: string[]
-  recommended?: boolean
-}
+const TYPES = [
+  { id: 'buyer', label: 'I want to buy a business', icon: Briefcase },
+  { id: 'seller', label: 'I want to sell my business', icon: TrendingUp },
+  { id: 'broker', label: "I'm a broker", icon: Users },
+] as const
 
 export function SignupContent() {
-  const { locale, currency, isRTL } = useLocale()
+  const router = useRouter()
   const searchParams = useSearchParams()
-  const selectedPlanParam = searchParams?.get('plan') as 'starter' | 'professional' | 'enterprise' | null
-  
-  const [selectedPlan, setSelectedPlan] = useState<'starter' | 'professional' | 'enterprise' | null>(selectedPlanParam || null)
-  const [step, setStep] = useState<'plans' | 'checkout'>('plans')
+  const typeParam = searchParams?.get('type') || ''
+  const redirectParam = searchParams?.get('redirect') || ''
 
-  const getPrice = (basePrice: number): number => {
-    if (currency === 'CAD') return Math.round(basePrice * 1.35)
-    if (currency === 'AED') return Math.round(basePrice * 3.67)
-    return basePrice
-  }
+  const [type, setType] = useState<string>(
+    ['buyer', 'seller', 'broker'].includes(typeParam) ? typeParam : 'buyer',
+  )
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [agree, setAgree] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const plans: Plan[] = [
-    {
-      id: 'starter',
-      name: 'Starter',
-      description: 'For emerging fund managers',
-      basePrice: 499,
-      features: [
-        'Advanced search & filters',
-        'Deal comparison (up to 3)',
-        'PDF export',
-        'Basic financial metrics',
-        'Saved searches & alerts',
-        'Email support',
-      ],
-    },
-    {
-      id: 'professional',
-      name: 'Professional',
-      description: 'For mid-market PE firms',
-      basePrice: 1999,
-      features: [
-        'Everything in Starter',
-        'Financial modeling tools (DCF, SDE, ROI)',
-        'Deal comparison (up to 5)',
-        'Portfolio dashboard & tracking',
-        'AI-powered recommendations',
-        'API access (10,000 calls/month)',
-        'Priority support',
-      ],
-      recommended: true,
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise',
-      description: 'For large PE firms',
-      basePrice: 0,
-      features: [
-        'Everything in Professional',
-        'Unlimited API access',
-        'Custom integrations',
-        'White-label marketplace',
-        'Dedicated account manager',
-        'Custom reporting',
-        '24/7 phone support',
-      ],
-    },
-  ]
+  const canSubmit =
+    firstName.trim() && lastName.trim() &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) &&
+    password.length >= 8 && agree
 
-  if (step === 'checkout' && selectedPlan) {
-    const plan = plans.find((p) => p.id === selectedPlan)!
-    return (
-      <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
-        <div className="border-b py-6 px-4 sm:px-6 lg:px-8" style={{ borderColor: COLOR_BORDER }}>
-          <div className="max-w-3xl mx-auto">
-            <button
-              onClick={() => setStep('plans')}
-              className="flex items-center gap-2 text-sm font-semibold hover:opacity-75"
-              style={{ color: COLOR_PRIMARY }}
-            >
-              <ArrowLeft size={16} style={{ transform: isRTL ? 'scaleX(-1)' : 'none' }} />
-              Back to Plans
-            </button>
-          </div>
-        </div>
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!canSubmit) return
+    setLoading(true)
+    setError('')
+    try {
+      const r = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, email, password, type }),
+      })
+      const data = await r.json()
+      if (!r.ok) { setError(data.error || 'Signup failed'); return }
 
-        <div className="py-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto">
-            <h1 className="text-3xl font-black text-center mb-12" style={{ color: COLOR_PRIMARY }}>
-              Complete Your Signup
-            </h1>
-            <StripeCheckout
-              planId={selectedPlan}
-              planName={plan.name}
-              amount={getPrice(plan.basePrice)}
-              features={plan.features}
-              onCancel={() => setStep('plans')}
-              onSuccess={() => {
-                window.location.href = '/dashboard'
-              }}
-            />
-          </div>
-        </div>
-      </div>
-    )
+      // Honor ?redirect= (same-origin relative paths only — open-redirect guard).
+      if (redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')) {
+        router.push(redirectParam)
+        return
+      }
+      // Role-appropriate landing: sellers go list, buyers browse, brokers dashboard.
+      if (type === 'seller') router.push('/list')
+      else if (type === 'broker') router.push('/dashboard/broker')
+      else router.push('/marketplace')
+    } catch {
+      setError('Network error — please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <div className="border-b py-8 px-4 sm:px-6 lg:px-8" style={{ borderColor: COLOR_BORDER }}>
-        <div className="max-w-5xl mx-auto">
-          <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold hover:opacity-75" style={{ color: COLOR_PRIMARY }}>
-            <ArrowLeft size={16} style={{ transform: isRTL ? 'scaleX(-1)' : 'none' }} />
-            Back to Home
-          </Link>
-          <h1 className="text-4xl font-black mt-4 mb-2" style={{ color: COLOR_PRIMARY }}>
-            Choose Your Plan
-          </h1>
-          <p style={{ color: COLOR_TEXT_SECONDARY }}>
-            14-day free trial. Cancel anytime. No credit card required for trial.
-          </p>
-        </div>
-      </div>
+    <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
+      <PublicHeader />
 
-      {/* Plans */}
-      <div className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {plans.map((plan, idx) => (
-              <motion.div
-                key={plan.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                className={`rounded-lg p-8 border transition-all relative flex flex-col ${
-                  plan.recommended ? 'ring-2 md:scale-105' : ''
-                }`}
-                style={{
-                  borderColor: plan.recommended ? COLOR_ACCENT : COLOR_BORDER,
-                  background: plan.recommended ? COLOR_ACCENT + '08' : 'white',
-                }}
-              >
-                {plan.recommended && (
-                  <div
-                    className="absolute -top-4 left-8 inline-block px-3 py-1 rounded-full text-xs font-bold text-white"
-                    style={{ background: COLOR_ACCENT }}
-                  >
-                    Recommended
-                  </div>
-                )}
+      <div className="max-w-md mx-auto px-6 py-12">
+        <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-center mb-3" style={{ color: '#B8956A' }}>
+          Free account · 60 seconds
+        </p>
+        <h1 className="text-3xl md:text-4xl font-black text-center mb-3" style={{ color: COLOR_PRIMARY }}>
+          Join Forward
+        </h1>
+        <p className="text-sm text-center mb-8" style={{ color: COLOR_TEXT_SECONDARY }}>
+          Free forever for browsing, saving, and contacting sellers. No credit card.
+        </p>
 
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-2" style={{ color: COLOR_PRIMARY }}>
-                    {plan.name}
-                  </h3>
-                  <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm mb-6">
-                    {plan.description}
-                  </p>
-
-                  <div className="mb-6">
-                    {plan.basePrice > 0 ? (
-                      <>
-                        <p className="text-4xl font-black" style={{ color: COLOR_ACCENT }}>
-                          ${plan.basePrice}
-                        </p>
-                        <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs mt-1">
-                          per month
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="text-2xl font-bold" style={{ color: COLOR_PRIMARY }}>
-                          Custom Pricing
-                        </p>
-                      </>
-                    )}
-                  </div>
-
-                  <div className="space-y-3 mb-6">
-                    {plan.features.map((feature, fidx) => (
-                      <div key={fidx} className="flex gap-3 text-sm">
-                        <span style={{ color: COLOR_ACCENT }}>✓</span>
-                        <span style={{ color: COLOR_TEXT_SECONDARY }}>{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
+        <form onSubmit={submit} className="space-y-4">
+          {/* Role selector */}
+          <div className="space-y-2">
+            {TYPES.map((t) => {
+              const Icon = t.icon
+              const active = type === t.id
+              return (
                 <button
-                  onClick={() => {
-                    setSelectedPlan(plan.id)
-                    setStep('checkout')
-                  }}
-                  className={`w-full px-6 py-3 rounded-lg font-bold transition-all ${
-                    plan.recommended ? 'text-white' : ''
-                  }`}
+                  key={t.id}
+                  type="button"
+                  onClick={() => setType(t.id)}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-sm font-bold text-left transition-colors"
                   style={{
-                    background: plan.recommended ? COLOR_ACCENT : COLOR_ACCENT + '20',
-                    color: plan.recommended ? 'white' : COLOR_ACCENT,
+                    borderColor: active ? '#B8956A' : COLOR_BORDER,
+                    background: active ? '#FAF6EF' : 'white',
+                    color: COLOR_PRIMARY,
                   }}
                 >
-                  {plan.id === 'enterprise' ? 'Contact Sales' : 'Start Free Trial'}
+                  <Icon size={18} style={{ color: active ? '#B8956A' : COLOR_TEXT_SECONDARY }} />
+                  {t.label}
+                  {active && <CheckCircle2 size={16} className="ml-auto" style={{ color: '#B8956A' }} />}
                 </button>
-              </motion.div>
-            ))}
+              )
+            })}
           </div>
 
-          {/* FAQ */}
-          <div className="mt-20 max-w-3xl mx-auto">
-            <h2 className="text-2xl font-bold text-center mb-8" style={{ color: COLOR_PRIMARY }}>
-              Questions?
-            </h2>
-            <div className="space-y-4">
-              {[
-                {
-                  q: "What's included in the free trial?",
-                  a: 'Full access to your selected plan for 14 days. No credit card required.',
-                },
-                {
-                  q: 'Can I change plans later?',
-                  a: 'Yes, upgrade or downgrade anytime. Changes take effect on your next billing cycle.',
-                },
-                {
-                  q: 'What payment methods do you accept?',
-                  a: 'All major credit cards via Stripe in USD, CAD, and AED.',
-                },
-              ].map((faq, idx) => (
-                <div key={idx} className="p-4 rounded-lg border" style={{ borderColor: COLOR_BORDER }}>
-                  <p className="font-bold mb-2" style={{ color: COLOR_PRIMARY }}>
-                    {faq.q}
-                  </p>
-                  <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm">
-                    {faq.a}
-                  </p>
-                </div>
-              ))}
-            </div>
+          <div className="grid grid-cols-2 gap-3">
+            <input
+              type="text" required placeholder="First name" value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="px-3 py-3 rounded-lg border bg-white text-sm focus:outline-none focus:ring-2"
+              style={{ borderColor: COLOR_BORDER }}
+            />
+            <input
+              type="text" required placeholder="Last name" value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="px-3 py-3 rounded-lg border bg-white text-sm focus:outline-none focus:ring-2"
+              style={{ borderColor: COLOR_BORDER }}
+            />
           </div>
+          <input
+            type="email" required placeholder="you@example.com" value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-3 py-3 rounded-lg border bg-white text-sm focus:outline-none focus:ring-2"
+            style={{ borderColor: COLOR_BORDER }}
+          />
+          <PasswordInput
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password (8+ characters)"
+            className="w-full px-3 py-3 rounded-lg border bg-white text-sm focus:outline-none focus:ring-2"
+            style={{ borderColor: COLOR_BORDER }}
+          />
+
+          <label className="flex items-start gap-2.5 cursor-pointer text-xs leading-relaxed" style={{ color: COLOR_TEXT_SECONDARY }}>
+            <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-0.5 accent-[#B8956A]" />
+            <span>
+              I agree to the <Link href="/terms" className="underline" style={{ color: '#B8956A' }}>Terms</Link> and{' '}
+              <Link href="/privacy" className="underline" style={{ color: '#B8956A' }}>Privacy Policy</Link>.
+            </span>
+          </label>
+
+          {error && (
+            <div className="rounded-lg border p-3 text-sm flex items-start gap-2" style={{ borderColor: '#FCA5A5', background: '#FEE2E2', color: '#991B1B' }}>
+              <AlertCircle size={15} className="flex-shrink-0 mt-0.5" /> {error}
+            </div>
+          )}
+
+          <button
+            type="submit" disabled={!canSubmit || loading}
+            className="w-full px-6 py-3.5 rounded-lg font-bold text-white text-sm hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+            style={{ background: COLOR_PRIMARY }}
+          >
+            {loading ? <><Loader size={15} className="animate-spin" /> Creating account…</> : <>Create free account <ArrowRight size={15} /></>}
+          </button>
+
+          <p className="text-center text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
+            Already have an account?{' '}
+            <Link href={`/auth/login${redirectParam ? `?redirect=${encodeURIComponent(redirectParam)}` : ''}`} className="font-bold underline" style={{ color: COLOR_PRIMARY }}>
+              Sign in
+            </Link>
+          </p>
+        </form>
+
+        <div className="mt-10 pt-6 border-t space-y-2.5 text-xs" style={{ borderColor: COLOR_BORDER, color: COLOR_TEXT_SECONDARY }}>
+          <div className="flex items-start gap-2"><ShieldCheck size={13} style={{ color: '#2D7A5F' }} className="mt-0.5 flex-shrink-0" /><span>Forward verifies every buyer and seller before any introduction.</span></div>
+          <div className="flex items-start gap-2"><Lock size={13} style={{ color: '#B8956A' }} className="mt-0.5 flex-shrink-0" /><span>Your details stay private — never shared publicly, never sold.</span></div>
         </div>
       </div>
     </div>
