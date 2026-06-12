@@ -55,13 +55,11 @@ const formatCategoryName = (name: string) => {
     .join(' ')
 }
 
-// Seller Type / Motivation are deliberately omitted: the Deal schema doesn't
-// store them per-listing yet, so /api/deals hardcodes every deal to Founder /
-// Strategic Exit, which would make those filter sections functionally useless.
-// Add them back here once Deal has real columns to filter on.
 const FILTER_SECTIONS = [
   { id: 'industry', label: 'Industry', icon: Building2 },
   { id: 'location', label: 'Location', icon: MapPin },
+  { id: 'sellerType', label: 'Seller Type', icon: Users },
+  { id: 'sellerMotivation', label: 'Seller Motivation', icon: Target },
 ]
 
 const containerVariants = {

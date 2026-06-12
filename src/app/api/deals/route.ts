@@ -27,6 +27,29 @@ function daysSince(date: Date | null): number {
   return Math.max(1, Math.round((Date.now() - new Date(date).getTime()) / 86_400_000))
 }
 
+// Map DB enum values to the human-readable strings the marketplace card +
+// filter sidebar expect. Keeping the marketplace UI shape stable means we
+// don't have to refactor the filter logic that consumes these labels.
+const SELLER_TYPE_LABEL: Record<string, string> = {
+  FOUNDER: 'Founder',
+  FAMILY: 'Family',
+  PE: 'PE Firm',
+  CORPORATE: 'Corporate',
+  BROKER: 'Broker',
+  MANAGEMENT: 'Management',
+  OTHER: 'Other',
+}
+const MOTIVATION_LABEL: Record<string, string> = {
+  STRATEGIC_EXIT: 'Strategic Exit',
+  SUCCESSION: 'Succession',
+  RETIREMENT: 'Retirement',
+  GROWTH_CAPITAL: 'Growth Capital',
+  PORTFOLIO_OPTIMIZATION: 'Portfolio Optimization',
+  DISTRESSED: 'Distressed',
+  RELOCATION: 'Relocation',
+  OTHER: 'Other',
+}
+
 export async function GET(_request: NextRequest) {
   try {
     const rows = await prisma.deal.findMany({
@@ -78,8 +101,8 @@ export async function GET(_request: NextRequest) {
         marketPosition: position,
         daysOnMarket: dom,
         location_country: d.country,
-        sellerType: 'Founder',
-        sellerMotivation: 'Strategic Exit',
+        sellerType: d.sellerType ? SELLER_TYPE_LABEL[d.sellerType] : 'Founder',
+        sellerMotivation: d.sellerMotivation ? MOTIVATION_LABEL[d.sellerMotivation] : 'Strategic Exit',
         financingEligible: d.financingEligible,
       }
     })

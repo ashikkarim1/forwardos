@@ -70,6 +70,30 @@ enum IndustryType {
   OTHER
 }
 
+// Who the seller is, structurally. Drives marketplace filters and buyer expectations.
+enum SellerType {
+  FOUNDER
+  FAMILY
+  PE
+  CORPORATE
+  BROKER
+  MANAGEMENT
+  OTHER
+}
+
+// Why the seller is selling. Drives marketplace filters and helps buyers
+// understand the urgency / opportunity behind the listing.
+enum SellerMotivation {
+  STRATEGIC_EXIT
+  SUCCESSION
+  RETIREMENT
+  GROWTH_CAPITAL
+  PORTFOLIO_OPTIMIZATION
+  DISTRESSED
+  RELOCATION
+  OTHER
+}
+
 enum DealPipelineStage {
   INTEREST
   QUALIFICATION
@@ -421,6 +445,11 @@ model Deal {
   realEstateIncluded    Boolean   @default(false)
   equipmentIncluded     Boolean   @default(false)
   isFranchise           Boolean   @default(false)
+
+  // Who the seller is & why they're selling — surfaced as marketplace filters.
+  // Nullable for backward-compat with deals seeded before the column existed.
+  sellerType            SellerType?
+  sellerMotivation      SellerMotivation?
 
   // Deal Characteristics
   keyStrengths          String?   @db.Text // JSON array

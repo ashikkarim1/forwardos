@@ -17,6 +17,15 @@ export const INDUSTRY_VALUES = [
   'AGRICULTURE', 'BIOTECH', 'CPG', 'MEDIA', 'TELECOM', 'OTHER',
 ] as const
 
+export const SELLER_TYPE_VALUES = [
+  'FOUNDER', 'FAMILY', 'PE', 'CORPORATE', 'BROKER', 'MANAGEMENT', 'OTHER',
+] as const
+
+export const SELLER_MOTIVATION_VALUES = [
+  'STRATEGIC_EXIT', 'SUCCESSION', 'RETIREMENT', 'GROWTH_CAPITAL',
+  'PORTFOLIO_OPTIMIZATION', 'DISTRESSED', 'RELOCATION', 'OTHER',
+] as const
+
 export interface MappedDeal {
   title: string
   description: string | null
@@ -34,6 +43,8 @@ export interface MappedDeal {
   heatScore: number | null
   sellerEmail: string | null
   sellerName: string | null
+  sellerType: string | null
+  sellerMotivation: string | null
 }
 
 /** Minimal RFC-4180-ish CSV parser: handles quoted fields, escaped quotes, commas, and newlines. */
@@ -91,6 +102,13 @@ export function mapRow(row: Record<string, string>): { ok: true; deal: MappedDea
   const country = (row.country || '').trim()
   if (!country) return { ok: false, error: `Missing country for "${title}"` }
 
+  // sellerType / sellerMotivation are optional; ignore unrecognized values
+  // rather than reject the whole row.
+  const rawType = (row.sellerType || '').trim().toUpperCase().replace(/[\s-]/g, '_')
+  const sellerType = SELLER_TYPE_VALUES.includes(rawType as never) ? rawType : null
+  const rawMot = (row.sellerMotivation || '').trim().toUpperCase().replace(/[\s-]/g, '_')
+  const sellerMotivation = SELLER_MOTIVATION_VALUES.includes(rawMot as never) ? rawMot : null
+
   return {
     ok: true,
     deal: {
@@ -110,6 +128,8 @@ export function mapRow(row: Record<string, string>): { ok: true; deal: MappedDea
       heatScore: toInt(row.heatScore || ''),
       sellerEmail: row.sellerEmail?.trim().toLowerCase() || null,
       sellerName: row.sellerName?.trim() || null,
+      sellerType,
+      sellerMotivation,
     },
   }
 }
@@ -167,6 +187,8 @@ export async function runImport(csvText: string, db: any): Promise<ImportResult>
         employees: d.employees, foundedYear: d.foundedYear, isFranchise: d.isFranchise,
         financingEligible: d.financingEligible, financingNote: d.financingNote,
         heatScore: d.heatScore,
+        sellerType: d.sellerType as never,
+        sellerMotivation: d.sellerMotivation as never,
       }
       const existing = await db.deal.findUnique({ where: { id } })
       if (existing) { await db.deal.update({ where: { id }, data }); result.updated++ }
