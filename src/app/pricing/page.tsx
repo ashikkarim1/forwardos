@@ -155,12 +155,17 @@ export default function PricingPage() {
                   className="rounded-2xl border bg-white overflow-hidden flex flex-col"
                   style={{ borderColor: tier.highlight ? '#B8956A' : COLOR_BORDER, borderWidth: tier.highlight ? 2 : 1 }}
                 >
-                  {tier.highlight && (
-                    <div className="px-4 py-1.5 text-center text-[10px] font-bold tracking-widest text-white" style={{ background: '#B8956A' }}>
-                      MOST POPULAR
-                    </div>
-                  )}
-                  <div className="p-7 flex-1">
+                  {/* Ribbon slot is reserved on EVERY card (invisible when not
+                      highlighted) so card bodies start at the same y and the
+                      bottom-pinned CTAs land on the same row. */}
+                  <div
+                    className="px-4 py-1.5 text-center text-[10px] font-bold tracking-widest text-white"
+                    style={{ background: tier.highlight ? '#B8956A' : 'transparent', visibility: tier.highlight ? 'visible' : 'hidden' }}
+                    aria-hidden={!tier.highlight}
+                  >
+                    MOST POPULAR
+                  </div>
+                  <div className="p-7 flex-1 flex flex-col">
                     <div className="flex items-baseline gap-2 mb-1">
                       {col.role === 'Brokers' ? <Building2 size={18} style={{ color: '#B8956A' }} /> : tier.highlight ? <Sparkles size={18} style={{ color: '#B8956A' }} /> : <Zap size={18} style={{ color: COLOR_TEXT_SECONDARY }} />}
                       <h3 className="text-xl font-black" style={{ color: COLOR_PRIMARY }}>{tier.name}</h3>
@@ -178,9 +183,11 @@ export default function PricingPage() {
                         </li>
                       ))}
                     </ul>
+                    {/* mt-auto pins the CTA to the bottom regardless of how
+                        many features the tier lists — buttons share a row. */}
                     <Link
                       href={tier.cta.href}
-                      className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity"
+                      className="mt-auto inline-flex items-center justify-center gap-2 w-full px-5 py-3 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity"
                       style={{ background: tier.highlight ? COLOR_PRIMARY : '#F4F2EE', color: tier.highlight ? 'white' : COLOR_PRIMARY }}
                     >
                       {tier.cta.label} <ArrowRight size={14} />

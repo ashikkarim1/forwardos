@@ -2,12 +2,12 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Zap, Briefcase, TrendingUp, Users, ArrowRight, BarChart3, Network, Sparkles } from 'lucide-react'
+import { Zap, Briefcase, TrendingUp, Users, ArrowRight, BarChart3, Network } from 'lucide-react'
 import { useState } from 'react'
 import { useLocale } from '@/context/LocaleContext'
 import { t } from '@/lib/translations'
 import { formatCurrency, getDefaultCurrency } from '@/lib/currency'
-import { LocaleSelector } from './LocaleSelector'
+import { PublicHeader } from './Navigation'
 import { SeeInActionSection } from './SeeInActionSection'
 import { FeaturedListingsSection } from './FeaturedListingsSection'
 import { HelpContactWidget } from './HelpContactWidget'
@@ -29,44 +29,10 @@ function LocalizedHomePageContent() {
 
   return (
     <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header Navigation */}
-      <nav
-        className="sticky top-0 z-50 bg-white border-b"
-        style={{ borderColor: COLOR_BORDER }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles size={32} style={{ color: COLOR_ACCENT }} />
-            <span className="text-xl font-black" style={{ color: COLOR_PRIMARY }}>
-              {t('nav.brand', locale)}
-            </span>
-          </div>
-          <div className={`flex items-center gap-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
-            <Link
-              href="/marketplace"
-              className="font-bold hover:opacity-80"
-              style={{ color: COLOR_PRIMARY }}
-            >
-              {t('nav.browseDeals', locale)}
-            </Link>
-            <Link
-              href="/pricing"
-              className="font-bold hover:opacity-80"
-              style={{ color: COLOR_PRIMARY }}
-            >
-              {t('cta.pricing', locale)}
-            </Link>
-            <LocaleSelector />
-            <Link
-              href="/auth/signin"
-              className="px-6 py-2 rounded-lg font-bold text-white hover:opacity-90"
-              style={{ background: COLOR_ACCENT }}
-            >
-              {t('nav.signIn', locale)}
-            </Link>
-          </div>
-        </div>
-      </nav>
+      {/* Standard site header — same logo + menu as every other page.
+          (The old one-off nav with the Sparkles icon + "Forward OS" wordmark
+          made the landing page look like a different product.) */}
+      <PublicHeader />
 
       {/* ─── Hero — cinematic "freedom after the sale" ─────────────────────
           Full-bleed imagery (the morning after you sign), dark ink gradient,
