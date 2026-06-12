@@ -30,16 +30,38 @@ const DEALS: Deal[] = [
 // Duplicate for pagination demo
 const EXTENDED_DEALS = [...DEALS, ...DEALS]
 
-// Format category names: SAAS -> Saas, FINTECH -> Fintech, etc.
+// Pretty-print enum-style values for filter checkboxes.
+//  - REAL_ESTATE  -> "Real Estate"
+//  - SAAS         -> "SaaS"
+//  - USA/UAE/KSA  -> preserve all-caps country/abbreviation
+//  - HEALTHCARE   -> "Healthcare"
+const SPECIAL_LABELS: Record<string, string> = {
+  SAAS: 'SaaS',
+  USA: 'USA',
+  UAE: 'UAE',
+  KSA: 'KSA',
+  UK: 'UK',
+  EDTECH: 'EdTech',
+  FINTECH: 'FinTech',
+  ECOMMERCE: 'E-Commerce',
+}
 const formatCategoryName = (name: string) => {
-  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase()
+  if (!name) return ''
+  const upper = name.toUpperCase()
+  if (SPECIAL_LABELS[upper]) return SPECIAL_LABELS[upper]
+  return upper
+    .split('_')
+    .map((part) => part.charAt(0) + part.slice(1).toLowerCase())
+    .join(' ')
 }
 
+// Seller Type / Motivation are deliberately omitted: the Deal schema doesn't
+// store them per-listing yet, so /api/deals hardcodes every deal to Founder /
+// Strategic Exit, which would make those filter sections functionally useless.
+// Add them back here once Deal has real columns to filter on.
 const FILTER_SECTIONS = [
   { id: 'industry', label: 'Industry', icon: Building2 },
   { id: 'location', label: 'Location', icon: MapPin },
-  { id: 'sellerType', label: 'Seller Type', icon: Users },
-  { id: 'sellerMotivation', label: 'Seller Motivation', icon: Target },
 ]
 
 const containerVariants = {
@@ -262,6 +284,10 @@ export default function MarketplacePage() {
                   { label: 'Success Probability', icon: CheckCircle2, min: successProb.min, max: successProb.max, setRange: setSuccessProb, minMax: { min: 0, max: 100 }, suffix: '%' },
                 ].map((range, i) => {
                   const Icon = range.icon
+                  // Reset pagination on slider change so users don't get stranded on
+                  // an empty page after narrowing the result set.
+                  const updateMin = (v: number) => { range.setRange({ min: v, max: range.max }); setCurrentPage(1) }
+                  const updateMax = (v: number) => { range.setRange({ min: range.min, max: v }); setCurrentPage(1) }
                   return (
                     <motion.div key={i} className="rounded-lg border p-3 hover:shadow-sm transition-shadow bg-white" style={{ borderColor: COLOR_BORDER }}>
                       <div className="flex items-center gap-2 mb-3">
@@ -271,11 +297,11 @@ export default function MarketplacePage() {
                       <div className="space-y-2">
                         <div>
                           <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>Min: {range.min}{range.suffix}</span>
-                          <input type="range" min={range.minMax.min} max={range.minMax.max} step="0.1" value={range.min} onChange={(e) => range.setRange({ min: parseFloat(e.target.value), max: range.max })} className="w-full" />
+                          <input type="range" min={range.minMax.min} max={range.minMax.max} step="0.1" value={range.min} onChange={(e) => updateMin(parseFloat(e.target.value))} className="w-full" />
                         </div>
                         <div>
                           <span className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>Max: {range.max}{range.suffix}</span>
-                          <input type="range" min={range.minMax.min} max={range.minMax.max} step="0.1" value={range.max} onChange={(e) => range.setRange({ min: range.min, max: parseFloat(e.target.value) })} className="w-full" />
+                          <input type="range" min={range.minMax.min} max={range.minMax.max} step="0.1" value={range.max} onChange={(e) => updateMax(parseFloat(e.target.value))} className="w-full" />
                         </div>
                       </div>
                     </motion.div>
