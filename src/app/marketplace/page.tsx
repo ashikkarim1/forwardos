@@ -137,12 +137,28 @@ export default function MarketplacePage() {
 
   const hotDeals = useMemo(() => [...activeDeals].sort((a, b) => b.heatIndex - a.heatIndex).slice(0, 4), [activeDeals])
 
+  // Active filter tally — counts every dimension that's been narrowed away
+  // from its default, so the sidebar pill and the empty-state copy are honest.
+  const activeFiltersCount =
+    selectedIndustries.length + selectedLocations.length + selectedSellerTypes.length + selectedMotivations.length
+    + (valuation.min !== 0.1 || valuation.max !== 100 ? 1 : 0)
+    + (revenue.min !== 0 || revenue.max !== 50 ? 1 : 0)
+    + (heatScore.min !== 0 || heatScore.max !== 100 ? 1 : 0)
+    + (successProb.min !== 0 || successProb.max !== 100 ? 1 : 0)
+    + (searchTerm.trim() ? 1 : 0)
+
   const CARDS_PER_PAGE = 20
   const totalPages = Math.ceil(filteredListings.length / CARDS_PER_PAGE)
+
+  // Snap currentPage back into [1, totalPages] when filters narrow results so
+  // the user never ends up stranded on a page past the end of the result set.
+  useEffect(() => {
+    if (totalPages > 0 && currentPage > totalPages) setCurrentPage(1)
+    if (totalPages === 0 && currentPage !== 1) setCurrentPage(1)
+  }, [totalPages, currentPage])
+
   const startIdx = (currentPage - 1) * CARDS_PER_PAGE
   const currentListings = filteredListings.slice(startIdx, startIdx + CARDS_PER_PAGE)
-
-  const activeFiltersCount = selectedIndustries.length + selectedLocations.length + selectedSellerTypes.length + selectedMotivations.length + (valuation.min !== 0.1 ? 1 : 0) + (valuation.max !== 100 ? 1 : 0)
 
   const toggleFilter = (id: string) => setExpandedFilters(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id])
 
@@ -181,6 +197,10 @@ export default function MarketplacePage() {
         </div>
       </section>
 
+      {/* Trending section is a discovery aid — hide it once the user has
+          expressed intent via filters, so it doesn't visually contradict an
+          empty filtered-results state below. */}
+      {activeFiltersCount === 0 && (
       <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="border-b" style={{ borderColor: COLOR_BORDER, background: 'white' }}>
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
           <div className="flex items-center gap-2 mb-6">
@@ -207,6 +227,7 @@ export default function MarketplacePage() {
           </div>
         </div>
       </motion.section>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -342,8 +363,24 @@ export default function MarketplacePage() {
                 )}
               </>
             ) : (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
-                <p className="text-lg" style={{ color: COLOR_TEXT_SECONDARY }}>No opportunities found. Try adjusting your filters.</p>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20 px-6">
+                <p className="text-2xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>
+                  No listings match {activeFiltersCount > 0 ? `your ${activeFiltersCount} filter${activeFiltersCount === 1 ? '' : 's'}` : 'your search'}
+                </p>
+                <p className="text-base mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
+                  {activeFiltersCount > 0
+                    ? `Try widening a range or removing an industry / location. ${activeDeals.length} listings total.`
+                    : 'No listings published yet.'}
+                </p>
+                {activeFiltersCount > 0 && (
+                  <button
+                    onClick={clearAllFilters}
+                    className="px-5 py-3 rounded-lg font-bold text-white hover:opacity-90"
+                    style={{ background: COLOR_ACCENT }}
+                  >
+                    Clear all filters → show {activeDeals.length} listings
+                  </button>
+                )}
               </motion.div>
             )}
           </div>
