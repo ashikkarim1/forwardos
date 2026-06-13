@@ -38,7 +38,9 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   poweredByHeader: false,
   distDir: '.next',
-  output: 'standalone',
+  // `output: 'standalone'` is for Docker self-hosting; on Vercel it bypasses
+  // the edge runtime so middleware.ts never runs. Leave Next.js in its
+  // default output mode and let Vercel handle the bundling.
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }]
   },
