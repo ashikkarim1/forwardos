@@ -36,9 +36,22 @@ export async function signToken(payload: JWTPayload): Promise<string> {
   return token
 }
 
+/**
+ * Sessions issued before this Unix timestamp are rejected on verify, even if
+ * the JWT signature is still valid. Bump this constant + redeploy to
+ * force-logout every existing user on next request — useful before a demo,
+ * after a perceived leak, or after a credential rotation.
+ *
+ * Unix seconds. Current value picked to invalidate all tokens issued during
+ * pre-launch testing (covers the $99 Stripe smoke-test sessions).
+ */
+const SESSION_REVOKE_BEFORE = 1781400000 // 2026-06-13 ~ deploy moment
+
 export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
     const verified = await jwtVerify(token, secret)
+    const iat = typeof verified.payload.iat === 'number' ? verified.payload.iat : 0
+    if (iat < SESSION_REVOKE_BEFORE) return null   // revoked — re-login required
     return {
       userId: verified.payload.userId as string,
       email: verified.payload.email as string,
