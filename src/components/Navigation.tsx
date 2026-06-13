@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { COLOR_ACCENT, COLOR_BORDER } from '@/styles/forward-colors'
 
 import { Bell, Heart } from 'lucide-react'
@@ -9,10 +10,31 @@ import { useSavedDeals } from '@/hooks/useSavedDeals'
 /**
  * Minimal public header for landing, pricing, login pages
  * Logo + Navigation + Notifications + Account button
+ *
+ * Notification-bell badge is gated on a session probe (/api/me) so it
+ * doesn't fire pre-auth and leak session-shaped UI to crawlers. We start
+ * authed=false on the client; the probe flips it once the cookie is checked.
  */
 export function PublicHeader() {
-  const unreadCount = 2 // Mock unread count
+  const [authed, setAuthed] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
   const { count: savedCount, hydrated: savedHydrated } = useSavedDeals()
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/me', { credentials: 'same-origin' })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => {
+        if (cancelled || !d?.authenticated) return
+        setAuthed(true)
+        // TODO(notif-api): replace with real unread count fetch once the
+        // notifications API ships. For now we keep the badge hidden by
+        // default so we never show a fake count.
+        setUnreadCount(0)
+      })
+      .catch(() => { /* anonymous browsing — leave hidden */ })
+    return () => { cancelled = true }
+  }, [])
 
   return (
     <header className="border-b sticky top-0 z-30 bg-white" style={{ borderColor: COLOR_BORDER }}>
@@ -104,21 +126,25 @@ export function PublicHeader() {
             )}
           </Link>
 
-          {/* Notification Bell */}
-          <Link
-            href="/notifications"
-            className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            <Bell className="w-6 h-6" style={{ color: '#1a1a1a' }} />
-            {unreadCount > 0 && (
-              <div
-                className="absolute top-0 right-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                style={{ background: COLOR_ACCENT }}
-              >
-                {unreadCount}
-              </div>
-            )}
-          </Link>
+          {/* Notification Bell — only rendered for signed-in users so the
+              header doesn't leak a notification UI to anonymous visitors. */}
+          {authed && (
+            <Link
+              href="/notifications"
+              className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Notifications"
+            >
+              <Bell className="w-6 h-6" style={{ color: '#1a1a1a' }} />
+              {unreadCount > 0 && (
+                <div
+                  className="absolute top-0 right-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                  style={{ background: COLOR_ACCENT }}
+                >
+                  {unreadCount}
+                </div>
+              )}
+            </Link>
+          )}
 
           {/* Account Button */}
           <Link

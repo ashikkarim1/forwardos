@@ -3,7 +3,10 @@ import Link from 'next/link'
 import { PublicHeader } from '@/components/Navigation'
 import { pageMetadata, breadcrumbLd, jsonLdScript } from '@/lib/seo'
 import { PRICING } from '@/lib/pricing'
-import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
+import { Button, Heading, Overline, Text } from '@/components/ui'
+import { palette, semantic, space, radius } from '@/styles/tokens'
+// Legacy aliases re-exported from tokens.ts — kept until full migration.
+import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 import { Check, ArrowRight, Sparkles, Zap, Building2 } from 'lucide-react'
 
 export const metadata: Metadata = pageMetadata({
@@ -125,19 +128,17 @@ const COLUMNS: PlanCol[] = [
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
+    <div className="min-h-screen" style={{ background: semantic.surface.cream }}>
       <PublicHeader />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Pricing', path: '/pricing' }])) }} />
 
-      <section className="px-6 py-14 border-b" style={{ borderColor: COLOR_BORDER, background: 'white' }}>
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-[10px] font-bold tracking-[0.25em] mb-4" style={{ color: '#B8956A' }}>FORWARD PRICING</p>
-          <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight" style={{ color: COLOR_PRIMARY }}>
-            Free to start. Pay only when Forward makes you money.
-          </h1>
-          <p className="text-lg" style={{ color: COLOR_TEXT_SECONDARY }}>
+      <section style={{ padding: `${space[16]} ${space[6]} ${space[12]}`, background: semantic.surface.default, borderBottom: `1px solid ${semantic.border.subtle}` }}>
+        <div style={{ maxWidth: '720px', margin: '0 auto', textAlign: 'center' }}>
+          <Overline tone="brand" style={{ marginBottom: space[3] }}>Forward pricing</Overline>
+          <Heading level={1}>Free to start. Pay only when Forward makes you money.</Heading>
+          <Text size="bodyLg" tone="secondary" style={{ marginTop: space[4] }}>
             Buyer accounts are always free. Basic seller listings are always free. Premium tiers unlock matching, intelligence, and outbound — every dollar is tied to outcomes.
-          </p>
+          </Text>
         </div>
       </section>
 
@@ -184,13 +185,19 @@ export default function PricingPage() {
                       ))}
                     </ul>
                     {/* mt-auto pins the CTA to the bottom regardless of how
-                        many features the tier lists — buttons share a row. */}
-                    <Link
-                      href={tier.cta.href}
-                      className="mt-auto inline-flex items-center justify-center gap-2 w-full px-5 py-3 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity"
-                      style={{ background: tier.highlight ? COLOR_PRIMARY : '#F4F2EE', color: tier.highlight ? 'white' : COLOR_PRIMARY }}
-                    >
-                      {tier.cta.label} <ArrowRight size={14} />
+                        many features the tier lists — buttons share a row.
+                        Highlighted tiers get the ink primary; others get the
+                        secondary so the page has one clear focal action per
+                        column. */}
+                    <Link href={tier.cta.href} className="mt-auto block">
+                      <Button
+                        variant={tier.highlight ? 'primary' : 'secondary'}
+                        size="lg"
+                        fullWidth
+                        rightIcon={<ArrowRight size={14} />}
+                      >
+                        {tier.cta.label}
+                      </Button>
                     </Link>
                   </div>
                 </article>

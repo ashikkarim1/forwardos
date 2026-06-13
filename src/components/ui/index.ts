@@ -5,7 +5,9 @@
  * Never inline a button / table / form input in a feature component.
  */
 export { Button } from './Button'
+export { CommandPaletteProvider } from './CommandPalette'
 export { DataTable, type ColumnDef } from './DataTable'
 export { EmptyState } from './EmptyState'
 export { Toaster, toast } from './Toast'
+export { Tooltip } from './Tooltip'
 export { Text, Heading, Display, Overline, Mono } from './Typography'

@@ -5,7 +5,7 @@ import { LaunchPromoBanner } from '@/components/LaunchPromoBanner'
 import FeedbackWidget from '@/components/FeedbackWidget'
 import ConsentBanner from '@/components/ConsentBanner'
 import Analytics from '@/components/Analytics'
-import { Toaster } from '@/components/ui'
+import { CommandPaletteProvider, Toaster } from '@/components/ui'
 import {
   SITE_URL, SITE_NAME, SITE_TAGLINE, DEFAULT_DESCRIPTION, DEFAULT_KEYWORDS, OG_IMAGE,
   organizationLd, webSiteLd, jsonLdScript,
@@ -66,6 +66,7 @@ export default function RootLayout({
           <FeedbackWidget />
           <ConsentBanner />
           <Toaster />
+          <CommandPaletteProvider />
         </LocaleProvider>
       </body>
     </html>
