@@ -1,21 +1,14 @@
-'use client'
+// SERVER COMPONENT — see /dashboard/layout.tsx for the why.
+import { requireSessionOrRedirect } from '@/lib/auth-guard'
+import NotificationsLayoutClient from './LayoutClient'
 
-import { AppShell } from '@/components/layout/AppShell'
-import { DashboardFooter } from '@/components/layout/DashboardFooter'
+export const dynamic = 'force-dynamic'
 
-export default function NotificationsLayout({
+export default async function NotificationsLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <AppShell>
-      <div className="flex flex-col min-h-[calc(100vh-56px)]">
-        <main className="flex-1">
-          {children}
-        </main>
-        <DashboardFooter />
-      </div>
-    </AppShell>
-  )
+  await requireSessionOrRedirect('/notifications')
+  return <NotificationsLayoutClient>{children}</NotificationsLayoutClient>
 }

@@ -1,21 +1,17 @@
-'use client'
+// SERVER COMPONENT — runs the auth check before any HTML is sent. This
+// supersedes middleware.ts because Vercel's edge cache serves statically
+// prerendered pages without running middleware; the server render path
+// always runs, cache or no cache.
+import { requireSessionOrRedirect } from '@/lib/auth-guard'
+import DashboardLayoutClient from './LayoutClient'
 
-import { AppShell } from '@/components/layout/AppShell'
-import { DashboardFooter } from '@/components/layout/DashboardFooter'
+export const dynamic = 'force-dynamic'
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <AppShell>
-      <div className="flex flex-col min-h-[calc(100vh-56px)]">
-        <main className="flex-1">
-          {children}
-        </main>
-        <DashboardFooter />
-      </div>
-    </AppShell>
-  )
+  await requireSessionOrRedirect('/dashboard')
+  return <DashboardLayoutClient>{children}</DashboardLayoutClient>
 }
