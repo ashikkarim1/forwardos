@@ -7,4 +7,5 @@
 export { Button } from './Button'
 export { DataTable, type ColumnDef } from './DataTable'
 export { EmptyState } from './EmptyState'
+export { Toaster, toast } from './Toast'
 export { Text, Heading, Display, Overline, Mono } from './Typography'

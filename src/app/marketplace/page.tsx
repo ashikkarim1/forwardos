@@ -345,6 +345,17 @@ export default function MarketplacePage() {
                 minHeatScore: heatScore.min !== 0 ? heatScore.min : undefined,
               }}
             />
+
+            {/* Institutional view — opens a TanStack-powered, sortable data
+                table for analysts evaluating dozens of deals at once. */}
+            <Link
+              href="/marketplace/table"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border bg-white hover:bg-[#FAF6EF] text-sm font-semibold transition-colors"
+              style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
+              title="Open the institutional view — sortable table, CSV export, bulk actions"
+            >
+              <SlidersHorizontal size={14} /> Table view
+            </Link>
           </div>
 
           {/* Active filter chips — one tap to remove any individual filter */}
