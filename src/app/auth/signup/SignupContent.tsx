@@ -26,15 +26,37 @@ const TYPES = [
   { id: 'broker', label: "I'm a broker", icon: Users },
 ] as const
 
+// Tier → copy + role pre-selection when the user came from a paid CTA.
+const TIER_COPY = {
+  BUYER_PREMIUM:  { role: 'buyer',  name: 'Buyer Premium',  price: '$99/mo'  },
+  SELLER_PREMIUM: { role: 'seller', name: 'Seller Premium', price: '$199/mo' },
+  BROKER_PRO:     { role: 'broker', name: 'Broker Pro',     price: '$599/mo' },
+} as const
+
 export function SignupContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const typeParam = searchParams?.get('type') || ''
   const redirectParam = searchParams?.get('redirect') || ''
 
-  const [type, setType] = useState<string>(
-    ['buyer', 'seller', 'broker'].includes(typeParam) ? typeParam : 'buyer',
-  )
+  // Detect "I want to upgrade after signing up" intent. If the redirect points
+  // at /api/billing/checkout?tier=X, the user came from a paid CTA on the
+  // pricing page — we surface that in the copy + pre-pick the right role so
+  // they don't see "Free account · 60s" when they're about to pay $99/mo.
+  const upgradeTier = (() => {
+    try {
+      if (!redirectParam.startsWith('/api/billing/checkout')) return null
+      const q = new URLSearchParams(redirectParam.split('?')[1] || '')
+      const tier = q.get('tier') || ''
+      return tier in TIER_COPY ? (tier as keyof typeof TIER_COPY) : null
+    } catch { return null }
+  })()
+
+  const defaultType: string = upgradeTier
+    ? TIER_COPY[upgradeTier].role
+    : ['buyer', 'seller', 'broker'].includes(typeParam) ? typeParam : 'buyer'
+
+  const [type, setType] = useState<string>(defaultType)
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -64,7 +86,15 @@ export function SignupContent() {
 
       // Honor ?redirect= (same-origin relative paths only — open-redirect guard).
       if (redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')) {
-        router.push(redirectParam)
+        // API routes need a full browser navigation so the new auth cookie
+        // is sent. router.push() does a soft client-side nav that doesn't
+        // fire the API handler at all — caused the "loops back to signup"
+        // bug when the redirect was /api/billing/checkout.
+        if (redirectParam.startsWith('/api/')) {
+          window.location.href = redirectParam
+        } else {
+          router.push(redirectParam)
+        }
         return
       }
       // Role-appropriate landing: sellers go list, buyers browse, brokers dashboard.
@@ -83,15 +113,32 @@ export function SignupContent() {
       <PublicHeader />
 
       <div className="max-w-md mx-auto px-6 py-12">
-        <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-center mb-3" style={{ color: '#B8956A' }}>
-          Free account · 60 seconds
-        </p>
-        <h1 className="text-3xl md:text-4xl font-black text-center mb-3" style={{ color: COLOR_PRIMARY }}>
-          Join Forward
-        </h1>
-        <p className="text-sm text-center mb-8" style={{ color: COLOR_TEXT_SECONDARY }}>
-          Free forever for browsing, saving, and contacting sellers. No credit card.
-        </p>
+        {upgradeTier ? (
+          <>
+            <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-center mb-3" style={{ color: '#B8956A' }}>
+              Step 1 of 2 · Create your account
+            </p>
+            <h1 className="text-3xl md:text-4xl font-black text-center mb-3" style={{ color: COLOR_PRIMARY }}>
+              Join Forward to subscribe
+            </h1>
+            <p className="text-sm text-center mb-8" style={{ color: COLOR_TEXT_SECONDARY }}>
+              You&apos;re subscribing to <strong>{TIER_COPY[upgradeTier].name}</strong> · <strong>{TIER_COPY[upgradeTier].price}</strong>.
+              We&apos;ll take you to Stripe to complete payment right after this step.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-center mb-3" style={{ color: '#B8956A' }}>
+              Free account · 60 seconds
+            </p>
+            <h1 className="text-3xl md:text-4xl font-black text-center mb-3" style={{ color: COLOR_PRIMARY }}>
+              Join Forward
+            </h1>
+            <p className="text-sm text-center mb-8" style={{ color: COLOR_TEXT_SECONDARY }}>
+              Free forever for browsing, saving, and contacting sellers. No credit card.
+            </p>
+          </>
+        )}
 
         <form onSubmit={submit} className="space-y-4">
           {/* Role selector */}

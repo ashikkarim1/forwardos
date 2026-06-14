@@ -55,7 +55,14 @@ export default function LoginPage() {
       // accepted — never an absolute URL — to prevent open-redirect abuse.
       const redirectParam = new URLSearchParams(window.location.search).get('redirect')
       if (redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')) {
-        router.push(redirectParam)
+        // API routes need a hard browser navigation so the cookie travels.
+        // router.push to /api/* does a soft client-side nav that doesn't
+        // fire the handler — leaves users stranded on /auth/login.
+        if (redirectParam.startsWith('/api/')) {
+          window.location.href = redirectParam
+        } else {
+          router.push(redirectParam)
+        }
         return
       }
 
