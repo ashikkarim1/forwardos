@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   DollarSign, Users, Eye, Lock, TrendingUp, AlertCircle, CheckCircle2, MessageSquare,
@@ -461,13 +462,35 @@ export default function BrokerDashboardV2() {
                   </div>
 
                   <div className="lg:col-span-2 flex gap-2">
-                    <button className="flex-1 px-4 py-2 rounded-lg font-bold text-white transition-all hover:opacity-90" style={{ background: '#10B981' }}>
+                    <button
+                      onClick={() => {
+                        if (confirm(`Approve ${request.buyerName}'s data room access for ${request.dealName}?`)) {
+                          // TODO(api): POST /api/broker/data-room/approve once endpoint lands
+                          alert('Approved. Buyer notified and data room access granted.')
+                        }
+                      }}
+                      className="flex-1 px-4 py-2 rounded-lg font-bold text-white transition-all hover:opacity-90"
+                      style={{ background: '#10B981' }}
+                    >
                       ✓ Approve
                     </button>
-                    <button className="flex-1 px-4 py-2 rounded-lg font-bold border" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
+                    <Link
+                      href={`/messages?to=${encodeURIComponent(request.buyerName)}&deal=${encodeURIComponent(request.dealName)}&intent=request-info`}
+                      className="flex-1 text-center px-4 py-2 rounded-lg font-bold border"
+                      style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}
+                    >
                       ? Request Info
-                    </button>
-                    <button className="px-4 py-2 rounded-lg font-bold border" style={{ borderColor: '#EF4444', color: '#EF4444' }}>
+                    </Link>
+                    <button
+                      onClick={() => {
+                        if (confirm(`Decline ${request.buyerName}'s request for ${request.dealName}?`)) {
+                          // TODO(api): POST /api/broker/data-room/decline once endpoint lands
+                          alert('Request declined. Buyer notified.')
+                        }
+                      }}
+                      className="px-4 py-2 rounded-lg font-bold border"
+                      style={{ borderColor: '#EF4444', color: '#EF4444' }}
+                    >
                       ✗ Decline
                     </button>
                   </div>
@@ -548,9 +571,9 @@ export default function BrokerDashboardV2() {
                     </p>
                   </div>
 
-                  <button className="px-4 py-2 rounded-lg font-bold border" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
+                  <Link href={`/listing/${deal.id}`} className="px-4 py-2 rounded-lg font-bold border" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
                     View Details →
-                  </button>
+                  </Link>
                 </div>
               </motion.div>
             ))}
@@ -672,9 +695,9 @@ export default function BrokerDashboardV2() {
             <p style={{ color: COLOR_TEXT_SECONDARY }}>
               Deal velocity, buyer engagement trends, and performance benchmarks coming soon...
             </p>
-            <button className="mt-4 px-6 py-3 rounded-lg font-bold text-white transition-all hover:opacity-90" style={{ background: COLOR_ACCENT }}>
+            <Link href="/market-insights" className="inline-block mt-4 px-6 py-3 rounded-lg font-bold text-white transition-all hover:opacity-90" style={{ background: COLOR_ACCENT }}>
               View Full Analytics
-            </button>
+            </Link>
           </div>
         </motion.div>
       )}

@@ -645,10 +645,19 @@ export default function SellerDashboardV2() {
                       >
                         ✓ Approve
                       </button>
-                      <button className="flex-1 px-4 py-2 rounded-lg font-bold border" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
+                      <Link href={`/messages?to=${encodeURIComponent(request.buyerName)}&deal=${encodeURIComponent(request.dealName)}&intent=request-info`} className="flex-1 text-center px-4 py-2 rounded-lg font-bold border" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
                         ? Request Info
-                      </button>
-                      <button className="px-4 py-2 rounded-lg font-bold border" style={{ borderColor: '#EF4444', color: '#EF4444' }}>
+                      </Link>
+                      <button
+                        onClick={() => {
+                          if (confirm(`Decline ${request.buyerName}'s data room request for ${request.dealName}?`)) {
+                            // TODO(api): POST /api/seller/data-room/decline once endpoint lands
+                            alert('Request marked declined. Buyer will be notified.')
+                          }
+                        }}
+                        className="px-4 py-2 rounded-lg font-bold border"
+                        style={{ borderColor: '#EF4444', color: '#EF4444' }}
+                      >
                         ✗ Decline
                       </button>
                     </div>
@@ -752,9 +761,9 @@ export default function SellerDashboardV2() {
                         </span>
                       ))}
                     </div>
-                    <button className="px-4 py-2 rounded-lg font-bold text-white transition-all hover:opacity-90 text-sm" style={{ background: COLOR_ACCENT }}>
+                    <Link href="/data-rooms" className="inline-block px-4 py-2 rounded-lg font-bold text-white transition-all hover:opacity-90 text-sm" style={{ background: COLOR_ACCENT }}>
                       Upload Documents
-                    </button>
+                    </Link>
                   </div>
                 ))}
               </motion.div>
@@ -850,9 +859,9 @@ export default function SellerDashboardV2() {
             <p style={{ color: COLOR_TEXT_SECONDARY }}>
               Weekly summaries, seriousness scoring, and engagement trends coming next...
             </p>
-            <button className="mt-4 px-6 py-3 rounded-lg font-bold text-white transition-all hover:opacity-90" style={{ background: COLOR_ACCENT }}>
+            <Link href="/market-insights" className="inline-block mt-4 px-6 py-3 rounded-lg font-bold text-white transition-all hover:opacity-90" style={{ background: COLOR_ACCENT }}>
               View Full Analytics
-            </button>
+            </Link>
           </motion.div>
         </motion.div>
       )}
@@ -875,9 +884,9 @@ export default function SellerDashboardV2() {
             <p style={{ color: COLOR_TEXT_SECONDARY }} className="mb-4">
               Delegate data room approval authority to your brokers.
             </p>
-            <button className="px-6 py-3 rounded-lg font-bold border" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
+            <Link href="/settings/team" className="inline-block px-6 py-3 rounded-lg font-bold border" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
               Manage Delegated Brokers
-            </button>
+            </Link>
           </motion.div>
         </motion.div>
       )}

@@ -1164,9 +1164,9 @@ export default function BuyerDashboardV2() {
                   {mockProfile.role} at {mockProfile.company}
                 </p>
               </div>
-              <button className="px-6 py-3 rounded-lg font-bold border" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
+              <Link href="/account" className="px-6 py-3 rounded-lg font-bold border" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
                 Edit Profile
-              </button>
+              </Link>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -1248,9 +1248,9 @@ export default function BuyerDashboardV2() {
                     Tech, Healthcare, Finance
                   </p>
                 </div>
-                <button style={{ color: COLOR_ACCENT }} className="font-bold">
+                <Link href="/saved-searches" style={{ color: COLOR_ACCENT }} className="font-bold">
                   Edit →
-                </button>
+                </Link>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: '#FAFAF8' }}>
                 <div>
@@ -1261,9 +1261,9 @@ export default function BuyerDashboardV2() {
                     MENA, Asia Pacific
                   </p>
                 </div>
-                <button style={{ color: COLOR_ACCENT }} className="font-bold">
+                <Link href="/saved-searches" style={{ color: COLOR_ACCENT }} className="font-bold">
                   Edit →
-                </button>
+                </Link>
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: '#FAFAF8' }}>
                 <div>
@@ -1274,9 +1274,9 @@ export default function BuyerDashboardV2() {
                     $50M - $500M
                   </p>
                 </div>
-                <button style={{ color: COLOR_ACCENT }} className="font-bold">
+                <Link href="/saved-searches" style={{ color: COLOR_ACCENT }} className="font-bold">
                   Edit →
-                </button>
+                </Link>
               </div>
             </div>
           </motion.div>

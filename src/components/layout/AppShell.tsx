@@ -10,7 +10,6 @@ import {
   HelpCircle, LogOut, Award, CreditCard,
 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
-import { LogoWithBee } from '@/components/LogoWithBee'
 
 // Navigation organized into semantic groups for deal discovery mission
 const NAV_GROUPS = [
@@ -204,16 +203,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               backgroundColor: '#FFFFFF',
             }}
           >
-            {/* Logo Section */}
+            {/* Logo Section — must match PublicHeader brand mark so the
+                dashboard and the public site read as the same product. */}
             <div className="p-6 border-b" style={{ borderColor: COLOR_BORDER }}>
-              <Link href="/" className="flex items-center gap-3 group">
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center overflow-hidden"
-                  style={{ background: COLOR_ACCENT }}>
-                  <LogoWithBee />
+              <Link href="/" className="flex items-center gap-3 group hover:opacity-80 transition-opacity">
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: COLOR_ACCENT }}
+                >
+                  <svg viewBox="0 0 40 40" className="w-6 h-6 text-white">
+                    <path fill="currentColor" d="M20 4c8.84 0 16 7.16 16 16s-7.16 16-16 16S4 28.84 4 20 11.16 4 20 4zm0 2c-7.73 0-14 6.27-14 14s6.27 14 14 14 14-6.27 14-14-6.27-14-14-14zm3.5 6a2.5 2.5 0 110 5 2.5 2.5 0 010-5zm-7 0a2.5 2.5 0 110 5 2.5 2.5 0 010-5zm3.5 8.5c3.59 0 6.5 2.24 6.5 5s-2.91 5-6.5 5-6.5-2.24-6.5-5 2.91-5 6.5-5z" />
+                  </svg>
                 </div>
-                <div>
-                  <div className="text-lg font-black" style={{ color: COLOR_PRIMARY }}>Forward OS</div>
-                  <div className="text-xs font-medium" style={{ color: COLOR_TEXT_SECONDARY }}>Deal Discovery</div>
+                <div className="flex flex-col -space-y-0.5">
+                  <span className="text-lg font-black leading-none" style={{ color: COLOR_PRIMARY }}>
+                    Forward
+                  </span>
+                  <span className="text-xs font-bold leading-none tracking-wide" style={{ color: COLOR_ACCENT }}>
+                    Intelligence
+                  </span>
                 </div>
               </Link>
             </div>
@@ -310,7 +318,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Footer in Sidebar */}
             <div className="border-t text-center py-4" style={{ borderColor: COLOR_BORDER }}>
               <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
-                Forward OS © 2026
+                Forward Intelligence © 2026
               </p>
             </div>
           </motion.aside>

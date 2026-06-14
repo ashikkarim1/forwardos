@@ -403,9 +403,9 @@ export function DailyIntelligenceDashboard({
                       </p>
                     </div>
                   </div>
-                  <button className="w-full px-4 py-2 rounded-lg font-bold text-sm transition-all text-white" style={{ background: COLOR_ACCENT }}>
+                  <Link href={`/deals?search=${encodeURIComponent(deal.dealName)}`} className="block w-full text-center px-4 py-2 rounded-lg font-bold text-sm transition-all text-white" style={{ background: COLOR_ACCENT }}>
                     View Full Deal →
-                  </button>
+                  </Link>
                 </motion.div>
               )}
             </motion.div>
