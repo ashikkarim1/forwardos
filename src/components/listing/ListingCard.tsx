@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { Heart, Zap, ArrowRight, TrendingUp, TrendingDown, Award, CheckCircle2 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 import { palette } from '@/styles/tokens'
+import { PredictionBadge } from '@/components/listing/PredictionBadge'
 
 interface ListingCardProps {
   id: string
@@ -280,6 +281,17 @@ export default function ListingCard({
               🔨 Auction
             </span>
           )}
+          {/* Forward Prediction — proprietary close-probability score.
+              Click drills into /intelligence/predictions for drivers. */}
+          <PredictionBadge
+            compact
+            dealQualityScore={dealQualityScore}
+            heatIndex={heatIndex}
+            daysOnMarket={daysOnMarket ?? 12}
+            financingEligible={financingEligible}
+            sellerVerified={sellerVerified}
+            growthRate={growthRate}
+          />
         </div>
 
         {/* MARKET INTELLIGENCE ROW */}
