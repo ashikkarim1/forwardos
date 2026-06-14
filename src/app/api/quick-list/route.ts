@@ -16,6 +16,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { rateLimit, clientIp, isSameOrigin } from '@/lib/rate-limit'
 import { sendEmail } from '@/lib/services/email'
+import { logAudit } from '@/lib/audit'
 import {
   REVENUE_RANGE_BY_ID,
   ASKING_RANGE_BY_ID,
@@ -223,6 +224,12 @@ export async function POST(request: NextRequest) {
         </body></html>
       `,
     }).catch((e) => console.error('[quick-list] email send failed:', e))
+
+    await logAudit({
+      req: request, userId: user.id, action: 'deal.created',
+      resourceType: 'deal', resourceId: deal.id,
+      changes: { industry, country, askingRange, revenueRange, photos: photos.length },
+    })
 
     return NextResponse.json({
       success: true,

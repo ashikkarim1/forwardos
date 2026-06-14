@@ -543,6 +543,8 @@ model Deal {
   uniqueVisitors        Int       @default(0)
   returningVisitors     Int       @default(0)
   inquiries             Int       @default(0)
+  viewCount             Int       @default(0)   // /listing/[slug] page loads
+  savedCount            Int       @default(0)   // mirrors COUNT(*) on SavedDeal — kept in sync on heart toggle
 
   // Intelligence Moat
   heatScore             Int?      // 0-100, proprietary heat map score
@@ -1091,6 +1093,52 @@ model AuditLog {
   @@index([action])
   @@index([resourceType])
   @@index([createdAt])
+}
+
+// ─── Team workspace ────────────────────────────────────────────────────────
+// One Team per organisation; founders create one on signup or via /settings/team.
+// Roles are coarse: OWNER (created, can manage billing + members), ADMIN
+// (can manage members), MEMBER (read + their own actions). Invites are
+// email-keyed with a one-time token that expires in 7 days.
+
+model Team {
+  id            String        @id @default(cuid())
+  name          String
+  createdById   String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  members       TeamMember[]
+  invites       TeamInvite[]
+
+  @@index([createdById])
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId    String
+  role      String   @default("MEMBER")  // OWNER | ADMIN | MEMBER
+  joinedAt  DateTime @default(now())
+
+  @@unique([teamId, userId])
+  @@index([userId])
+}
+
+model TeamInvite {
+  id           String    @id @default(cuid())
+  teamId       String
+  team         Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  email        String
+  role         String    @default("MEMBER")
+  token        String    @unique
+  invitedById  String
+  acceptedAt   DateTime?
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+
+  @@index([email])
+  @@index([teamId])
 }
 
 // ==================== SYSTEM & CONFIGURATION ====================

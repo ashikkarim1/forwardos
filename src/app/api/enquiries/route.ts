@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { rateLimit, clientIp, isSameOrigin } from '@/lib/rate-limit'
+import { logAudit } from '@/lib/audit'
 import { sendEmail } from '@/lib/services/email'
 import { industryLabel } from '@/lib/listing-narrative'
 import { maskCity } from '@/lib/listing-helpers'
@@ -223,6 +224,12 @@ export async function POST(request: NextRequest) {
         cta: { label: 'Open the listing', href: listingHref },
       }),
     }).catch((e) => console.error('[enquiry/audit-email]', e))
+
+    await logAudit({
+      req: request, userId: buyer.id, action: 'deal.enquiry.sent',
+      resourceType: 'enquiry', resourceId: enquiry.id,
+      changes: { dealId: deal.id, sellerId: deal.sellerId, reference: refId },
+    })
 
     return NextResponse.json({
       success: true,

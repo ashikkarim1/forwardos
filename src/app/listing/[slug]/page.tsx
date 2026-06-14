@@ -87,6 +87,16 @@ export default async function ListingPage({ params }: Props) {
   if (!deal) notFound()
   if (deal.status !== 'ACTIVE' && deal.status !== 'PUBLISHED') notFound()
 
+  // Bump the view counter (best-effort, never blocks the page render).
+  // This is intentionally not deduped per-IP at the page level — the
+  // /api/deals/[slug]/view endpoint is for client-side bumps with rate
+  // limiting; this server-side bump fires on every render path so
+  // analytics + Heat score have a baseline signal even without JS.
+  prisma.deal.updateMany({
+    where: { slug: params.slug },
+    data: { viewCount: { increment: 1 } },
+  }).catch(() => {})
+
   // Identity is masked everywhere — generated from non-identifying fields.
   const headline = confidentialTitle(deal.industry, deal.country, deal.id)
   const region = maskCity(deal.city, deal.country)

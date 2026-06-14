@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { hashPassword, signToken, setAuthCookie } from '@/lib/auth'
 import { rateLimit, clientIp, isSameOrigin } from '@/lib/rate-limit'
+import { logAudit } from '@/lib/audit'
 import crypto from 'crypto'
 
 const VALID_TYPES = new Set(['buyer', 'seller', 'broker'])
@@ -67,6 +68,12 @@ export async function POST(request: NextRequest) {
       kycStatus: user.kycStatus as never,
     })
     await setAuthCookie(token)
+
+    await logAudit({
+      req: request, userId: user.id, action: 'auth.register',
+      resourceType: 'user', resourceId: user.id,
+      changes: { role: user.role, email: user.email },
+    })
 
     return NextResponse.json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role } }, { status: 201 })
   } catch (e) {

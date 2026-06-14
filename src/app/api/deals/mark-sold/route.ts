@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { notifySoldFollowers } from '@/lib/services/sold-notifications'
+import { logAudit } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,6 +34,11 @@ export async function POST(request: NextRequest) {
       await prisma.deal.update({
         where: { id: dealId },
         data: { status: 'CLOSED', closedAt: new Date() },
+      })
+      await logAudit({
+        req: request, userId: null, action: 'deal.sold',
+        resourceType: 'deal', resourceId: dealId,
+        changes: { before: { status: deal.status }, after: { status: 'CLOSED' }, source: 'cron' },
       })
     }
 

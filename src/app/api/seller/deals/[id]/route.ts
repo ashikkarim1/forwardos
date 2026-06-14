@@ -22,6 +22,7 @@ import { prisma } from '@/lib/prisma'
 import { getSession } from '@/lib/auth'
 import { isSameOrigin } from '@/lib/rate-limit'
 import { notifySoldFollowers } from '@/lib/services/sold-notifications'
+import { logAudit } from '@/lib/audit'
 
 const VALID_ACTIONS = new Set(['unlist', 'relist', 'sold', 'cancel', 'upgrade', 'downgrade'])
 
@@ -90,6 +91,16 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   if (!action || !VALID_ACTIONS.has(action)) {
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
   }
+
+  // One audit row per lifecycle action — gives compliance a single timeline
+  // per deal. Resolved before the switch so we don't repeat it.
+  const session = await getSession()
+  await logAudit({
+    req: request, userId: session?.userId ?? null,
+    action: `deal.${action}`,
+    resourceType: 'deal', resourceId: deal.id,
+    changes: { before: { status: deal.status, dealPlan: deal.dealPlan } },
+  })
 
   switch (action) {
     case 'unlist': {

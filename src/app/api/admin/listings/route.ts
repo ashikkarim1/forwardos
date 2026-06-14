@@ -71,8 +71,8 @@ export async function GET() {
       tier: tierFromDealPlan(d.dealPlan as string | null),
       revenue: fmtUSD(d.revenue),
       valuation: fmtUSD(d.askingPrice),
-      views: 0,             // TODO: wire view-count table
-      saves: 0,             // TODO: wire saved-deal aggregate
+      views: d.viewCount ?? 0,
+      saves: d.savedCount ?? 0,
       featured: d.dealPlan === 'PREMIUM',
       flagReason: undefined as string | undefined,
     }))

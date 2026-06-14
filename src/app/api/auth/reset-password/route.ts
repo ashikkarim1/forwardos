@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { hashPassword, signToken, setAuthCookie } from '@/lib/auth'
 import { rateLimit, clientIp, isSameOrigin } from '@/lib/rate-limit'
+import { logAudit } from '@/lib/audit'
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,6 +57,10 @@ export async function POST(request: NextRequest) {
     })
     await setAuthCookie(sessionToken)
 
+    await logAudit({
+      req: request, userId: rec.user.id, action: 'auth.password.reset',
+      resourceType: 'user', resourceId: rec.user.id,
+    })
     return NextResponse.json({ success: true, role: rec.user.role })
   } catch (e) {
     console.error('[API] reset-password error:', e)

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendApprovalNotification, sendPremiumPaymentLink, sendEmail } from '@/lib/services/email'
-import { requireRole } from '@/lib/auth'
+import { requireRole, getSession } from '@/lib/auth'
+import { logAudit } from '@/lib/audit'
 
 interface ApprovalRequest {
   action: 'approve' | 'reject' | 'request_changes'
@@ -31,6 +32,22 @@ export async function POST(request: NextRequest, { params }: { params: { dealId:
         { status: 404 }
       )
     }
+
+    // Audit-log the moderation decision before the side-effects (email,
+    // status flip) run. Captures the moderator, the rationale, and the
+    // pre-state for compliance review.
+    const session = await getSession()
+    await logAudit({
+      req: request, userId: session?.userId ?? null,
+      action: `admin.approval.${body.action}`,
+      resourceType: 'deal', resourceId: dealId,
+      changes: {
+        before: { status: deal.status },
+        notes: body.notes ?? null,
+        planTier: body.planTier ?? null,
+        sellerId: deal.sellerId,
+      },
+    })
 
     // ========== PROCESS ACTION ==========
     if (body.action === 'approve') {

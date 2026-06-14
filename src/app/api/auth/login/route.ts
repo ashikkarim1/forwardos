@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { verifyPassword, signToken, setAuthCookie } from '@/lib/auth'
 import { rateLimit, clientIp, isSameOrigin } from '@/lib/rate-limit'
 import { parseBody, loginSchema } from '@/lib/validation'
+import { logAudit } from '@/lib/audit'
 
 /**
  * POST /api/auth/login  { email, password }
@@ -29,6 +30,13 @@ export async function POST(request: NextRequest) {
     const user = await prisma.user.findUnique({ where: { email: String(email).toLowerCase() } })
     // Generic message — don't reveal whether the email exists.
     if (!user || !(await verifyPassword(password, user.password))) {
+      // Record the failed attempt so brute-force patterns are visible in
+      // /admin/activity. userId is null because we never auth'd the actor.
+      await logAudit({
+        req: request, userId: null, action: 'auth.login.failed',
+        resourceType: 'user', resourceId: user?.id ?? null,
+        changes: { email: String(email).toLowerCase() },
+      })
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
@@ -41,6 +49,12 @@ export async function POST(request: NextRequest) {
     await setAuthCookie(token)
 
     await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } }).catch(() => {})
+
+    await logAudit({
+      req: request, userId: user.id, action: 'auth.login.success',
+      resourceType: 'user', resourceId: user.id,
+      changes: { role: user.role },
+    })
 
     return NextResponse.json({
       success: true,
