@@ -316,7 +316,7 @@ export function Switch({ label, description, checked, onChange, disabled, id }: 
           width: '16px',
           height: '16px',
           borderRadius: radius.full,
-          background: '#FFFFFF',
+          background: semantic.surface.default,
           boxShadow: shadow.sm,
           transition: `left ${motion.duration.fast} ${motion.easing.standard}`,
         }} />
