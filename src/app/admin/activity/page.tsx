@@ -1,147 +1,214 @@
+/**
+ * /admin/activity — audit log viewer for compliance review.
+ *
+ * Pulls real AuditLog rows via /api/admin/audit. Token-disciplined; built
+ * on <DataTable> + <Badge> + <Mono> for action codes. Supports:
+ *
+ *   - Search across action, actor, resourceId
+ *   - Filter dropdown for top-level action prefix (stripe, auth, dsr…)
+ *   - CSV export of the current filter
+ *   - Pagination (50/page) with sort by createdAt
+ *
+ * Designed for the "show me who approved deal X / who triggered the
+ * Stripe refund / who exported data on 2026-06-12" question that compliance
+ * asks every time, from one page.
+ */
 'use client'
 
-import { motion } from 'framer-motion'
-import { Search, Filter, Download, Eye, Save, Share2, FileDown, MessageSquare } from 'lucide-react'
-import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
+import { useEffect, useMemo, useState } from 'react'
+import { Download, Shield } from 'lucide-react'
+import {
+  Badge, Button, Card, ColumnDef, DataTable, EmptyState,
+  Heading, Mono, Overline, Select, Text, toast,
+} from '@/components/ui'
+import { space } from '@/styles/tokens'
 
-const ACTIVITY_TYPES = {
-  login: { icon: '🔐', color: '#B8956A', label: 'Login' },
-  view: { icon: '👁️', color: '#8B5CF6', label: 'View Deal' },
-  save: { icon: '⭐', color: '#F59E0B', label: 'Save Deal' },
-  compare: { icon: '📊', color: '#10B981', label: 'Compare' },
-  download: { icon: '⬇️', color: COLOR_ACCENT, label: 'Download CIM' },
-  message: { icon: '💬', color: '#EC4899', label: 'Message' },
-  upload: { icon: '⬆️', color: '#6366F1', label: 'Upload' },
-  flag: { icon: '🚩', color: '#EF4444', label: 'Flag' },
+interface AuditEntry {
+  id: string
+  action: string
+  resourceType: string
+  resourceId: string | null
+  userId: string | null
+  actor: string
+  changes: string | null
+  ipAddress: string | null
+  userAgent: string | null
+  createdAt: string
 }
 
-const RECENT_ACTIVITIES = [
-  { time: '4:32 PM', user: 'Jane Smith #1023', action: 'view', details: 'Viewed Deal #487', icon: '👁️' },
-  { time: '4:31 PM', user: 'Mike Chen #1022', action: 'save', details: 'Saved Deal #486', icon: '⭐' },
-  { time: '4:30 PM', user: 'System', action: 'flag', details: 'Auto-flagged Listing #523 (Duplicate)', icon: '🚩' },
-  { time: '4:29 PM', user: 'John Doe #1024', action: 'upload', details: 'Updated Listing #487 (revenue)', icon: '⬆️' },
-  { time: '4:28 PM', user: 'Sarah Lee #1021', action: 'download', details: 'Downloaded CIM #487', icon: '⬇️' },
-  { time: '4:25 PM', user: 'Admin Sarah', action: 'flag', details: 'Approved KYC for User #1021', icon: '✓' },
-  { time: '4:20 PM', user: 'Mike Chen #1022', action: 'compare', details: 'Ran Comparison (3 deals)', icon: '📊' },
-  { time: '4:15 PM', user: 'System', action: 'flag', details: 'Suspicious activity detected on User #1020', icon: '🚩' },
-  { time: '4:10 PM', user: 'Jane Smith #1023', action: 'message', details: 'Sent message to seller (Deal #487)', icon: '💬' },
-  { time: '4:05 PM', user: 'John Doe #1024', action: 'login', details: 'Logged in from 192.168.1.100', icon: '🔐' },
+function categoryTone(action: string): 'success' | 'warning' | 'danger' | 'brand' | 'default' {
+  if (action.startsWith('stripe.')) return 'brand'
+  if (action.startsWith('auth.')) return 'success'
+  if (action.includes('delete') || action.includes('revoke')) return 'danger'
+  if (action.startsWith('dsr.') || action.includes('export')) return 'warning'
+  return 'default'
+}
+
+function fmtRelative(iso: string): string {
+  const now = Date.now()
+  const t = new Date(iso).getTime()
+  const s = Math.round((now - t) / 1000)
+  if (s < 60) return `${s}s ago`
+  if (s < 3600) return `${Math.round(s / 60)}m ago`
+  if (s < 86400) return `${Math.round(s / 3600)}h ago`
+  if (s < 604800) return `${Math.round(s / 86400)}d ago`
+  return new Date(iso).toLocaleDateString()
+}
+
+const PREFIX_OPTIONS = [
+  { value: '', label: 'All actions' },
+  { value: 'stripe.', label: 'Stripe / billing' },
+  { value: 'auth.', label: 'Auth / sessions' },
+  { value: 'admin.', label: 'Admin actions' },
+  { value: 'dsr.', label: 'Data subject requests' },
+  { value: 'kyc.', label: 'KYC / verification' },
+  { value: 'deal.', label: 'Deal lifecycle' },
 ]
 
 export default function AdminActivityPage() {
+  const [entries, setEntries] = useState<AuditEntry[] | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [prefix, setPrefix] = useState<string>('')
+
+  useEffect(() => {
+    let cancelled = false
+    const q = prefix ? `?action=${encodeURIComponent(prefix)}` : ''
+    setEntries(null)
+    fetch(`/api/admin/audit${q}`, { credentials: 'same-origin' })
+      .then(async (r) => {
+        const data = await r.json()
+        if (cancelled) return
+        if (!r.ok) {
+          setLoadError(data?.error || 'Failed to load audit log.')
+          setEntries([])
+          return
+        }
+        setLoadError(null)
+        setEntries(Array.isArray(data.entries) ? data.entries : [])
+      })
+      .catch(() => { if (!cancelled) { setLoadError('Network error.'); setEntries([]) } })
+    return () => { cancelled = true }
+  }, [prefix])
+
+  const columns = useMemo<ColumnDef<AuditEntry>[]>(() => [
+    {
+      accessorKey: 'createdAt',
+      header: 'When',
+      cell: ({ getValue }) => {
+        const iso = String(getValue() ?? '')
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: '120px' }}>
+            <Text size="bodySm" tone="primary">{fmtRelative(iso)}</Text>
+            <Text size="caption" tone="tertiary">{new Date(iso).toLocaleString()}</Text>
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: 'action',
+      header: 'Action',
+      cell: ({ row }) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: '220px' }}>
+          <Badge tone={categoryTone(row.original.action)}>{row.original.action.split('.')[0]}</Badge>
+          <Mono tone="primary">{row.original.action}</Mono>
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'actor',
+      header: 'Actor',
+      cell: ({ getValue }) => <Text size="bodySm" tone="primary">{String(getValue() ?? 'system')}</Text>,
+    },
+    {
+      accessorKey: 'resourceType',
+      header: 'Resource',
+      cell: ({ row }) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <Text size="bodySm" tone="secondary">{row.original.resourceType}</Text>
+          {row.original.resourceId && <Mono tone="tertiary">{row.original.resourceId}</Mono>}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'ipAddress',
+      header: 'IP',
+      cell: ({ getValue }) => {
+        const v = String(getValue() ?? '')
+        return v ? <Mono tone="tertiary">{v}</Mono> : <Text size="bodySm" tone="muted">—</Text>
+      },
+    },
+  ], [])
+
+  function exportCsv(rows: AuditEntry[]) {
+    const header = ['When', 'Action', 'Actor', 'ResourceType', 'ResourceId', 'IP', 'Changes']
+    const lines = rows.map((r) => [
+      r.createdAt, r.action, r.actor, r.resourceType, r.resourceId ?? '', r.ipAddress ?? '', r.changes ?? '',
+    ].map((v) => {
+      const s = String(v ?? '')
+      return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s
+    }).join(','))
+    const blob = new Blob([[header.join(','), ...lines].join('\n')], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `forward-audit-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    toast.success(`Exported ${rows.length} ${rows.length === 1 ? 'entry' : 'entries'}`)
+  }
+
   return (
-    <div className="p-4 md:p-8 space-y-6">
-      {/* Header */}
+    <div style={{ padding: space[8], display: 'flex', flexDirection: 'column', gap: space[6] }}>
       <div>
-        <h1 className="text-3xl md:text-4xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>
-          Activity Monitoring
-        </h1>
-        <p style={{ color: COLOR_TEXT_SECONDARY }}>
-          Real-time activity stream and user action tracking
-        </p>
-      </div>
-
-      {/* Filters */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="p-6 rounded-lg border"
-        style={{ borderColor: COLOR_BORDER }}
-      >
-        <div className="space-y-4">
-          <div className="relative">
-            <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: COLOR_TEXT_SECONDARY }} />
-            <input
-              type="text"
-              placeholder="Search by user or action..."
-              className="w-full pl-10 pr-4 py-3 rounded-lg border bg-white focus:outline-none focus:ring-2"
-              style={{
-                borderColor: COLOR_BORDER,
-                '--tw-ring-color': COLOR_ACCENT,
-              } as any}
-            />
+        <Overline tone="brand">Compliance</Overline>
+        <div style={{ marginTop: space[2], display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: space[4], flexWrap: 'wrap' }}>
+          <div>
+            <Heading level={1}>Audit log</Heading>
+            <Text size="bodyLg" tone="secondary" style={{ marginTop: space[2] }}>
+              Every privileged action — auth, billing, KYC, admin moderation — recorded for review.
+            </Text>
           </div>
-
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(ACTIVITY_TYPES).map(([key, value]) => (
-              <button
-                key={key}
-                className="px-3 py-2 rounded-lg text-sm font-semibold transition-all hover:scale-105"
-                style={{
-                  background: value.color + '20',
-                  color: value.color,
-                  border: `2px solid ${value.color}50`,
-                }}
-              >
-                {value.icon} {value.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex justify-between items-center">
-            <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-              Showing last 10 activities (more available)
-            </p>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all hover:bg-gray-50"
-              style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}>
-              <Download size={18} />
+          <div style={{ display: 'flex', gap: space[2], alignItems: 'flex-end' }}>
+            <div style={{ minWidth: '220px' }}>
+              <Select
+                label="Filter"
+                value={prefix}
+                onChange={(e) => setPrefix(e.target.value)}
+                options={PREFIX_OPTIONS}
+              />
+            </div>
+            <Button variant="secondary" leftIcon={<Download size={14} />} onClick={() => exportCsv(entries ?? [])}>
               Export
-            </button>
+            </Button>
           </div>
         </div>
-      </motion.div>
-
-      {/* Activity Stream */}
-      <div className="space-y-3">
-        {RECENT_ACTIVITIES.map((activity, idx) => (
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.05 }}
-            className="p-4 rounded-lg border flex items-start gap-4 hover:bg-gray-50 transition-colors"
-            style={{ borderColor: COLOR_BORDER }}
-          >
-            <div className="text-2xl flex-shrink-0">{activity.icon}</div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm" style={{ color: COLOR_PRIMARY }}>
-                {activity.user}
-              </p>
-              <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-                {activity.details}
-              </p>
-            </div>
-            <p className="text-xs flex-shrink-0 whitespace-nowrap" style={{ color: COLOR_TEXT_SECONDARY }}>
-              {activity.time}
-            </p>
-          </motion.div>
-        ))}
       </div>
 
-      {/* Analytics Cards */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-      >
-        {[
-          { label: 'Logins This Week', value: '8,234', icon: '🔐', color: '#B8956A' },
-          { label: 'Deals Viewed', value: '45,120', icon: '👁️', color: '#8B5CF6' },
-          { label: 'Comparisons', value: '2,345', icon: '📊', color: '#10B981' },
-          { label: 'CIM Downloads', value: '567', icon: '⬇️', color: COLOR_ACCENT },
-        ].map((stat, idx) => (
-          <div key={idx} className="p-4 rounded-lg border" style={{ borderColor: COLOR_BORDER }}>
-            <p className="text-2xl mb-2">{stat.icon}</p>
-            <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-              {stat.label}
-            </p>
-            <p className="text-2xl font-black mt-1" style={{ color: stat.color }}>
-              {stat.value}
-            </p>
-          </div>
-        ))}
-      </motion.div>
+      <Card padding="none">
+        <DataTable<AuditEntry>
+          data={entries ?? []}
+          loading={entries === null}
+          columns={columns}
+          searchPlaceholder="Search action, actor, resource ID…"
+          pageSize={50}
+          getRowId={(d) => d.id}
+          selectable
+          bulkActions={(rows) => (
+            <Button variant="ghost" size="sm" leftIcon={<Download size={14} />} onClick={() => exportCsv(rows)}>
+              Export {rows.length}
+            </Button>
+          )}
+          emptyState={
+            <EmptyState
+              icon={<Shield size={28} />}
+              title={loadError ?? 'No audit entries match'}
+              body={loadError ? 'Make sure you are signed in as an admin.' : 'Try a different filter, or wait for the next privileged action.'}
+            />
+          }
+        />
+      </Card>
     </div>
   )
 }

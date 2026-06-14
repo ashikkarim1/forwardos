@@ -15,7 +15,7 @@
  */
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CheckCircle, Download, Eye, Flag, XCircle } from 'lucide-react'
 import {
   Badge, Button, Card, ColumnDef, DataTable, EmptyState,
@@ -41,13 +41,7 @@ interface AdminListing {
   flagReason?: string
 }
 
-const MOCK_LISTINGS: AdminListing[] = [
-  { id: '487', name: 'SaaS Platform — Project Management',  location: 'San Francisco', owner: 'John Doe',     status: 'approved', tier: 'premium',  revenue: '$850K', valuation: '$2.5M', views: 127, saves:  8, featured: true  },
-  { id: '486', name: 'Healthcare Network',                  location: 'Boston',        owner: 'Jane Smith',   status: 'pending',  tier: 'standard', revenue: '$1.2M', valuation: '$3.2M', views:  87, saves:  5, featured: false },
-  { id: '485', name: 'Digital Marketing Agency',            location: 'Seattle',       owner: 'Mike Chen',    status: 'flagged',  tier: 'standard', revenue: '$1.8M', valuation: '$2.8M', views:  12, saves:  0, featured: false, flagReason: 'Suspicious Metrics' },
-  { id: '484', name: 'E-commerce Platform',                 location: 'Chicago',       owner: 'Sarah Lee',    status: 'approved', tier: 'standard', revenue: '$2.1M', valuation: '$4.5M', views: 156, saves: 14, featured: false },
-  { id: '483', name: 'SaaS Analytics Tool',                 location: 'Austin',        owner: 'Alex Johnson', status: 'pending',  tier: 'free',     revenue: '$450K', valuation: '$1.8M', views:  34, saves:  2, featured: false },
-]
+// Listings load from GET /api/admin/listings (real Neon data). No mock seed.
 
 const STATUS_TONE: Record<ListingStatus, 'success' | 'warning' | 'danger' | 'default'> = {
   approved: 'success',
@@ -63,15 +57,33 @@ const TIER_TONE: Record<ListingTier, 'brand' | 'default'> = {
 }
 
 export default function AdminListingsPage() {
-  const [listings, setListings] = useState<AdminListing[]>(MOCK_LISTINGS)
+  const [listings, setListings] = useState<AdminListing[] | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/admin/listings', { credentials: 'same-origin' })
+      .then(async (r) => {
+        const data = await r.json()
+        if (cancelled) return
+        if (!r.ok) {
+          setLoadError(data?.error || 'Failed to load listings.')
+          setListings([])
+          return
+        }
+        setListings(Array.isArray(data.listings) ? data.listings : [])
+      })
+      .catch(() => { if (!cancelled) { setLoadError('Network error.'); setListings([]) } })
+    return () => { cancelled = true }
+  }, [])
 
   const update = (id: string, next: ListingStatus) => {
-    setListings((rows) => rows.map((r) => (r.id === id ? { ...r, status: next } : r)))
+    setListings((rows) => (rows ?? []).map((r) => (r.id === id ? { ...r, status: next } : r)))
     toast.success(`Listing #${id} marked ${next}`)
   }
 
   const bulk = (ids: string[], next: ListingStatus) => {
-    setListings((rows) => rows.map((r) => (ids.includes(r.id) ? { ...r, status: next } : r)))
+    setListings((rows) => (rows ?? []).map((r) => (ids.includes(r.id) ? { ...r, status: next } : r)))
     toast.success(`${ids.length} listings marked ${next}`)
   }
 
@@ -185,7 +197,7 @@ export default function AdminListingsPage() {
             <Button variant="ghost" leftIcon={<Eye size={14} />} onClick={() => toast.info('Reviewer log opens next iteration')}>
               Reviewer log
             </Button>
-            <Button variant="secondary" leftIcon={<Download size={14} />} onClick={() => exportCsv(listings)}>
+            <Button variant="secondary" leftIcon={<Download size={14} />} onClick={() => exportCsv(listings ?? [])}>
               Export all
             </Button>
           </div>
@@ -194,7 +206,8 @@ export default function AdminListingsPage() {
 
       <Card padding="none">
         <DataTable<AdminListing>
-          data={listings}
+          data={listings ?? []}
+          loading={listings === null}
           columns={columns}
           searchPlaceholder="Search by listing, owner, or city…"
           selectable
@@ -215,8 +228,8 @@ export default function AdminListingsPage() {
           )}
           emptyState={
             <EmptyState
-              title="No listings match your search"
-              body="Adjust the filters or wait for the next listing to roll in."
+              title={loadError ?? 'No listings match your search'}
+              body={loadError ? 'Make sure you are signed in as an admin, then reload.' : 'Adjust the filters or wait for the next listing to roll in.'}
             />
           }
         />

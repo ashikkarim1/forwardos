@@ -23,6 +23,7 @@ import {
   Flame,
 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
+import { palette } from '@/styles/tokens'
 
 interface Deal {
   id: string
@@ -454,7 +455,7 @@ function MyFavouritesContent() {
                         </div>
                         <div className="flex justify-between text-sm">
                           <span style={{ color: COLOR_TEXT_SECONDARY }}>Growth</span>
-                          <span className="font-bold" style={{ color: '#10B981' }}>
+                          <span className="font-bold" style={{ color: palette.emerald[500] }}>
                             {deal.growthRate}%
                           </span>
                         </div>
@@ -481,7 +482,7 @@ function MyFavouritesContent() {
                             removeFavourite(deal.id)
                           }}
                           className="px-3 py-2 rounded-lg border hover:bg-red-50 transition-colors"
-                          style={{ borderColor: COLOR_BORDER, color: '#EF4444' }}
+                          style={{ borderColor: COLOR_BORDER, color: palette.crimson[400] }}
                         >
                           <Trash2 size={16} />
                         </button>
@@ -602,7 +603,7 @@ function MyFavouritesContent() {
                               Valuation
                             </td>
                             {selectedDealObjects.map((deal) => (
-                              <td key={deal.id} className="p-4 text-center font-black text-lg" style={{ color: '#B8956A' }}>
+                              <td key={deal.id} className="p-4 text-center font-black text-lg" style={{ color: palette.champagne[500] }}>
                                 ${(deal.valuation / 1000000).toFixed(1)}M
                               </td>
                             ))}
@@ -613,7 +614,7 @@ function MyFavouritesContent() {
                               Annual Revenue
                             </td>
                             {selectedDealObjects.map((deal) => (
-                              <td key={deal.id} className="p-4 text-center font-black text-lg" style={{ color: '#10B981' }}>
+                              <td key={deal.id} className="p-4 text-center font-black text-lg" style={{ color: palette.emerald[500] }}>
                                 ${(deal.revenue / 1000000).toFixed(2)}M
                               </td>
                             ))}
@@ -625,7 +626,7 @@ function MyFavouritesContent() {
                               EBITDA Margin
                             </td>
                             {selectedDealObjects.map((deal) => (
-                              <td key={deal.id} className="p-4 text-center font-bold" style={{ color: '#F59E0B' }}>
+                              <td key={deal.id} className="p-4 text-center font-bold" style={{ color: palette.amber[500] }}>
                                 {deal.ebitdaMargin}%
                               </td>
                             ))}
@@ -636,7 +637,7 @@ function MyFavouritesContent() {
                               Revenue per Employee
                             </td>
                             {selectedDealObjects.map((deal) => (
-                              <td key={deal.id} className="p-4 text-center font-bold" style={{ color: '#8B5CF6' }}>
+                              <td key={deal.id} className="p-4 text-center font-bold" style={{ color: palette.champagne[500] }}>
                                 ${((deal.revenue / deal.employees) / 1000).toFixed(0)}K
                               </td>
                             ))}
@@ -648,7 +649,7 @@ function MyFavouritesContent() {
                               YoY Growth Rate
                             </td>
                             {selectedDealObjects.map((deal) => (
-                              <td key={deal.id} className="p-4 text-center font-black text-lg" style={{ color: '#10B981' }}>
+                              <td key={deal.id} className="p-4 text-center font-black text-lg" style={{ color: palette.emerald[500] }}>
                                 {deal.growthRate}%
                               </td>
                             ))}
@@ -670,7 +671,7 @@ function MyFavouritesContent() {
                                     className="h-1 rounded"
                                     style={{
                                       width: `${deal.successProbability}%`,
-                                      background: deal.successProbability > 80 ? '#10B981' : deal.successProbability > 70 ? '#F59E0B' : '#EF4444',
+                                      background: deal.successProbability > 80 ? palette.emerald[500] : deal.successProbability > 70 ? palette.amber[500] : palette.crimson[400],
                                     }}
                                   />
                                 </div>
@@ -683,7 +684,7 @@ function MyFavouritesContent() {
                               Deal Heat Score
                             </td>
                             {selectedDealObjects.map((deal) => (
-                              <td key={deal.id} className="p-4 text-center font-bold" style={{ color: '#EF4444' }}>
+                              <td key={deal.id} className="p-4 text-center font-bold" style={{ color: palette.crimson[400] }}>
                                 <div className="text-lg">{deal.heatScore}/100</div>
                                 <div
                                   className="h-1 rounded mt-2 mx-auto w-24"
@@ -693,7 +694,7 @@ function MyFavouritesContent() {
                                     className="h-1 rounded"
                                     style={{
                                       width: `${deal.heatScore}%`,
-                                      background: deal.heatScore > 85 ? '#EF4444' : deal.heatScore > 75 ? '#F59E0B' : '#10B981',
+                                      background: deal.heatScore > 85 ? palette.crimson[400] : deal.heatScore > 75 ? palette.amber[500] : palette.emerald[500],
                                     }}
                                   />
                                 </div>
@@ -718,7 +719,7 @@ function MyFavouritesContent() {
                               Revenue Multiple (V/R)
                             </td>
                             {selectedDealObjects.map((deal) => (
-                              <td key={deal.id} className="p-4 text-center font-bold" style={{ color: '#B8956A' }}>
+                              <td key={deal.id} className="p-4 text-center font-bold" style={{ color: palette.champagne[500] }}>
                                 {(deal.valuation / deal.revenue).toFixed(1)}x
                               </td>
                             ))}
@@ -729,7 +730,7 @@ function MyFavouritesContent() {
                               Revenue per $ Valuation
                             </td>
                             {selectedDealObjects.map((deal) => (
-                              <td key={deal.id} className="p-4 text-center font-bold text-sm" style={{ color: '#10B981' }}>
+                              <td key={deal.id} className="p-4 text-center font-bold text-sm" style={{ color: palette.emerald[500] }}>
                                 ${(deal.revenue / deal.valuation * 100).toFixed(1)}%
                               </td>
                             ))}
@@ -808,10 +809,10 @@ function MyFavouritesContent() {
                     {insights && (
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {[
-                          { label: 'Avg Valuation', value: `$${(insights.avgValuation / 1000000).toFixed(1)}M`, color: '#B8956A' },
-                          { label: 'Avg Growth', value: `${insights.avgGrowth.toFixed(0)}%`, color: '#10B981' },
+                          { label: 'Avg Valuation', value: `$${(insights.avgValuation / 1000000).toFixed(1)}M`, color: palette.champagne[500] },
+                          { label: 'Avg Growth', value: `${insights.avgGrowth.toFixed(0)}%`, color: palette.emerald[500] },
                           { label: 'Avg Success %', value: `${insights.avgSuccess.toFixed(0)}%`, color: COLOR_ACCENT },
-                          { label: 'Total Revenue', value: `$${(insights.totalRevenue / 1000000).toFixed(1)}M`, color: '#8B5CF6' },
+                          { label: 'Total Revenue', value: `$${(insights.totalRevenue / 1000000).toFixed(1)}M`, color: palette.champagne[500] },
                         ].map((stat, idx) => (
                           <div key={idx} className="p-4 rounded-lg bg-white border" style={{ borderColor: COLOR_BORDER }}>
                             <p className="text-xs font-bold uppercase mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>
@@ -828,7 +829,7 @@ function MyFavouritesContent() {
                     <div className="mt-6 p-4 rounded-lg border" style={{ borderColor: COLOR_BORDER, background: 'white' }}>
                       <p className="text-sm leading-relaxed" style={{ color: COLOR_TEXT_SECONDARY }}>
                         <strong style={{ color: COLOR_PRIMARY }}>AI Recommendation:</strong> Based on the selected deals, your portfolio shows{' '}
-                        <strong style={{ color: '#10B981' }}>strong growth potential</strong> with an average {insights?.avgGrowth.toFixed(0)}%
+                        <strong style={{ color: palette.emerald[500] }}>strong growth potential</strong> with an average {insights?.avgGrowth.toFixed(0)}%
                         YoY growth. The deals are positioned in{' '}
                         <strong style={{ color: COLOR_ACCENT }}>high-opportunity markets</strong> with{' '}
                         <strong style={{ color: COLOR_ACCENT }}>{insights?.avgSuccess.toFixed(0)}% success probability</strong> on average.
@@ -940,8 +941,8 @@ function MyFavouritesContent() {
                                     <div
                                       className="p-6 rounded-lg border"
                                       style={{
-                                        borderColor: deltaAnalysis.deltas.valuation.pct > 0 ? '#10B981' : '#EF4444',
-                                        background: deltaAnalysis.deltas.valuation.pct > 0 ? '#10B981' + '10' : '#EF4444' + '10',
+                                        borderColor: deltaAnalysis.deltas.valuation.pct > 0 ? palette.emerald[500] : palette.crimson[400],
+                                        background: deltaAnalysis.deltas.valuation.pct > 0 ? palette.emerald[500] + '10' : palette.crimson[400] + '10',
                                       }}
                                     >
                                       <div className="flex items-start justify-between mb-3">
@@ -949,11 +950,11 @@ function MyFavouritesContent() {
                                           <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs font-bold uppercase">
                                             Valuation Delta
                                           </p>
-                                          <p className="text-2xl font-black mt-1" style={{ color: deltaAnalysis.deltas.valuation.pct > 0 ? '#10B981' : '#EF4444' }}>
+                                          <p className="text-2xl font-black mt-1" style={{ color: deltaAnalysis.deltas.valuation.pct > 0 ? palette.emerald[500] : palette.crimson[400] }}>
                                             {deltaAnalysis.deltas.valuation.pct > 0 ? '+' : ''}{deltaAnalysis.deltas.valuation.pct.toFixed(1)}%
                                           </p>
                                         </div>
-                                        <span className="text-xs font-bold px-2 py-1 rounded" style={{ background: 'white', color: deltaAnalysis.deltas.valuation.pct > 0 ? '#10B981' : '#EF4444' }}>
+                                        <span className="text-xs font-bold px-2 py-1 rounded" style={{ background: 'white', color: deltaAnalysis.deltas.valuation.pct > 0 ? palette.emerald[500] : palette.crimson[400] }}>
                                           {deltaAnalysis.deltas.valuation.pct > 0 ? 'Premium' : 'Discount'}
                                         </span>
                                       </div>
@@ -966,8 +967,8 @@ function MyFavouritesContent() {
                                     <div
                                       className="p-6 rounded-lg border"
                                       style={{
-                                        borderColor: deltaAnalysis.deltas.growth > 0 ? '#10B981' : '#EF4444',
-                                        background: deltaAnalysis.deltas.growth > 0 ? '#10B981' + '10' : '#EF4444' + '10',
+                                        borderColor: deltaAnalysis.deltas.growth > 0 ? palette.emerald[500] : palette.crimson[400],
+                                        background: deltaAnalysis.deltas.growth > 0 ? palette.emerald[500] + '10' : palette.crimson[400] + '10',
                                       }}
                                     >
                                       <div className="flex items-start justify-between mb-3">
@@ -975,11 +976,11 @@ function MyFavouritesContent() {
                                           <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs font-bold uppercase">
                                             Growth Delta
                                           </p>
-                                          <p className="text-2xl font-black mt-1" style={{ color: deltaAnalysis.deltas.growth > 0 ? '#10B981' : '#EF4444' }}>
+                                          <p className="text-2xl font-black mt-1" style={{ color: deltaAnalysis.deltas.growth > 0 ? palette.emerald[500] : palette.crimson[400] }}>
                                             {deltaAnalysis.deltas.growth > 0 ? '+' : ''}{deltaAnalysis.deltas.growth.toFixed(1)}%
                                           </p>
                                         </div>
-                                        <span className="text-xs font-bold px-2 py-1 rounded" style={{ background: 'white', color: deltaAnalysis.deltas.growth > 0 ? '#10B981' : '#EF4444' }}>
+                                        <span className="text-xs font-bold px-2 py-1 rounded" style={{ background: 'white', color: deltaAnalysis.deltas.growth > 0 ? palette.emerald[500] : palette.crimson[400] }}>
                                           {deltaAnalysis.deltas.growth > 0 ? 'Above Avg' : 'Below Avg'}
                                         </span>
                                       </div>
@@ -992,8 +993,8 @@ function MyFavouritesContent() {
                                     <div
                                       className="p-6 rounded-lg border"
                                       style={{
-                                        borderColor: deltaAnalysis.deltas.success > 0 ? '#10B981' : '#EF4444',
-                                        background: deltaAnalysis.deltas.success > 0 ? '#10B981' + '10' : '#EF4444' + '10',
+                                        borderColor: deltaAnalysis.deltas.success > 0 ? palette.emerald[500] : palette.crimson[400],
+                                        background: deltaAnalysis.deltas.success > 0 ? palette.emerald[500] + '10' : palette.crimson[400] + '10',
                                       }}
                                     >
                                       <div className="flex items-start justify-between mb-3">
@@ -1001,11 +1002,11 @@ function MyFavouritesContent() {
                                           <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs font-bold uppercase">
                                             Success Delta
                                           </p>
-                                          <p className="text-2xl font-black mt-1" style={{ color: deltaAnalysis.deltas.success > 0 ? '#10B981' : '#EF4444' }}>
+                                          <p className="text-2xl font-black mt-1" style={{ color: deltaAnalysis.deltas.success > 0 ? palette.emerald[500] : palette.crimson[400] }}>
                                             {deltaAnalysis.deltas.success > 0 ? '+' : ''}{deltaAnalysis.deltas.success.toFixed(1)}%
                                           </p>
                                         </div>
-                                        <span className="text-xs font-bold px-2 py-1 rounded" style={{ background: 'white', color: deltaAnalysis.deltas.success > 0 ? '#10B981' : '#EF4444' }}>
+                                        <span className="text-xs font-bold px-2 py-1 rounded" style={{ background: 'white', color: deltaAnalysis.deltas.success > 0 ? palette.emerald[500] : palette.crimson[400] }}>
                                           {deltaAnalysis.deltas.success > 0 ? 'Stronger' : 'Weaker'}
                                         </span>
                                       </div>
@@ -1018,8 +1019,8 @@ function MyFavouritesContent() {
                                     <div
                                       className="p-6 rounded-lg border"
                                       style={{
-                                        borderColor: deltaAnalysis.deltas.margin > 0 ? '#10B981' : '#EF4444',
-                                        background: deltaAnalysis.deltas.margin > 0 ? '#10B981' + '10' : '#EF4444' + '10',
+                                        borderColor: deltaAnalysis.deltas.margin > 0 ? palette.emerald[500] : palette.crimson[400],
+                                        background: deltaAnalysis.deltas.margin > 0 ? palette.emerald[500] + '10' : palette.crimson[400] + '10',
                                       }}
                                     >
                                       <div className="flex items-start justify-between mb-3">
@@ -1027,11 +1028,11 @@ function MyFavouritesContent() {
                                           <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs font-bold uppercase">
                                             Margin Delta
                                           </p>
-                                          <p className="text-2xl font-black mt-1" style={{ color: deltaAnalysis.deltas.margin > 0 ? '#10B981' : '#EF4444' }}>
+                                          <p className="text-2xl font-black mt-1" style={{ color: deltaAnalysis.deltas.margin > 0 ? palette.emerald[500] : palette.crimson[400] }}>
                                             {deltaAnalysis.deltas.margin > 0 ? '+' : ''}{deltaAnalysis.deltas.margin.toFixed(1)}%
                                           </p>
                                         </div>
-                                        <span className="text-xs font-bold px-2 py-1 rounded" style={{ background: 'white', color: deltaAnalysis.deltas.margin > 0 ? '#10B981' : '#EF4444' }}>
+                                        <span className="text-xs font-bold px-2 py-1 rounded" style={{ background: 'white', color: deltaAnalysis.deltas.margin > 0 ? palette.emerald[500] : palette.crimson[400] }}>
                                           {deltaAnalysis.deltas.margin > 0 ? 'Higher' : 'Lower'}
                                         </span>
                                       </div>
@@ -1051,7 +1052,7 @@ function MyFavouritesContent() {
                                         <div
                                           className="w-1 h-1 rounded-full mt-2 flex-shrink-0"
                                           style={{
-                                            background: insight.severity === 'positive' ? '#10B981' : insight.severity === 'caution' ? '#F59E0B' : '#B8956A',
+                                            background: insight.severity === 'positive' ? palette.emerald[500] : insight.severity === 'caution' ? palette.amber[500] : palette.champagne[500],
                                           }}
                                         />
                                         <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm leading-relaxed">
@@ -1075,10 +1076,10 @@ function MyFavouritesContent() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="mb-12 p-8 rounded-xl border"
-                      style={{ borderColor: COLOR_BORDER, background: '#F59E0B' + '05' }}
+                      style={{ borderColor: COLOR_BORDER, background: palette.amber[500] + '05' }}
                     >
                       <div className="flex items-center gap-3 mb-8">
-                        <BarChart3 size={24} style={{ color: '#F59E0B' }} />
+                        <BarChart3 size={24} style={{ color: palette.amber[500] }} />
                         <h2 className="text-2xl font-bold" style={{ color: COLOR_PRIMARY }}>
                           ⚖️ Current Deal Comparison Analysis
                         </h2>
@@ -1124,7 +1125,7 @@ function MyFavouritesContent() {
                                   <span style={{ color: COLOR_TEXT_SECONDARY }}>
                                     {idx + 1}. {deal.name}
                                   </span>
-                                  <span style={{ color: '#10B981' }} className="font-bold">
+                                  <span style={{ color: palette.emerald[500] }} className="font-bold">
                                     {deal.growthRate}% YoY
                                   </span>
                                 </div>
@@ -1154,7 +1155,7 @@ function MyFavouritesContent() {
                                     </span>
                                     <span
                                       style={{
-                                        color: ratioNum > 1 ? '#10B981' : ratioNum > 0.5 ? '#F59E0B' : '#EF4444',
+                                        color: ratioNum > 1 ? palette.emerald[500] : ratioNum > 0.5 ? palette.amber[500] : palette.crimson[400],
                                       }}
                                       className="text-sm font-bold"
                                     >
@@ -1185,10 +1186,10 @@ function MyFavouritesContent() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="mb-12 p-8 rounded-xl border"
-                      style={{ borderColor: COLOR_BORDER, background: '#8B5CF6' + '05' }}
+                      style={{ borderColor: COLOR_BORDER, background: palette.champagne[500] + '05' }}
                     >
                       <div className="flex items-center gap-3 mb-8">
-                        <AlertCircle size={24} style={{ color: '#8B5CF6' }} />
+                        <AlertCircle size={24} style={{ color: palette.champagne[500] }} />
                         <h2 className="text-2xl font-bold" style={{ color: COLOR_PRIMARY }}>
                           💡 Things to Note from AI
                         </h2>
@@ -1221,7 +1222,7 @@ function MyFavouritesContent() {
                                   <span
                                     className="text-lg font-black"
                                     style={{
-                                      color: score > 0.7 ? '#10B981' : score > 0.5 ? '#F59E0B' : '#EF4444',
+                                      color: score > 0.7 ? palette.emerald[500] : score > 0.5 ? palette.amber[500] : palette.crimson[400],
                                     }}
                                   >
                                     {(score * 100).toFixed(0)}/100
@@ -1238,34 +1239,34 @@ function MyFavouritesContent() {
                           </p>
                           <div className="space-y-3 text-sm">
                             {selectedDealObjects.some((d) => d.maaProbability > 80) && (
-                              <div className="flex gap-3 items-start p-3 rounded-lg border" style={{ borderColor: '#10B981', background: '#10B981' + '10' }}>
-                                <Flame size={16} style={{ color: '#10B981', flexShrink: 0 }} />
+                              <div className="flex gap-3 items-start p-3 rounded-lg border" style={{ borderColor: palette.emerald[500], background: palette.emerald[500] + '10' }}>
+                                <Flame size={16} style={{ color: palette.emerald[500], flexShrink: 0 }} />
                                 <span style={{ color: COLOR_TEXT_SECONDARY }}>
-                                  <strong style={{ color: '#10B981' }}>High M&A Fit:</strong> {selectedDealObjects.filter((d) => d.maaProbability > 80).map((d) => d.name).join(', ')} show strong strategic fit indicators
+                                  <strong style={{ color: palette.emerald[500] }}>High M&A Fit:</strong> {selectedDealObjects.filter((d) => d.maaProbability > 80).map((d) => d.name).join(', ')} show strong strategic fit indicators
                                 </span>
                               </div>
                             )}
                             {selectedDealObjects.some((d) => d.ebitdaMargin > 25) && (
-                              <div className="flex gap-3 items-start p-3 rounded-lg border" style={{ borderColor: '#10B981', background: '#10B981' + '10' }}>
-                                <DollarSign size={16} style={{ color: '#10B981', flexShrink: 0 }} />
+                              <div className="flex gap-3 items-start p-3 rounded-lg border" style={{ borderColor: palette.emerald[500], background: palette.emerald[500] + '10' }}>
+                                <DollarSign size={16} style={{ color: palette.emerald[500], flexShrink: 0 }} />
                                 <span style={{ color: COLOR_TEXT_SECONDARY }}>
-                                  <strong style={{ color: '#10B981' }}>Margin Excellence:</strong> High profitability deals present immediate EBITDA accretion opportunities
+                                  <strong style={{ color: palette.emerald[500] }}>Margin Excellence:</strong> High profitability deals present immediate EBITDA accretion opportunities
                                 </span>
                               </div>
                             )}
                             {selectedDealObjects.some((d) => d.growthRate < 35) && (
-                              <div className="flex gap-3 items-start p-3 rounded-lg border" style={{ borderColor: '#F59E0B', background: '#F59E0B' + '10' }}>
-                                <TrendingUp size={16} style={{ color: '#F59E0B', flexShrink: 0 }} />
+                              <div className="flex gap-3 items-start p-3 rounded-lg border" style={{ borderColor: palette.amber[500], background: palette.amber[500] + '10' }}>
+                                <TrendingUp size={16} style={{ color: palette.amber[500], flexShrink: 0 }} />
                                 <span style={{ color: COLOR_TEXT_SECONDARY }}>
-                                  <strong style={{ color: '#F59E0B' }}>Growth Consideration:</strong> Some deals show lower growth; evaluate for cash generation vs. growth potential
+                                  <strong style={{ color: palette.amber[500] }}>Growth Consideration:</strong> Some deals show lower growth; evaluate for cash generation vs. growth potential
                                 </span>
                               </div>
                             )}
                             {selectedDealObjects.some((d) => d.successProbability < 80) && (
-                              <div className="flex gap-3 items-start p-3 rounded-lg border" style={{ borderColor: '#F59E0B', background: '#F59E0B' + '10' }}>
-                                <Target size={16} style={{ color: '#F59E0B', flexShrink: 0 }} />
+                              <div className="flex gap-3 items-start p-3 rounded-lg border" style={{ borderColor: palette.amber[500], background: palette.amber[500] + '10' }}>
+                                <Target size={16} style={{ color: palette.amber[500], flexShrink: 0 }} />
                                 <span style={{ color: COLOR_TEXT_SECONDARY }}>
-                                  <strong style={{ color: '#F59E0B' }}>Due Diligence Focus:</strong> Lower success probability deals require deeper operational assessment
+                                  <strong style={{ color: palette.amber[500] }}>Due Diligence Focus:</strong> Lower success probability deals require deeper operational assessment
                                 </span>
                               </div>
                             )}
@@ -1300,8 +1301,8 @@ function MyFavouritesContent() {
                         </div>
 
                         {/* Risk Mitigation */}
-                        <div className="p-6 rounded-lg border md:col-span-2" style={{ borderColor: COLOR_BORDER, background: '#EF4444' + '05' }}>
-                          <p style={{ color: '#EF4444' }} className="font-bold mb-4">
+                        <div className="p-6 rounded-lg border md:col-span-2" style={{ borderColor: COLOR_BORDER, background: palette.crimson[400] + '05' }}>
+                          <p style={{ color: palette.crimson[400] }} className="font-bold mb-4">
                             ⚠️ Risk Mitigation Priorities
                           </p>
                           <div className="space-y-3 text-sm">
@@ -1363,7 +1364,7 @@ function MyFavouritesContent() {
                                       </h4>
                                       <span
                                         className="inline-block text-xs font-bold px-2 py-1 rounded mt-1"
-                                        style={{ background: '#8B5CF6' + '30', color: '#8B5CF6' }}
+                                        style={{ background: palette.champagne[500] + '30', color: palette.champagne[500] }}
                                       >
                                         Market Precedent
                                       </span>
@@ -1382,7 +1383,7 @@ function MyFavouritesContent() {
                                         <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs font-bold">
                                           Growth
                                         </p>
-                                        <p className="font-black" style={{ color: '#10B981' }}>
+                                        <p className="font-black" style={{ color: palette.emerald[500] }}>
                                           {comp.growthRate}%
                                         </p>
                                       </div>
@@ -1398,7 +1399,7 @@ function MyFavouritesContent() {
                                         <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-xs font-bold">
                                           Margin
                                         </p>
-                                        <p className="font-black" style={{ color: '#F59E0B' }}>
+                                        <p className="font-black" style={{ color: palette.amber[500] }}>
                                           {comp.ebitdaMargin}%
                                         </p>
                                       </div>
