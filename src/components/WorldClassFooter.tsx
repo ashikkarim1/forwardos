@@ -170,7 +170,7 @@ export function WorldClassFooter() {
               <div
                 key={idx}
                 className="p-6 rounded-xl border"
-                style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'white' }}
+                style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)' }}
               >
                 <h4 className="font-bold text-lg mb-3" style={{ color: 'white' }}>
                   {office.region}
@@ -254,7 +254,7 @@ export function WorldClassFooter() {
                 desc: 'We have a clear dispute resolution process. Contact our support team for any issues or concerns.',
               },
             ].map((item, idx) => (
-              <div key={idx} className="p-4 rounded-lg border" style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'white' }}>
+              <div key={idx} className="p-4 rounded-lg border" style={{ borderColor: 'rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)' }}>
                 <h4 className="font-bold text-sm mb-2" style={{ color: 'white' }}>
                   {item.title}
                 </h4>
