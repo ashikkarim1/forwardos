@@ -80,7 +80,9 @@ export async function createCheckoutSession(options: CreateCheckoutSessionOption
     billing_address_collection: 'required',
     tax_id_collection: { enabled: true },
     automatic_tax: { enabled: true },
-    customer_update: { address: 'auto', name: 'auto' },
+    // customer_update is only valid alongside a customer: ID for an existing
+    // Stripe customer. We use customer_email and let Stripe create a new
+    // customer; address is auto-attached during checkout, so no need to set it.
     metadata: { userId: options.userId, dealId: options.dealId || '', planTier: options.planTier },
     subscription_data: { metadata: { userId: options.userId, planTier: options.planTier } },
   })
