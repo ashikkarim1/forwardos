@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { Search, ChevronLeft, ChevronRight, ChevronDown, X, SlidersHorizontal, Heart, ArrowRight, Lock, Sparkles, Camera, CheckCircle2, Mail } from 'lucide-react'
 import { BusinessPhotoGallery } from '@/components/BusinessPhotoGallery'
 import { SaveSearchButton } from '@/components/SaveSearchButton'
+import { SavedViewsMenu } from '@/components/marketplace/SavedViews'
 import { PublicHeader } from '@/components/Navigation'
 import { useSavedDeals } from '@/hooks/useSavedDeals'
 import { generateNarrative, narrativeEyebrow, maskedHeadline, industryLabel } from '@/lib/listing-narrative'
@@ -345,6 +346,8 @@ export default function MarketplacePage() {
                 minHeatScore: heatScore.min !== 0 ? heatScore.min : undefined,
               }}
             />
+
+            <SavedViewsMenu />
 
             {/* Institutional view — opens a TanStack-powered, sortable data
                 table for analysts evaluating dozens of deals at once. */}

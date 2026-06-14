@@ -77,14 +77,61 @@ export default function AdminListingsPage() {
     return () => { cancelled = true }
   }, [])
 
-  const update = (id: string, next: ListingStatus) => {
+  // Optimistic update: flip the UI immediately, then POST. If the API
+  // fails, revert the row and surface the error. Same shape used by
+  // /admin/activity-relevant mutations everywhere.
+  const moderate = async (id: string, next: ListingStatus) => {
+    const action = next === 'approved' ? 'approve' : next === 'rejected' ? 'reject' : next === 'flagged' ? 'flag' : 'pending'
+    const prev = listings?.find((r) => r.id === id)?.status
     setListings((rows) => (rows ?? []).map((r) => (r.id === id ? { ...r, status: next } : r)))
-    toast.success(`Listing #${id} marked ${next}`)
+    try {
+      const r = await fetch(`/api/admin/listings/${id}/status`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      })
+      if (!r.ok) {
+        const data = await r.json().catch(() => ({}))
+        throw new Error(data?.error || 'Failed to save.')
+      }
+      toast.success(`Listing #${id} marked ${next}`)
+    } catch (err) {
+      // Revert
+      setListings((rows) => (rows ?? []).map((r) => (r.id === id && prev ? { ...r, status: prev } : r)))
+      toast.error(err instanceof Error ? err.message : 'Failed to save')
+    }
   }
 
-  const bulk = (ids: string[], next: ListingStatus) => {
+  const bulk = async (ids: string[], next: ListingStatus) => {
+    const action = next === 'approved' ? 'approve' : next === 'rejected' ? 'reject' : next === 'flagged' ? 'flag' : 'pending'
+    const prevSnapshot = new Map((listings ?? []).map((r) => [r.id, r.status]))
     setListings((rows) => (rows ?? []).map((r) => (ids.includes(r.id) ? { ...r, status: next } : r)))
-    toast.success(`${ids.length} listings marked ${next}`)
+    const results = await Promise.allSettled(
+      ids.map((id) => fetch(`/api/admin/listings/${id}/status`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      }).then((r) => r.ok ? id : Promise.reject(new Error(`#${id} failed`))))
+    )
+    const succeeded = results.filter((r) => r.status === 'fulfilled').length
+    const failed = results.length - succeeded
+    if (failed === 0) {
+      toast.success(`${succeeded} listings marked ${next}`)
+    } else {
+      // Revert failures
+      setListings((rows) => (rows ?? []).map((r) => {
+        if (!ids.includes(r.id)) return r
+        const idx = ids.indexOf(r.id)
+        if (results[idx].status === 'rejected') {
+          const prev = prevSnapshot.get(r.id)
+          return prev ? { ...r, status: prev } : r
+        }
+        return r
+      }))
+      toast.warning(`${succeeded} succeeded, ${failed} failed`, { description: 'The failed rows reverted.' })
+    }
   }
 
   const columns = useMemo<ColumnDef<AdminListing>[]>(() => [
@@ -144,17 +191,17 @@ export default function AdminListingsPage() {
         return (
           <div style={{ display: 'flex', gap: space[1], justifyContent: 'flex-end' }} onClick={(e) => e.stopPropagation()}>
             {r.status !== 'approved' && (
-              <Button variant="ghost" size="sm" leftIcon={<CheckCircle size={12} />} onClick={() => update(r.id, 'approved')}>
+              <Button variant="ghost" size="sm" leftIcon={<CheckCircle size={12} />} onClick={() => moderate(r.id, 'approved')}>
                 Approve
               </Button>
             )}
             {r.status !== 'rejected' && (
-              <Button variant="ghost" size="sm" leftIcon={<XCircle size={12} />} onClick={() => update(r.id, 'rejected')}>
+              <Button variant="ghost" size="sm" leftIcon={<XCircle size={12} />} onClick={() => moderate(r.id, 'rejected')}>
                 Reject
               </Button>
             )}
             {r.status !== 'flagged' && (
-              <Button variant="ghost" size="sm" leftIcon={<Flag size={12} />} onClick={() => update(r.id, 'flagged')}>
+              <Button variant="ghost" size="sm" leftIcon={<Flag size={12} />} onClick={() => moderate(r.id, 'flagged')}>
                 Flag
               </Button>
             )}
