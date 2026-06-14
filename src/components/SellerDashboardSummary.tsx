@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { TrendingUp, AlertCircle, Clock, Target, DollarSign, Users, CheckCircle2, Zap } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_SURFACE_SUCCESS } from '@/styles/forward-colors'
+import { palette } from '@/styles/tokens'
 
 interface DealMetric {
   stage: string
@@ -91,8 +92,8 @@ export function SellerDashboardSummary({
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <TrendingUp className="w-4 h-4" style={{ color: '#10B981' }} />
-            <span className="text-xs font-bold" style={{ color: '#10B981' }}>
+            <TrendingUp className="w-4 h-4" style={{ color: palette.emerald[500] }} />
+            <span className="text-xs font-bold" style={{ color: palette.emerald[500] }}>
               ↑ {trends.pipelineGrowth}% this quarter
             </span>
           </div>
@@ -124,8 +125,8 @@ export function SellerDashboardSummary({
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <TrendingUp className="w-4 h-4" style={{ color: '#10B981' }} />
-            <span className="text-xs font-bold" style={{ color: '#10B981' }}>
+            <TrendingUp className="w-4 h-4" style={{ color: palette.emerald[500] }} />
+            <span className="text-xs font-bold" style={{ color: palette.emerald[500] }}>
               ↑ {trends.activeDealsGrowth}% from last month
             </span>
           </div>
@@ -148,9 +149,9 @@ export function SellerDashboardSummary({
             </div>
             <div
               className="p-3 rounded-lg"
-              style={{ background: '#10B981' + '20' }}
+              style={{ background: palette.emerald[500] + '20' }}
             >
-              <Target className="w-5 h-5" style={{ color: '#10B981' }} />
+              <Target className="w-5 h-5" style={{ color: palette.emerald[500] }} />
             </div>
           </div>
           <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
@@ -175,9 +176,9 @@ export function SellerDashboardSummary({
             </div>
             <div
               className="p-3 rounded-lg"
-              style={{ background: '#10B981' + '20' }}
+              style={{ background: palette.emerald[500] + '20' }}
             >
-              <CheckCircle2 className="w-5 h-5" style={{ color: '#10B981' }} />
+              <CheckCircle2 className="w-5 h-5" style={{ color: palette.emerald[500] }} />
             </div>
           </div>
           <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
@@ -205,7 +206,7 @@ export function SellerDashboardSummary({
             {dealsByStage.map((stage, idx) => {
               const maxDays = Math.max(...dealsByStage.map(s => s.daysInStage))
               const percentComplete = (stage.daysInStage / maxDays) * 100
-              const riskColor = stage.riskLevel === 'high' ? '#EF4444' : stage.riskLevel === 'medium' ? '#F59E0B' : '#10B981'
+              const riskColor = stage.riskLevel === 'high' ? palette.crimson[400] : stage.riskLevel === 'medium' ? palette.amber[500] : palette.emerald[500]
 
               return (
                 <motion.div
@@ -213,7 +214,7 @@ export function SellerDashboardSummary({
                   className="p-4 rounded-lg border cursor-pointer transition-all"
                   style={{
                     borderColor: selectedDealStage === stage.stage ? COLOR_ACCENT : COLOR_BORDER,
-                    background: selectedDealStage === stage.stage ? COLOR_ACCENT + '08' : '#FAFAF8',
+                    background: selectedDealStage === stage.stage ? COLOR_ACCENT + '08' : palette.cream[50],
                   }}
                   onClick={() => setSelectedDealStage(selectedDealStage === stage.stage ? null : stage.stage)}
                   whileHover={{ scale: 1.02 }}
@@ -271,24 +272,24 @@ export function SellerDashboardSummary({
 
           {/* Risk Summary */}
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="p-4 rounded-lg text-center" style={{ background: '#F3F4F6' }}>
-              <p className="text-2xl font-black" style={{ color: '#EF4444' }}>
+            <div className="p-4 rounded-lg text-center" style={{ background: palette.ink[50] }}>
+              <p className="text-2xl font-black" style={{ color: palette.crimson[400] }}>
                 {riskIndicators.high}
               </p>
               <p className="text-xs font-bold mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
                 High Risk
               </p>
             </div>
-            <div className="p-4 rounded-lg text-center" style={{ background: '#FEF3C7' }}>
-              <p className="text-2xl font-black" style={{ color: '#F59E0B' }}>
+            <div className="p-4 rounded-lg text-center" style={{ background: palette.amber[50] }}>
+              <p className="text-2xl font-black" style={{ color: palette.amber[500] }}>
                 {riskIndicators.medium}
               </p>
               <p className="text-xs font-bold mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
                 Medium Risk
               </p>
             </div>
-            <div className="p-4 rounded-lg text-center" style={{ background: '#DCFCE7' }}>
-              <p className="text-2xl font-black" style={{ color: '#10B981' }}>
+            <div className="p-4 rounded-lg text-center" style={{ background: palette.emerald[50] }}>
+              <p className="text-2xl font-black" style={{ color: palette.emerald[500] }}>
                 {riskIndicators.low}
               </p>
               <p className="text-xs font-bold mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
@@ -300,13 +301,13 @@ export function SellerDashboardSummary({
           {/* Critical Issues */}
           <div>
             <h4 className="font-bold text-sm mb-3 flex items-center gap-2" style={{ color: COLOR_PRIMARY }}>
-              <AlertCircle className="w-4 h-4" style={{ color: '#EF4444' }} />
+              <AlertCircle className="w-4 h-4" style={{ color: palette.crimson[400] }} />
               Critical Issues
             </h4>
             <div className="space-y-2">
               {riskIndicators.high > 0 && (
-                <div className="p-3 rounded-lg border-l-4" style={{ borderLeftColor: '#EF4444', background: '#FEF2F2' }}>
-                  <p className="text-sm font-bold" style={{ color: '#EF4444' }}>
+                <div className="p-3 rounded-lg border-l-4" style={{ borderLeftColor: palette.crimson[400], background: palette.crimson[50] }}>
+                  <p className="text-sm font-bold" style={{ color: palette.crimson[400] }}>
                     {riskIndicators.high} deal{riskIndicators.high !== 1 ? 's' : ''} at risk of stalling
                   </p>
                   <p className="text-xs mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
@@ -315,8 +316,8 @@ export function SellerDashboardSummary({
                 </div>
               )}
               {riskIndicators.medium > 0 && (
-                <div className="p-3 rounded-lg border-l-4" style={{ borderLeftColor: '#F59E0B', background: '#FFFBEB' }}>
-                  <p className="text-sm font-bold" style={{ color: '#F59E0B' }}>
+                <div className="p-3 rounded-lg border-l-4" style={{ borderLeftColor: palette.amber[500], background: palette.amber[50] }}>
+                  <p className="text-sm font-bold" style={{ color: palette.amber[500] }}>
                     {riskIndicators.medium} deal{riskIndicators.medium !== 1 ? 's' : ''} showing friction
                   </p>
                   <p className="text-xs mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
@@ -325,8 +326,8 @@ export function SellerDashboardSummary({
                 </div>
               )}
               {riskIndicators.high === 0 && riskIndicators.medium === 0 && (
-                <div className="p-3 rounded-lg border-l-4" style={{ borderLeftColor: '#10B981', background: '#F0FDF4' }}>
-                  <p className="text-sm font-bold" style={{ color: '#10B981' }}>
+                <div className="p-3 rounded-lg border-l-4" style={{ borderLeftColor: palette.emerald[500], background: palette.emerald[50] }}>
+                  <p className="text-sm font-bold" style={{ color: palette.emerald[500] }}>
                     All systems go
                   </p>
                   <p className="text-xs mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>

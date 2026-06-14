@@ -8,6 +8,7 @@ import {
   AlertCircle, MessageSquare, RefreshCw
 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
+import { palette } from '@/styles/tokens'
 
 interface MarketSignal {
   id: string
@@ -74,9 +75,9 @@ export function DailyIntelligenceDashboard({
   const [selectedTab, setSelectedTab] = useState<'signals' | 'momentum' | 'comparables' | 'alerts'>('signals')
 
   const getMomentumColor = (momentum: string) => {
-    if (momentum === 'accelerating') return '#10B981'
+    if (momentum === 'accelerating') return palette.emerald[500]
     if (momentum === 'steady') return COLOR_ACCENT
-    return '#EF4444'
+    return palette.crimson[400]
   }
 
   const getMomentumIcon = (momentum: string) => {
@@ -88,13 +89,13 @@ export function DailyIntelligenceDashboard({
   const getSignalBackground = (type: string) => {
     switch (type) {
       case 'hot':
-        return '#F3F4F6'
+        return palette.ink[50]
       case 'cold':
-        return '#F3F4F6'
+        return palette.ink[50]
       case 'trend':
-        return '#DBEAFE'
+        return palette.champagne[50]
       case 'alert':
-        return '#FEE2E2'
+        return palette.crimson[50]
       default:
         return 'white'
     }
@@ -105,11 +106,11 @@ export function DailyIntelligenceDashboard({
       case 'hot':
         return COLOR_ACCENT
       case 'cold':
-        return '#D1D5DB'
+        return palette.ink[200]
       case 'trend':
-        return '#B8956A'
+        return palette.champagne[500]
       case 'alert':
-        return '#EF4444'
+        return palette.crimson[400]
       default:
         return COLOR_BORDER
     }
@@ -138,7 +139,7 @@ export function DailyIntelligenceDashboard({
               Updated {lastUpdated}
             </span>
           </div>
-          <span className="text-xs px-3 py-1 rounded-full" style={{ background: '#DCFCE7', color: '#10B981' }}>
+          <span className="text-xs px-3 py-1 rounded-full" style={{ background: palette.emerald[50], color: palette.emerald[500] }}>
             ✓ Real-time
           </span>
         </div>
@@ -236,9 +237,9 @@ export function DailyIntelligenceDashboard({
                   }}
                 >
                   {signal.type === 'hot' && <Flame className="w-4 h-4" style={{ color: COLOR_ACCENT }} />}
-                  {signal.type === 'cold' && <TrendingDown className="w-4 h-4" style={{ color: '#6B7280' }} />}
-                  {signal.type === 'trend' && <TrendingUp className="w-4 h-4" style={{ color: '#B8956A' }} />}
-                  {signal.type === 'alert' && <AlertTriangle className="w-4 h-4" style={{ color: '#EF4444' }} />}
+                  {signal.type === 'cold' && <TrendingDown className="w-4 h-4" style={{ color: palette.ink[400] }} />}
+                  {signal.type === 'trend' && <TrendingUp className="w-4 h-4" style={{ color: palette.champagne[500] }} />}
+                  {signal.type === 'alert' && <AlertTriangle className="w-4 h-4" style={{ color: palette.crimson[400] }} />}
                 </div>
               </div>
 
@@ -256,13 +257,13 @@ export function DailyIntelligenceDashboard({
                   </p>
                   <div className="flex items-center gap-1">
                     {signal.change > 0 ? (
-                      <ArrowUpRight className="w-4 h-4" style={{ color: '#10B981' }} />
+                      <ArrowUpRight className="w-4 h-4" style={{ color: palette.emerald[500] }} />
                     ) : (
-                      <ArrowDownRight className="w-4 h-4" style={{ color: '#EF4444' }} />
+                      <ArrowDownRight className="w-4 h-4" style={{ color: palette.crimson[400] }} />
                     )}
                     <span
                       className="text-xs font-bold"
-                      style={{ color: signal.change > 0 ? '#10B981' : '#EF4444' }}
+                      style={{ color: signal.change > 0 ? palette.emerald[500] : palette.crimson[400] }}
                     >
                       {Math.abs(signal.change)}% {signal.change > 0 ? 'up' : 'down'}
                     </span>
@@ -350,7 +351,7 @@ export function DailyIntelligenceDashboard({
                   <motion.div
                     className="h-2 rounded-full"
                     style={{
-                      background: deal.heat > 75 ? COLOR_ACCENT : deal.heat > 50 ? '#F59E0B' : '#6B7280',
+                      background: deal.heat > 75 ? COLOR_ACCENT : deal.heat > 50 ? palette.amber[500] : palette.ink[400],
                       width: `${deal.heat}%`,
                     }}
                     initial={{ width: 0 }}
@@ -370,17 +371,17 @@ export function DailyIntelligenceDashboard({
                   exit={{ opacity: 0, height: 0 }}
                 >
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 rounded-lg" style={{ background: '#F3F4F6' }}>
+                    <div className="p-3 rounded-lg" style={{ background: palette.ink[50] }}>
                       <p className="text-xs font-bold mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>
                         Risk Level
                       </p>
                       <p className="text-sm font-bold capitalize" style={{
-                        color: deal.riskLevel === 'high' ? '#EF4444' : deal.riskLevel === 'medium' ? '#F59E0B' : '#10B981'
+                        color: deal.riskLevel === 'high' ? palette.crimson[400] : deal.riskLevel === 'medium' ? palette.amber[500] : palette.emerald[500]
                       }}>
                         {deal.riskLevel}
                       </p>
                     </div>
-                    <div className="p-3 rounded-lg" style={{ background: '#F3F4F6' }}>
+                    <div className="p-3 rounded-lg" style={{ background: palette.ink[50] }}>
                       <p className="text-xs font-bold mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>
                         Next Action
                       </p>
@@ -433,11 +434,11 @@ export function DailyIntelligenceDashboard({
                       {comp.multiple.toFixed(1)}x Revenue
                     </p>
                     <div className="flex items-center gap-1 justify-end mt-1">
-                      {isHigher && <ArrowUpRight className="w-4 h-4" style={{ color: '#EF4444' }} />}
-                      {isLower && <ArrowDownRight className="w-4 h-4" style={{ color: '#10B981' }} />}
+                      {isHigher && <ArrowUpRight className="w-4 h-4" style={{ color: palette.crimson[400] }} />}
+                      {isLower && <ArrowDownRight className="w-4 h-4" style={{ color: palette.emerald[500] }} />}
                       <span
                         className="text-xs font-bold"
-                        style={{ color: isHigher ? '#EF4444' : isLower ? '#10B981' : COLOR_TEXT_SECONDARY }}
+                        style={{ color: isHigher ? palette.crimson[400] : isLower ? palette.emerald[500] : COLOR_TEXT_SECONDARY }}
                       >
                         {Math.abs(comp.percentageDiff)}% {isHigher ? 'overvalued' : isLower ? 'undervalued' : 'at market'}
                       </span>
@@ -446,7 +447,7 @@ export function DailyIntelligenceDashboard({
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 text-center">
-                  <div className="p-3 rounded-lg" style={{ background: '#F3F4F6' }}>
+                  <div className="p-3 rounded-lg" style={{ background: palette.ink[50] }}>
                     <p className="text-xs font-bold mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>
                       Revenue
                     </p>
@@ -454,7 +455,7 @@ export function DailyIntelligenceDashboard({
                       AED {(comp.revenue / 1000000).toFixed(1)}M
                     </p>
                   </div>
-                  <div className="p-3 rounded-lg" style={{ background: '#F3F4F6' }}>
+                  <div className="p-3 rounded-lg" style={{ background: palette.ink[50] }}>
                     <p className="text-xs font-bold mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>
                       Valuation
                     </p>
@@ -487,10 +488,10 @@ export function DailyIntelligenceDashboard({
           {alerts.length === 0 ? (
             <motion.div
               className="p-8 rounded-lg border-2 text-center"
-              style={{ borderColor: COLOR_BORDER, background: '#DCFCE7' }}
+              style={{ borderColor: COLOR_BORDER, background: palette.emerald[50] }}
             >
-              <CheckCircle2 className="w-8 h-8 mx-auto mb-2" style={{ color: '#10B981' }} />
-              <p className="font-bold" style={{ color: '#10B981' }}>
+              <CheckCircle2 className="w-8 h-8 mx-auto mb-2" style={{ color: palette.emerald[500] }} />
+              <p className="font-bold" style={{ color: palette.emerald[500] }}>
                 All Clear!
               </p>
               <p className="text-sm mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
@@ -503,8 +504,8 @@ export function DailyIntelligenceDashboard({
                 key={alert.id}
                 className="p-4 rounded-lg border-l-4"
                 style={{
-                  borderLeftColor: alert.severity === 'high' ? '#EF4444' : alert.severity === 'medium' ? '#F59E0B' : '#B8956A',
-                  background: alert.severity === 'high' ? '#FEF2F2' : alert.severity === 'medium' ? '#FFFBEB' : '#DBEAFE',
+                  borderLeftColor: alert.severity === 'high' ? palette.crimson[400] : alert.severity === 'medium' ? palette.amber[500] : palette.champagne[500],
+                  background: alert.severity === 'high' ? palette.crimson[50] : alert.severity === 'medium' ? palette.amber[50] : palette.champagne[50],
                 }}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -514,13 +515,13 @@ export function DailyIntelligenceDashboard({
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       {alert.severity === 'high' && (
-                        <AlertTriangle className="w-4 h-4" style={{ color: '#EF4444' }} />
+                        <AlertTriangle className="w-4 h-4" style={{ color: palette.crimson[400] }} />
                       )}
                       {alert.severity === 'medium' && (
-                        <AlertCircle className="w-4 h-4" style={{ color: '#F59E0B' }} />
+                        <AlertCircle className="w-4 h-4" style={{ color: palette.amber[500] }} />
                       )}
                       {alert.severity === 'low' && (
-                        <AlertCircle className="w-4 h-4" style={{ color: '#B8956A' }} />
+                        <AlertCircle className="w-4 h-4" style={{ color: palette.champagne[500] }} />
                       )}
                       <h3 className="font-bold text-sm" style={{ color: COLOR_PRIMARY }}>
                         {alert.title}

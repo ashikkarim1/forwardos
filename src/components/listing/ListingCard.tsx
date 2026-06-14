@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Heart, Zap, ArrowRight, TrendingUp, TrendingDown, Award, CheckCircle2 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
+import { palette } from '@/styles/tokens'
 
 interface ListingCardProps {
   id: string
@@ -45,10 +46,10 @@ interface ListingCardProps {
 }
 
 const DEAL_QUALITY_COLORS = {
-  excellent: '#10B981',
-  good: '#B8956A',
-  fair: '#F59E0B',
-  poor: '#EF4444',
+  excellent: palette.emerald[500],
+  good: palette.champagne[500],
+  fair: palette.amber[500],
+  poor: palette.crimson[400],
 }
 
 const getQualityColor = (score: number) => {
@@ -68,11 +69,11 @@ const getQualityLabel = (score: number) => {
 const getMarketPositionColor = (position?: string) => {
   switch (position) {
     case 'underpriced':
-      return '#10B981' // Green - good deal
+      return palette.emerald[500] // Green - good deal
     case 'premium':
-      return '#EF4444' // Red - expensive
+      return palette.crimson[400] // Red - expensive
     default:
-      return '#B8956A' // Blue - fair
+      return palette.champagne[500] // Blue - fair
   }
 }
 
@@ -164,7 +165,7 @@ export default function ListingCard({
           {status === 'NEW' && (
             <span
               className="px-2 py-1 rounded-full text-xs font-bold text-white"
-              style={{ background: '#EF4444' }}
+              style={{ background: palette.crimson[400] }}
             >
               🆕 NEW
             </span>
@@ -181,7 +182,7 @@ export default function ListingCard({
             <Link
               href="/finance-center"
               className="px-2 py-1 rounded-full text-xs font-bold text-white flex items-center gap-1 hover:opacity-90"
-              style={{ background: '#2D7A5F' }}
+              style={{ background: palette.emerald[500] }}
               title="Pre-qualified for CSBFP / BDC / SME / Islamic financing"
             >
               💰 Financing Eligible
@@ -204,7 +205,7 @@ export default function ListingCard({
             <div
               className="px-2 py-1 rounded-lg text-xs font-bold text-white flex items-center gap-1"
               style={{
-                background: marketTrend === 'up' ? '#10B981' : marketTrend === 'down' ? '#EF4444' : '#6B7280',
+                background: marketTrend === 'up' ? palette.emerald[500] : marketTrend === 'down' ? palette.crimson[400] : palette.ink[400],
               }}
             >
               {marketTrend === 'up' ? <TrendingUp size={12} /> : marketTrend === 'down' ? <TrendingDown size={12} /> : null}
@@ -215,7 +216,7 @@ export default function ListingCard({
           {/* Heat Index */}
           <div
             className="px-2 py-1 rounded-lg text-xs font-bold text-white flex items-center gap-1"
-            style={{ background: heatIndex > 70 ? '#DC2626' : '#F59E0B' }}
+            style={{ background: heatIndex > 70 ? palette.crimson[600] : palette.amber[500] }}
           >
             <Zap size={12} />
             {heatIndex}
@@ -266,10 +267,10 @@ export default function ListingCard({
             style={{
               background:
                 dealType === 'LEASE'
-                  ? '#06B6D4'
+                  ? palette.champagne[500]
                   : dealType === 'QUICK_SALE'
-                    ? '#DC2626'
-                    : '#10B981',
+                    ? palette.crimson[600]
+                    : palette.emerald[500],
             }}
           >
             {dealType === 'LEASE' ? '🏢 LEASE' : dealType === 'QUICK_SALE' ? '⚡ QUICK' : '💼 SALE'}
@@ -293,25 +294,25 @@ export default function ListingCard({
 
           {/* Days on Market */}
           {daysOnMarket && (
-            <div className="flex items-center justify-between p-1.5 rounded" style={{ background: daysOnMarket > 30 ? '#EF444415' : '#10B98115', borderLeft: `3px solid ${daysOnMarket > 30 ? '#EF4444' : '#10B981'}` }}>
+            <div className="flex items-center justify-between p-1.5 rounded" style={{ background: daysOnMarket > 30 ? palette.crimson[50] : palette.emerald[50], borderLeft: `3px solid ${daysOnMarket > 30 ? palette.crimson[400] : palette.emerald[500]}` }}>
               <span style={{ color: COLOR_TEXT_SECONDARY, fontSize: '10px' }}>Days</span>
-              <span className="font-bold" style={{ color: daysOnMarket > 30 ? '#EF4444' : '#10B981' }}>
+              <span className="font-bold" style={{ color: daysOnMarket > 30 ? palette.crimson[400] : palette.emerald[500] }}>
                 {daysOnMarket}d
               </span>
             </div>
           )}
 
           {/* Seller Trust Score */}
-          <div className="flex items-center justify-between p-1.5 rounded" style={{ background: '#B8956A15', borderLeft: '3px solid #B8956A' }}>
+          <div className="flex items-center justify-between p-1.5 rounded" style={{ background: palette.champagne[50], borderLeft: `3px solid ${palette.champagne[500]}` }}>
             <span style={{ color: COLOR_TEXT_SECONDARY, fontSize: '10px' }}>Trust</span>
-            <span className="font-bold" style={{ color: '#B8956A' }}>
+            <span className="font-bold" style={{ color: palette.champagne[500] }}>
               {sellerTrustScore}/100
             </span>
           </div>
 
           {/* Upcoming Actions */}
           {upcomingAuction && (
-            <div className="flex items-center justify-between p-1.5 rounded bg-purple-50" style={{ borderLeft: '3px solid #A855F7' }}>
+            <div className="flex items-center justify-between p-1.5 rounded" style={{ background: palette.champagne[50], borderLeft: `3px solid ${palette.champagne[500]}` }}>
               <span style={{ color: COLOR_TEXT_SECONDARY, fontSize: '10px' }}>Action</span>
               <span className="font-bold text-purple-700">Auction Soon</span>
             </div>
@@ -353,7 +354,7 @@ export default function ListingCard({
             <p className="font-semibold mb-0.5 leading-tight" style={{ color: COLOR_TEXT_SECONDARY }}>
               EBITDA
             </p>
-            <p className="font-black text-xs" style={{ color: '#10B981' }}>
+            <p className="font-black text-xs" style={{ color: palette.emerald[500] }}>
               {formatCurrency(ebitda / 1000, askingPriceCurrency)}K
             </p>
           </div>
@@ -362,7 +363,7 @@ export default function ListingCard({
             <p className="font-semibold mb-0.5 leading-tight" style={{ color: COLOR_TEXT_SECONDARY }}>
               Margin
             </p>
-            <p className="font-black text-xs" style={{ color: '#B8956A' }}>
+            <p className="font-black text-xs" style={{ color: palette.champagne[500] }}>
               {profitMarginPercent}%
             </p>
           </div>
@@ -371,7 +372,7 @@ export default function ListingCard({
             <p className="font-semibold mb-0.5 leading-tight" style={{ color: COLOR_TEXT_SECONDARY }}>
               Growth
             </p>
-            <p className="font-black text-xs" style={{ color: '#10B981' }}>
+            <p className="font-black text-xs" style={{ color: palette.emerald[500] }}>
               ↗ {growthRate}%
             </p>
           </div>
@@ -381,7 +382,7 @@ export default function ListingCard({
             <p className="font-semibold mb-0.5 leading-tight" style={{ color: COLOR_TEXT_SECONDARY }}>
               ROI
             </p>
-            <p className="font-black text-xs" style={{ color: '#F59E0B' }}>
+            <p className="font-black text-xs" style={{ color: palette.amber[500] }}>
               {roiProjection}%
             </p>
           </div>
@@ -390,7 +391,7 @@ export default function ListingCard({
             <p className="font-semibold mb-0.5 leading-tight" style={{ color: COLOR_TEXT_SECONDARY }}>
               Payback
             </p>
-            <p className="font-black text-xs" style={{ color: '#DC2626' }}>
+            <p className="font-black text-xs" style={{ color: palette.crimson[600] }}>
               {paybackPeriod}mo
             </p>
           </div>

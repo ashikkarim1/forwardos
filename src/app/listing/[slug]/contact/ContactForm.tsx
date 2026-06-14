@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { PublicHeader } from '@/components/Navigation'
 import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
+import { palette } from '@/styles/tokens'
 
 interface AuthUser { id: string; name?: string | null; email: string; role?: string }
 
@@ -132,16 +133,16 @@ export function ContactForm(props: Props) {
         <PublicHeader />
         <div className="max-w-2xl mx-auto px-6 py-16">
           <div className="rounded-2xl border bg-white p-10 text-center" style={{ borderColor: COLOR_BORDER }}>
-            <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-5" style={{ background: '#EAF5F0' }}>
-              <CheckCircle2 size={28} style={{ color: '#2D7A5F' }} />
+            <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-5" style={{ background: palette.emerald[50] }}>
+              <CheckCircle2 size={28} style={{ color: palette.emerald[500] }} />
             </div>
-            <p className="text-[10px] font-bold tracking-[0.22em] uppercase mb-3" style={{ color: '#B8956A' }}>Introduction received</p>
+            <p className="text-[10px] font-bold tracking-[0.22em] uppercase mb-3" style={{ color: palette.champagne[500] }}>Introduction received</p>
             <h1 className="text-3xl md:text-4xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>Thank you — we&apos;ll be in touch.</h1>
             <p className="text-base mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
               Forward Intelligence is verifying your details. A confirmation has been sent to <strong>{form.email}</strong>.
               We typically introduce buyers and sellers within 24 hours.
             </p>
-            <div className="rounded-lg p-4 mb-6 text-sm" style={{ background: '#F4F2EE', color: COLOR_PRIMARY }}>
+            <div className="rounded-lg p-4 mb-6 text-sm" style={{ background: palette.cream[200], color: COLOR_PRIMARY }}>
               Reference · <strong className="font-mono">{result.reference}</strong>
             </div>
             <div className="flex flex-wrap gap-3 justify-center">
@@ -174,12 +175,12 @@ export function ContactForm(props: Props) {
         <div role="dialog" aria-modal="true" aria-labelledby="auth-gate-title"
              className="fixed inset-0 z-50 flex items-center justify-center px-4"
              style={{ background: 'rgba(15,20,25,0.65)', backdropFilter: 'blur(4px)' }}>
-          <div className="rounded-2xl bg-white shadow-2xl max-w-md w-full overflow-hidden" style={{ border: '1px solid #E8E4DC' }}>
+          <div className="rounded-2xl bg-white shadow-2xl max-w-md w-full overflow-hidden" style={{ border: `1px solid ${palette.cream[300]}` }}>
             <div className="p-7 pb-5 text-center">
-              <div className="w-14 h-14 mx-auto rounded-full flex items-center justify-center mb-4" style={{ background: '#FAF6EF' }}>
-                <ShieldAlert size={24} style={{ color: '#B8956A' }} />
+              <div className="w-14 h-14 mx-auto rounded-full flex items-center justify-center mb-4" style={{ background: palette.cream[100] }}>
+                <ShieldAlert size={24} style={{ color: palette.champagne[500] }} />
               </div>
-              <p className="text-[10px] font-bold tracking-[0.22em] uppercase mb-2" style={{ color: '#B8956A' }}>Verified Buyers Only</p>
+              <p className="text-[10px] font-bold tracking-[0.22em] uppercase mb-2" style={{ color: palette.champagne[500] }}>Verified Buyers Only</p>
               <h2 id="auth-gate-title" className="text-2xl font-black mb-3 leading-tight" style={{ color: COLOR_PRIMARY }}>
                 Sign in to introduce yourself to the seller.
               </h2>
@@ -187,11 +188,11 @@ export function ContactForm(props: Props) {
                 Sellers on Forward are looking for serious, verifiable buyers — not anonymous tire-kickers. Create a free Forward account (60 seconds) and we&apos;ll vouch for you to the seller.
               </p>
 
-              <div className="text-left rounded-lg p-4 mb-5" style={{ background: '#F4F2EE' }}>
+              <div className="text-left rounded-lg p-4 mb-5" style={{ background: palette.cream[200] }}>
                 <ul className="space-y-2 text-xs" style={{ color: COLOR_PRIMARY }}>
-                  <li className="flex items-start gap-2"><CheckCircle2 size={13} style={{ color: '#2D7A5F' }} className="mt-0.5 flex-shrink-0" /><span>Forward verifies every buyer before introducing</span></li>
-                  <li className="flex items-start gap-2"><CheckCircle2 size={13} style={{ color: '#2D7A5F' }} className="mt-0.5 flex-shrink-0" /><span>Your details stay private — we never share them publicly</span></li>
-                  <li className="flex items-start gap-2"><CheckCircle2 size={13} style={{ color: '#2D7A5F' }} className="mt-0.5 flex-shrink-0" /><span>Track inquiries and saved listings in one dashboard</span></li>
+                  <li className="flex items-start gap-2"><CheckCircle2 size={13} style={{ color: palette.emerald[500] }} className="mt-0.5 flex-shrink-0" /><span>Forward verifies every buyer before introducing</span></li>
+                  <li className="flex items-start gap-2"><CheckCircle2 size={13} style={{ color: palette.emerald[500] }} className="mt-0.5 flex-shrink-0" /><span>Your details stay private — we never share them publicly</span></li>
+                  <li className="flex items-start gap-2"><CheckCircle2 size={13} style={{ color: palette.emerald[500] }} className="mt-0.5 flex-shrink-0" /><span>Track inquiries and saved listings in one dashboard</span></li>
                 </ul>
               </div>
 
@@ -212,7 +213,7 @@ export function ContactForm(props: Props) {
                 I already have an account
               </Link>
             </div>
-            <div className="px-7 py-4 border-t text-center" style={{ borderColor: COLOR_BORDER, background: '#FBFAF7' }}>
+            <div className="px-7 py-4 border-t text-center" style={{ borderColor: COLOR_BORDER, background: palette.cream[50] }}>
               <Link href={`/listing/${slug}`} className="text-xs font-semibold hover:underline" style={{ color: COLOR_TEXT_SECONDARY }}>
                 ← Back to the listing
               </Link>
@@ -247,7 +248,7 @@ export function ContactForm(props: Props) {
           <Link href={`/listing/${slug}`} className="inline-flex items-center gap-1.5 text-sm font-semibold mb-4 hover:underline" style={{ color: COLOR_TEXT_SECONDARY }}>
             <ArrowLeft size={14} /> Back to listing
           </Link>
-          <p className="text-[10px] font-bold tracking-[0.22em] uppercase mb-2" style={{ color: '#B8956A' }}>Request introduction</p>
+          <p className="text-[10px] font-bold tracking-[0.22em] uppercase mb-2" style={{ color: palette.champagne[500] }}>Request introduction</p>
           <h1 className="text-3xl md:text-4xl font-black mb-3" style={{ color: COLOR_PRIMARY }}>
             Tell us about you, and we&apos;ll make the introduction.
           </h1>
@@ -319,7 +320,7 @@ export function ContactForm(props: Props) {
               <p className="text-[10px] text-right mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>{form.message.length}/4000</p>
             </Field>
 
-            <div className="rounded-xl border p-4" style={{ borderColor: '#D6C5A8', background: '#FAF6EF' }}>
+            <div className="rounded-xl border p-4" style={{ borderColor: palette.champagne[200], background: palette.cream[100] }}>
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox" required
@@ -329,13 +330,13 @@ export function ContactForm(props: Props) {
                 />
                 <span className="text-sm leading-relaxed" style={{ color: COLOR_PRIMARY }}>
                   I acknowledge this is a <strong>binding introduction</strong> — Forward Intelligence facilitates this introduction, and a success fee applies if a transaction closes through Forward. I confirm the details I&apos;ve provided are accurate.{' '}
-                  <Link href="/terms" className="underline" style={{ color: '#B8956A' }}>Forward terms →</Link>
+                  <Link href="/terms" className="underline" style={{ color: palette.champagne[500] }}>Forward terms →</Link>
                 </span>
               </label>
             </div>
 
             {error && (
-              <div className="rounded-lg border p-3 text-sm flex items-start gap-2" style={{ borderColor: '#FCA5A5', background: '#FEE2E2', color: '#991B1B' }}>
+              <div className="rounded-lg border p-3 text-sm flex items-start gap-2" style={{ borderColor: palette.crimson[200], background: palette.crimson[50], color: palette.crimson[700] }}>
                 <AlertCircle size={16} className="flex-shrink-0 mt-0.5" /> <span>{error}</span>
               </div>
             )}
@@ -353,7 +354,7 @@ export function ContactForm(props: Props) {
         {/* Sidebar */}
         <aside className="lg:col-span-1">
           <div className="sticky top-6 rounded-xl border bg-white p-6" style={{ borderColor: COLOR_BORDER }}>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold mb-3" style={{ background: '#F4F2EE', color: '#B8956A' }}>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold mb-3" style={{ background: palette.cream[200], color: palette.champagne[500] }}>
               <Lock size={10} /> CONFIDENTIAL
             </div>
             <p className="text-[10px] font-bold tracking-[0.22em] uppercase mb-2" style={{ color: COLOR_TEXT_SECONDARY }}>{indLabel}</p>
@@ -365,8 +366,8 @@ export function ContactForm(props: Props) {
               {qualityScore != null && <p><strong style={{ color: COLOR_PRIMARY }}>Quality:</strong> {qualityScore}/100</p>}
             </div>
             <div className="pt-4 space-y-3 text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
-              <div className="flex items-start gap-2"><ShieldCheck size={13} style={{ color: '#2D7A5F' }} className="mt-0.5 flex-shrink-0" /><span>Forward verifies your details before introducing.</span></div>
-              <div className="flex items-start gap-2"><Lock size={13} style={{ color: '#B8956A' }} className="mt-0.5 flex-shrink-0" /><span>The seller never sees your contact details until they engage.</span></div>
+              <div className="flex items-start gap-2"><ShieldCheck size={13} style={{ color: palette.emerald[500] }} className="mt-0.5 flex-shrink-0" /><span>Forward verifies your details before introducing.</span></div>
+              <div className="flex items-start gap-2"><Lock size={13} style={{ color: palette.champagne[500] }} className="mt-0.5 flex-shrink-0" /><span>The seller never sees your contact details until they engage.</span></div>
               <div className="flex items-start gap-2"><CheckCircle2 size={13} style={{ color: COLOR_ACCENT }} className="mt-0.5 flex-shrink-0" /><span>You hear back within 24 hours, on average.</span></div>
             </div>
           </div>
@@ -398,7 +399,7 @@ function RadioChip({ label, checked, onClick }: { label: string; checked: boolea
       className="px-3 py-2.5 rounded-lg border text-xs font-semibold text-left transition-colors"
       style={{
         borderColor: checked ? COLOR_PRIMARY : COLOR_BORDER,
-        background: checked ? '#F4F2EE' : 'white',
+        background: checked ? palette.cream[200] : 'white',
         color: COLOR_PRIMARY,
       }}
     >

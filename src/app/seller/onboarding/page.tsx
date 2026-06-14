@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { PasswordInput } from '@/components/PasswordInput'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
+import { palette } from '@/styles/tokens'
 
 interface Step {
   id: number
@@ -367,9 +368,9 @@ export default function SellerOnboarding() {
               </p>
 
               {errors.submit && (
-                <div className="mb-6 p-4 rounded-lg flex items-center gap-3" style={{ background: '#FEE2E2', borderLeft: '4px solid #EF4444' }}>
-                  <AlertCircle size={20} style={{ color: '#DC2626' }} />
-                  <span style={{ color: '#7F1D1D' }} className="text-sm">
+                <div className="mb-6 p-4 rounded-lg flex items-center gap-3" style={{ background: palette.crimson[50], borderLeft: `4px solid ${palette.crimson[400]}` }}>
+                  <AlertCircle size={20} style={{ color: palette.crimson[600] }} />
+                  <span style={{ color: palette.crimson[800] }} className="text-sm">
                     {errors.submit}
                   </span>
                 </div>
@@ -459,7 +460,7 @@ export default function SellerOnboarding() {
                   background: data.planTier === 'premium' ? COLOR_BG_PRIMARY : 'white',
                 }}>
                   <div className="flex items-center gap-2 mb-2">
-                    <Crown size={18} style={{ color: '#F59E0B' }} />
+                    <Crown size={18} style={{ color: palette.amber[500] }} />
                     <h3 className="font-bold text-lg" style={{ color: COLOR_PRIMARY }}>
                       Premium
                     </h3>
@@ -543,9 +544,9 @@ function StepAccountCreation({
             value={data.firstName}
             onChange={(e) => updateData('firstName', e.target.value)}
             className="w-full px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
-            style={{ borderColor: errors.firstName ? '#EF4444' : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
+            style={{ borderColor: errors.firstName ? palette.crimson[400] : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
           />
-          {errors.firstName && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.firstName}</p>}
+          {errors.firstName && <p className="text-xs mt-1" style={{ color: palette.crimson[400] }}>{errors.firstName}</p>}
         </div>
 
         <div>
@@ -558,9 +559,9 @@ function StepAccountCreation({
             value={data.lastName}
             onChange={(e) => updateData('lastName', e.target.value)}
             className="w-full px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
-            style={{ borderColor: errors.lastName ? '#EF4444' : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
+            style={{ borderColor: errors.lastName ? palette.crimson[400] : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
           />
-          {errors.lastName && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.lastName}</p>}
+          {errors.lastName && <p className="text-xs mt-1" style={{ color: palette.crimson[400] }}>{errors.lastName}</p>}
         </div>
       </div>
 
@@ -574,9 +575,9 @@ function StepAccountCreation({
           value={data.companyName}
           onChange={(e) => updateData('companyName', e.target.value)}
           className="w-full px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
-          style={{ borderColor: errors.companyName ? '#EF4444' : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
+          style={{ borderColor: errors.companyName ? palette.crimson[400] : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
         />
-        {errors.companyName && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.companyName}</p>}
+        {errors.companyName && <p className="text-xs mt-1" style={{ color: palette.crimson[400] }}>{errors.companyName}</p>}
       </div>
 
       <div>
@@ -589,9 +590,9 @@ function StepAccountCreation({
           value={data.email}
           onChange={(e) => updateData('email', e.target.value)}
           className="w-full px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
-          style={{ borderColor: errors.email ? '#EF4444' : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
+          style={{ borderColor: errors.email ? palette.crimson[400] : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
         />
-        {errors.email && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.email}</p>}
+        {errors.email && <p className="text-xs mt-1" style={{ color: palette.crimson[400] }}>{errors.email}</p>}
         <p className="text-xs mt-2" style={{ color: COLOR_TEXT_SECONDARY }}>
           We'll send a verification link to this email
         </p>
@@ -620,9 +621,9 @@ function StepAccountCreation({
           value={data.password}
           onChange={(e) => updateData('password', e.target.value)}
           className="w-full pl-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
-          style={{ borderColor: errors.password ? '#EF4444' : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
+          style={{ borderColor: errors.password ? palette.crimson[400] : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
         />
-        {errors.password && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.password}</p>}
+        {errors.password && <p className="text-xs mt-1" style={{ color: palette.crimson[400] }}>{errors.password}</p>}
       </div>
 
       <div>
@@ -634,9 +635,9 @@ function StepAccountCreation({
           value={data.confirmPassword}
           onChange={(e) => updateData('confirmPassword', e.target.value)}
           className="w-full pl-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
-          style={{ borderColor: errors.confirmPassword ? '#EF4444' : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
+          style={{ borderColor: errors.confirmPassword ? palette.crimson[400] : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
         />
-        {errors.confirmPassword && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.confirmPassword}</p>}
+        {errors.confirmPassword && <p className="text-xs mt-1" style={{ color: palette.crimson[400] }}>{errors.confirmPassword}</p>}
       </div>
 
       <div className="p-4 rounded-lg" style={{ background: COLOR_BG_PRIMARY }}>
@@ -668,9 +669,9 @@ function StepBusinessInfo({
           value={data.businessDescription}
           onChange={(e) => updateData('businessDescription', e.target.value)}
           className="w-full px-4 py-3 rounded-lg border text-sm resize-none h-28 focus:outline-none focus:ring-2"
-          style={{ borderColor: errors.businessDescription ? '#EF4444' : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
+          style={{ borderColor: errors.businessDescription ? palette.crimson[400] : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
         />
-        {errors.businessDescription && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.businessDescription}</p>}
+        {errors.businessDescription && <p className="text-xs mt-1" style={{ color: palette.crimson[400] }}>{errors.businessDescription}</p>}
         <p className="text-xs mt-1" style={{ color: COLOR_TEXT_SECONDARY }}>
           {data.businessDescription.length}/500 characters (minimum 50)
         </p>
@@ -685,7 +686,7 @@ function StepBusinessInfo({
             value={data.industry}
             onChange={(e) => updateData('industry', e.target.value)}
             className="w-full px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
-            style={{ borderColor: errors.industry ? '#EF4444' : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
+            style={{ borderColor: errors.industry ? palette.crimson[400] : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
           >
             <option value="">Select industry...</option>
             <option value="SAAS">SaaS</option>
@@ -696,7 +697,7 @@ function StepBusinessInfo({
             <option value="FINTECH">Fintech</option>
             <option value="OTHER">Other</option>
           </select>
-          {errors.industry && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.industry}</p>}
+          {errors.industry && <p className="text-xs mt-1" style={{ color: palette.crimson[400] }}>{errors.industry}</p>}
         </div>
 
         <div>
@@ -709,9 +710,9 @@ function StepBusinessInfo({
             value={data.location}
             onChange={(e) => updateData('location', e.target.value)}
             className="w-full px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
-            style={{ borderColor: errors.location ? '#EF4444' : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
+            style={{ borderColor: errors.location ? palette.crimson[400] : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
           />
-          {errors.location && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.location}</p>}
+          {errors.location && <p className="text-xs mt-1" style={{ color: palette.crimson[400] }}>{errors.location}</p>}
         </div>
       </div>
 
@@ -741,9 +742,9 @@ function StepBusinessInfo({
             value={data.teamSize}
             onChange={(e) => updateData('teamSize', parseInt(e.target.value))}
             className="w-full px-4 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2"
-            style={{ borderColor: errors.teamSize ? '#EF4444' : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
+            style={{ borderColor: errors.teamSize ? palette.crimson[400] : COLOR_BORDER, outlineColor: COLOR_ACCENT }}
           />
-          {errors.teamSize && <p className="text-xs mt-1" style={{ color: '#EF4444' }}>{errors.teamSize}</p>}
+          {errors.teamSize && <p className="text-xs mt-1" style={{ color: palette.crimson[400] }}>{errors.teamSize}</p>}
         </div>
       </div>
 
@@ -817,8 +818,8 @@ function StepPhotos({
         </label>
       </div>
 
-      {errors.photos && <p className="text-xs" style={{ color: '#EF4444' }}>{errors.photos}</p>}
-      {errors.featured && <p className="text-xs" style={{ color: '#EF4444' }}>{errors.featured}</p>}
+      {errors.photos && <p className="text-xs" style={{ color: palette.crimson[400] }}>{errors.photos}</p>}
+      {errors.featured && <p className="text-xs" style={{ color: palette.crimson[400] }}>{errors.featured}</p>}
 
       {data.photos.length > 0 && (
         <div>
@@ -907,7 +908,7 @@ function StepDocuments({
         </label>
       </div>
 
-      {errors.documents && <p className="text-xs" style={{ color: '#EF4444' }}>{errors.documents}</p>}
+      {errors.documents && <p className="text-xs" style={{ color: palette.crimson[400] }}>{errors.documents}</p>}
 
       {data.documents.length > 0 && (
         <div>
@@ -1031,7 +1032,7 @@ function StepSelectPlan({ data, updateData }: { data: OnboardingData; updateData
           </div>
 
           <h3 className="text-lg font-bold mb-2 flex items-center gap-2" style={{ color: COLOR_PRIMARY }}>
-            <Crown size={20} style={{ color: '#F59E0B' }} />
+            <Crown size={20} style={{ color: palette.amber[500] }} />
             Premium
           </h3>
           <p style={{ color: COLOR_TEXT_SECONDARY }} className="text-sm mb-6">

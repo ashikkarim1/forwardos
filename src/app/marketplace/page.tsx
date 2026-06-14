@@ -11,6 +11,7 @@ import { PublicHeader } from '@/components/Navigation'
 import { useSavedDeals } from '@/hooks/useSavedDeals'
 import { generateNarrative, narrativeEyebrow, maskedHeadline, industryLabel } from '@/lib/listing-narrative'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
+import { palette } from '@/styles/tokens'
 
 interface Deal {
   id: string; slug?: string; title: string; location: string; country: string; image: string; askingPrice: number; askingPriceCurrency: string; annualRevenue: number; cashFlowMin: number; cashFlowMax: number; ebitda: number; profitMarginPercent: number; dealQualityScore: number; heatIndex: number; roiProjection: number; paybackPeriod: number; growthRate: number; status: 'NEW' | 'FEATURED' | 'STANDARD'; category: string; dealType: 'SALE' | 'LEASE' | 'QUICK_SALE'; employeeCount: number; sellerVerified: boolean; sellerTrustScore: number; marketTrend: 'up' | 'down' | 'stable'; marketPosition: 'underpriced' | 'fair' | 'premium'; daysOnMarket: number; location_country: string; sellerType: string; sellerMotivation: string; financingEligible?: boolean; upcomingAuction?: boolean
@@ -193,7 +194,7 @@ export default function MarketplacePage() {
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
       <PublicHeader />
 
-      <section className="px-4 md:px-8 py-6 border-b" style={{ borderColor: COLOR_BORDER, background: '#EFF6FF' }}>
+      <section className="px-4 md:px-8 py-6 border-b" style={{ borderColor: COLOR_BORDER, background: palette.champagne[50] }}>
         <div className="max-w-7xl mx-auto">
           <span className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-2" style={{ background: COLOR_ACCENT, color: 'white' }}>
             MARKETPLACE
@@ -225,11 +226,11 @@ export default function MarketplacePage() {
                         <h3 className="font-bold text-sm line-clamp-1" style={{ color: COLOR_PRIMARY }}>Confidential {industryLabel(deal.category)}</h3>
                         <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>{deal.location}</p>
                       </div>
-                      <div className="px-2 py-1 rounded text-xs font-bold text-white flex-shrink-0" style={{ background: '#DC2626' }}>{deal.heatIndex}🔥</div>
+                      <div className="px-2 py-1 rounded text-xs font-bold text-white flex-shrink-0" style={{ background: palette.crimson[600] }}>{deal.heatIndex}🔥</div>
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span style={{ color: COLOR_TEXT_SECONDARY }}>${(deal.askingPrice / 1000000).toFixed(1)}M</span>
-                      <span style={{ color: '#10B981', fontWeight: 'bold' }}>{deal.growthRate}% growth</span>
+                      <span style={{ color: palette.emerald[500], fontWeight: 'bold' }}>{deal.growthRate}% growth</span>
                     </div>
                   </motion.div>
                 </Link>
@@ -353,8 +354,10 @@ export default function MarketplacePage() {
                 table for analysts evaluating dozens of deals at once. */}
             <Link
               href="/marketplace/table"
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border bg-white hover:bg-[#FAF6EF] text-sm font-semibold transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border bg-white text-sm font-semibold transition-colors"
               style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = palette.cream[100] }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = '' }}
               title="Open the institutional view — sortable table, CSV export, bulk actions"
             >
               <SlidersHorizontal size={14} /> Table view
@@ -369,7 +372,7 @@ export default function MarketplacePage() {
                   key={`${chip.label}-${i}`}
                   onClick={chip.remove}
                   className="inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full text-xs font-bold border hover:bg-gray-50 transition-colors"
-                  style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT, background: '#EFF6FF' }}
+                  style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT, background: palette.champagne[50] }}
                 >
                   {chip.label}
                   <X size={12} />
@@ -510,7 +513,7 @@ function EditorialRow({
           </Link>
           {/* Status chip */}
           {deal.status !== 'STANDARD' && (
-            <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-black tracking-wide text-white" style={{ background: deal.status === 'FEATURED' ? COLOR_ACCENT : '#2D7A5F' }}>
+            <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-black tracking-wide text-white" style={{ background: deal.status === 'FEATURED' ? COLOR_ACCENT : palette.emerald[500] }}>
               {deal.status === 'FEATURED' ? '★ FEATURED' : 'NEW'}
             </div>
           )}
@@ -577,11 +580,11 @@ function EditorialRow({
 
         {/* Badge row — trust + position signals from the old card */}
         <div className="flex flex-wrap gap-1.5 mb-4">
-          {deal.sellerVerified && <Badge bg="#EAF5F0" color="#2D7A5F"><CheckCircle2 size={10} className="inline mr-1 -mt-0.5" />Verified · trust {deal.sellerTrustScore}/100</Badge>}
-          {deal.marketPosition === 'underpriced' && <Badge bg="#EAF5F0" color="#2D7A5F">Below market</Badge>}
-          {deal.marketPosition === 'premium' && <Badge bg="#FEF3C7" color="#B45309">Premium positioning</Badge>}
-          {deal.marketTrend === 'up' && <Badge bg="#EFF6FF" color="#8C6D45">Trending ↑</Badge>}
-          {deal.financingEligible && <Badge bg="#EFF6FF" color="#8C6D45">Financing eligible</Badge>}
+          {deal.sellerVerified && <Badge bg={palette.emerald[50]} color={palette.emerald[500]}><CheckCircle2 size={10} className="inline mr-1 -mt-0.5" />Verified · trust {deal.sellerTrustScore}/100</Badge>}
+          {deal.marketPosition === 'underpriced' && <Badge bg={palette.emerald[50]} color={palette.emerald[500]}>Below market</Badge>}
+          {deal.marketPosition === 'premium' && <Badge bg={palette.amber[50]} color={palette.amber[500]}>Premium positioning</Badge>}
+          {deal.marketTrend === 'up' && <Badge bg={palette.champagne[50]} color={palette.champagne[700]}>Trending ↑</Badge>}
+          {deal.financingEligible && <Badge bg={palette.champagne[50]} color={palette.champagne[700]}>Financing eligible</Badge>}
         </div>
 
         {/* AI narrative */}
@@ -632,7 +635,7 @@ function MiniStat({ label, value, positive }: { label: string; value: string; po
   return (
     <div>
       <span className="block font-semibold" style={{ color: COLOR_TEXT_SECONDARY }}>{label}</span>
-      <span className="font-black text-xs" style={{ color: positive ? '#2D7A5F' : COLOR_PRIMARY }}>{value}</span>
+      <span className="font-black text-xs" style={{ color: positive ? palette.emerald[500] : COLOR_PRIMARY }}>{value}</span>
     </div>
   )
 }
@@ -661,7 +664,7 @@ function FilterPill({
         style={{
           borderColor: active || isOpen ? COLOR_ACCENT : COLOR_BORDER,
           color: active ? COLOR_ACCENT : COLOR_PRIMARY,
-          background: active ? '#EFF6FF' : 'white',
+          background: active ? palette.champagne[50] : 'white',
         }}
         aria-expanded={isOpen}
       >
@@ -712,7 +715,7 @@ function OptionList({
             className="flex items-center justify-between gap-3 px-2 py-1.5 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
           >
             <span className="flex items-center gap-2.5">
-              <input type="checkbox" checked={checked} onChange={() => onToggle(value)} className="w-4 h-4 rounded cursor-pointer accent-[#B8956A]" />
+              <input type="checkbox" checked={checked} onChange={() => onToggle(value)} className="w-4 h-4 rounded cursor-pointer" style={{ accentColor: palette.champagne[500] }} />
               <span className="text-sm font-medium" style={{ color: COLOR_PRIMARY }}>
                 {raw ? value : formatLabel(value)}
               </span>
@@ -753,13 +756,13 @@ function RangeControl({
         <input
           type="range" min={minMax.min} max={minMax.max} step="0.1" value={value.min}
           onChange={(e) => onChange({ min: Math.min(parseFloat(e.target.value), value.max), max: value.max })}
-          className="w-full accent-[#B8956A]"
+          className="w-full" style={{ accentColor: palette.champagne[500] }}
           aria-label={`${label} minimum`}
         />
         <input
           type="range" min={minMax.min} max={minMax.max} step="0.1" value={value.max}
           onChange={(e) => onChange({ min: value.min, max: Math.max(parseFloat(e.target.value), value.min) })}
-          className="w-full accent-[#B8956A]"
+          className="w-full" style={{ accentColor: palette.champagne[500] }}
           aria-label={`${label} maximum`}
         />
       </div>
