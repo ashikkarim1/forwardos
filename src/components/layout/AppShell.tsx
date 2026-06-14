@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, TrendingUp, BarChart3, Settings, Bell, ChevronDown,
   Menu, X, Zap, Eye, MessageSquare, FileText, PieChart, Target,
-  HelpCircle, LogOut, Award
+  HelpCircle, LogOut, Award, CreditCard,
 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 import { LogoWithBee } from '@/components/LogoWithBee'
@@ -57,6 +57,7 @@ const NAV_GROUPS = [
     collapsible: true,
     items: [
       { href: '/account', icon: Settings, label: 'Account Settings', badge: null, key: 'account' },
+      { href: '/account/billing', icon: CreditCard, label: 'Plans & Billing', badge: null, key: 'billing' },
       { href: '/notifications', icon: Bell, label: 'Notifications', badge: null, key: 'notifications' },
       { href: '/help', icon: HelpCircle, label: 'Help & Docs', badge: null, key: 'help' },
     ],
