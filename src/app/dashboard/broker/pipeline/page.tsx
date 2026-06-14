@@ -31,7 +31,7 @@ import { ArrowRight, MessageSquare, FileText, Clock, TrendingUp, ChevronRight } 
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { LockedFeature } from '@/components/dashboard/LockedFeature'
-import { PipelineActions } from './PipelineActions'
+import { PipelineBoard } from './PipelineBoard'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Pipeline · Forward Broker Pro' }
@@ -227,17 +227,10 @@ export default async function BrokerPipelinePage() {
         {cards.length === 0 ? (
           <EmptyState />
         ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${STAGE_ORDER.length}, minmax(260px, 1fr))`,
-            gap: 12,
-            overflowX: 'auto',
-            paddingBottom: 24,
-          }}>
-            {STAGE_ORDER.map((stage) => (
-              <Column key={stage} stage={stage} cards={cardsByStage[stage]} />
-            ))}
-          </div>
+          // Client component — drag cards between columns to advance
+          // the stage. Auto-derived stages (NDA / data room / diligence)
+          // accept no drops; the board explains why with an inline toast.
+          <PipelineBoard cards={cards} stageMeta={STAGE_META} stageOrder={STAGE_ORDER} />
         )}
       </div>
     </div>
@@ -250,98 +243,6 @@ function Stat({ label, value, accent, muted }: { label: string; value: number; a
     <div style={{ textAlign: 'right' }}>
       <div style={{ fontSize: 22, fontWeight: 800, color, lineHeight: 1 }}>{value}</div>
       <div style={{ fontSize: 11, color: '#6C7480', letterSpacing: '0.04em', textTransform: 'uppercase', marginTop: 4 }}>{label}</div>
-    </div>
-  )
-}
-
-function Column({ stage, cards }: { stage: Stage; cards: PipelineCard[] }) {
-  const meta = STAGE_META[stage]
-  return (
-    <div style={{
-      background: '#fff', border: '1px solid #E8EAED', borderRadius: 12,
-      display: 'flex', flexDirection: 'column', minHeight: 240, maxHeight: 'calc(100vh - 200px)',
-    }}>
-      <div style={{ padding: '12px 14px', borderBottom: '1px solid #F0F2F4', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 8, height: 8, borderRadius: 999, background: meta.color, flexShrink: 0 }} />
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#0F1419', letterSpacing: '0.02em' }}>{meta.label}</span>
-        </div>
-        <span style={{ fontSize: 11, color: '#6C7480', fontWeight: 600 }}>{cards.length}</span>
-      </div>
-      <div style={{ padding: 8, overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {cards.length === 0 ? (
-          <p style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center', padding: '20px 0', margin: 0 }}>
-            Nothing here yet.
-          </p>
-        ) : (
-          cards.map((c) => <Card key={c.enquiryId} card={c} />)
-        )}
-      </div>
-    </div>
-  )
-}
-
-function Card({ card }: { card: PipelineCard }) {
-  const listingHref = card.dealSlug ? `/listing/${card.dealSlug}` : `/deal/${card.dealId}`
-  return (
-    <div style={{
-      background: '#FFFEF8', border: '1px solid #F0E8D8', borderRadius: 10, padding: 10,
-      display: 'flex', flexDirection: 'column', gap: 8,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#0F1419', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {card.buyerLabel}
-        </p>
-        {card.buyerVerified && (
-          <span title="KYC verified" style={{ fontSize: 9, color: '#1B7F4E', fontWeight: 700, letterSpacing: '0.04em' }}>✓ KYC</span>
-        )}
-        {card.hasUnread && (
-          <span title="Unread" style={{ width: 7, height: 7, borderRadius: 999, background: '#B8956A' }} />
-        )}
-        {/* Client-only kebab → Mark Contacted / Close / Reopen. NDA,
-            data room, diligence transitions stay auto-derived from
-            buyer signals so we don't expose them as manual buttons. */}
-        <PipelineActions enquiryId={card.enquiryId} stage={card.stage} />
-      </div>
-
-      <Link href={listingHref} style={{ textDecoration: 'none' }}>
-        <p style={{ margin: 0, fontSize: 11, color: '#454D58', fontWeight: 600 }}>{card.dealTitle}</p>
-        <p style={{ margin: '2px 0 0', fontSize: 10, color: '#6C7480' }}>
-          {card.industry} · {card.country}
-          {card.askingPriceUsd && ` · $${(card.askingPriceUsd / 1_000_000).toFixed(1)}M`}
-        </p>
-      </Link>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10, color: '#6C7480' }}>
-        <Clock size={10} /> {card.lastSignal}
-      </div>
-
-      <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
-        <Link
-          href={`/messages?to=${encodeURIComponent(card.buyerLabel)}&deal=${encodeURIComponent(card.dealTitle)}`}
-          style={{
-            flex: 1, textAlign: 'center',
-            padding: '5px 6px', borderRadius: 6,
-            background: '#0F1419', color: '#fff',
-            fontSize: 10, fontWeight: 600, textDecoration: 'none',
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-          }}
-        >
-          <MessageSquare size={10} /> Message
-        </Link>
-        <Link
-          href="/data-rooms"
-          style={{
-            flex: 1, textAlign: 'center',
-            padding: '5px 6px', borderRadius: 6,
-            background: '#FFFFFF', color: '#0F1419', border: '1px solid #C7CCD3',
-            fontSize: 10, fontWeight: 600, textDecoration: 'none',
-            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-          }}
-        >
-          <FileText size={10} /> Room
-        </Link>
-      </div>
     </div>
   )
 }

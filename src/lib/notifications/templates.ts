@@ -15,6 +15,7 @@ import { formatAskingRange } from '@/lib/public-listing'
 import { industryLabel } from '@/lib/listing-narrative'
 import { maskCity } from '@/lib/listing-helpers'
 import type { AlertFrequency } from '@prisma/client'
+import { trackingPixelUrl } from '@/lib/notifications/tracking'
 
 interface DealCard {
   id: string
@@ -31,11 +32,14 @@ interface DigestOptions {
   isPaid: boolean
   userName?: string
   deals: DealCard[]
+  /** When provided, an invisible open-tracking pixel is injected.
+   *  Drives engagement-decay in the send-window. */
+  tracking?: { userId: string; sendId: string }
 }
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.forwardos.ai'
 
-export function renderMatchDigest({ cadence, isPaid, userName, deals }: DigestOptions): string {
+export function renderMatchDigest({ cadence, isPaid, userName, deals, tracking }: DigestOptions): string {
   const cards = deals
     .map((d) => listingBlock({
       industryLabel: industryLabel(d.industry as never),
@@ -71,13 +75,22 @@ export function renderMatchDigest({ cadence, isPaid, userName, deals }: DigestOp
 
   const footerNote = renderFooterNote(cadence)
 
+  // Open-tracking pixel — injected when the send-window passes a
+  // (userId, sendId). 1×1 transparent GIF served by /api/notifications/open.
+  // The pixel updates lastEmailEngagedAt, which is read by the engagement-
+  // decay logic to keep INSTANT/DAILY users from being silently stepped
+  // down. Always at the very bottom of the email body.
+  const pixel = tracking
+    ? `<img src="${trackingPixelUrl(tracking)}" alt="" width="1" height="1" style="display:block;border:0;width:1px;height:1px" />`
+    : ''
+
   return luxuryEmail({
     preheader: `${deals.length} new opportunities matched on Forward Intelligence.`,
     eyebrow,
     title,
     greetingName: userName,
     intro,
-    innerHtml: cards,
+    innerHtml: cards + pixel,
     cta,
     secondaryCta,
     footerNote,

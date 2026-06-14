@@ -118,6 +118,9 @@ export async function runSendWindow(opts: RunOptions = {}): Promise<SendResult> 
     const isPaid =
       user.buyerPlanTier  === 'PREMIUM_BUYER' ||
       user.brokerPlanTier === 'BROKER_PRO'
+    // Stable sendId per digest send so retries / multiple opens of the
+    // same email count as one engagement event, not many.
+    const sendId = `${userId}-${effectiveCadence}-${new Date().toISOString().slice(0, 10)}`
     const html = renderMatchDigest({
       cadence: effectiveCadence,
       isPaid,
@@ -131,6 +134,7 @@ export async function runSendWindow(opts: RunOptions = {}): Promise<SendResult> 
         askingPriceCents: a.deal.askingPrice ? Number(a.deal.askingPrice) : null,
         heatScore: a.deal.heatScore,
       })),
+      tracking: { userId, sendId },
     })
     const subject =
       effectiveCadence === 'WEEKLY' ? `Your weekly Forward digest — ${deals.length} new ${deals.length === 1 ? 'match' : 'matches'}` :

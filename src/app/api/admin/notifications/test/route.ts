@@ -83,9 +83,19 @@ export async function GET(req: NextRequest) {
   // its own pacing for production traffic and doesn't hit this code.
   const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms))
 
+  // Synthetic tracking id so the pixel renders in test emails too. This
+  // userId won't match any real user, so the pixel call is a no-op past
+  // the signature check — useful to prove the HTML includes it.
+  const testUserId = 'test-' + to.replace(/[^a-zA-Z0-9]/g, '')
+  const testSendId = 'test-' + new Date().toISOString().slice(0, 13).replace(/[^0-9]/g, '')
+
   const results: Array<{ tag: string; success: boolean; id?: string; mocked?: boolean }> = []
   for (const v of variants) {
-    const html = renderMatchDigest({ cadence: v.cadence, isPaid: v.isPaid, userName: 'CEO', deals: dealCards.slice(0, v.cadence === 'INSTANT' ? 2 : 5) })
+    const html = renderMatchDigest({
+      cadence: v.cadence, isPaid: v.isPaid, userName: 'CEO',
+      deals: dealCards.slice(0, v.cadence === 'INSTANT' ? 2 : 5),
+      tracking: { userId: testUserId, sendId: `${testSendId}-${v.tag}` },
+    })
     const r = await sendEmail({ to, subject: v.subject, html })
     results.push({ tag: v.tag, success: r.success, ...('id' in r ? { id: r.id } : {}), ...('mocked' in r ? { mocked: r.mocked } : {}) })
     await sleep(600)
