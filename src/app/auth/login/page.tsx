@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { Mail, Lock, ArrowRight, AlertCircle, Loader } from 'lucide-react'
 import { PasswordInput } from '@/components/PasswordInput'
 import { DashboardTour, type DemoRole } from '@/components/DashboardTour'
+import { PublicHeader } from '@/components/Navigation'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
 const containerVariants = {
@@ -76,36 +77,27 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-white">
+      <PublicHeader />
+      <div className="flex items-center justify-center px-4 py-12">
       <motion.div
         className="w-full max-w-md"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        {/* Header */}
+        {/* Header — brand identity is provided by <PublicHeader /> at the top of
+            the page now; here we keep just the editorial sign-in framing so the
+            login surface matches the rest of the app. */}
         <motion.div className="text-center mb-8" variants={itemVariants}>
-          <Link href="/" className="inline-flex items-center gap-3 mb-6">
-            <div
-              className="w-12 h-12 rounded-lg flex items-center justify-center font-black text-white text-xl"
-              style={{ background: COLOR_ACCENT }}
-            >
-              F
-            </div>
-            <div>
-              <div className="text-xl font-black text-left" style={{ color: COLOR_PRIMARY }}>
-                Forward OS
-              </div>
-              <div className="text-xs font-medium text-left" style={{ color: COLOR_TEXT_SECONDARY }}>
-                M&A Marketplace
-              </div>
-            </div>
-          </Link>
+          <p className="text-[10px] font-bold tracking-[0.25em] uppercase mb-2" style={{ color: COLOR_ACCENT }}>
+            Sign in
+          </p>
           <h1 className="text-3xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>
-            Welcome Back
+            Welcome back
           </h1>
           <p style={{ color: COLOR_TEXT_SECONDARY }}>
-            Sign in to your Forward OS account
+            Sign in to continue to Forward Intelligence.
           </p>
         </motion.div>
 
@@ -255,6 +247,7 @@ export default function LoginPage() {
       </motion.div>
 
       {tourRole && <DashboardTour role={tourRole} onClose={() => setTourRole(null)} />}
+      </div>
     </div>
   )
 }
