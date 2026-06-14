@@ -36,7 +36,7 @@ const NAV_GROUPS = [
     section: 'INTELLIGENCE',
     collapsible: true,
     items: [
-      { href: '/intelligence', icon: TrendingUp, label: 'Market Trends', badge: null, key: 'market-trends' },
+      { href: '/market-insights', icon: TrendingUp, label: 'Market Trends', badge: null, key: 'market-trends' },
       { href: '/intelligence/predictions', icon: Eye, label: 'M&A Predictions', badge: null, key: 'predictions' },
       { href: '/intelligence/feeds', icon: Bell, label: 'Real-Time Feeds', badge: null, key: 'feeds' },
       { href: '/intelligence/signals', icon: Zap, label: 'Deal Signals', badge: null, key: 'signals' },
@@ -47,8 +47,8 @@ const NAV_GROUPS = [
     collapsible: true,
     items: [
       { href: '/diligence', icon: Award, label: 'Advanced Diligence', badge: null, key: 'diligence' },
-      { href: '/data-room', icon: FileText, label: 'Data Room', badge: null, key: 'data-room' },
-      { href: '/messaging', icon: MessageSquare, label: 'Messaging', badge: null, key: 'messaging' },
+      { href: '/data-rooms', icon: FileText, label: 'Data Room', badge: null, key: 'data-room' },
+      { href: '/messages', icon: MessageSquare, label: 'Messaging', badge: null, key: 'messaging' },
       { href: '/cap-table', icon: PieChart, label: 'Cap Table', badge: null, key: 'cap-table' },
     ],
   },
