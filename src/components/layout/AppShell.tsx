@@ -27,7 +27,7 @@ const NAV_GROUPS = [
     section: 'DEALS',
     collapsible: true,
     items: [
-      { href: '/deals', icon: Target, label: 'Deal Discovery', badge: 'Hot', key: 'deal-discovery' },
+      { href: '/deals', icon: Target, label: 'Marketplace', badge: 'Hot', key: 'deal-discovery' },
       { href: '/deals/heat-maps', icon: Zap, label: 'Heat Maps', badge: null, key: 'heat-maps' },
       { href: '/deals/comparables', icon: BarChart3, label: 'Comparables', badge: 'New', key: 'comparables' },
     ],

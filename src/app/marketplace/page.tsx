@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Search, ChevronLeft, ChevronRight, ChevronDown, X, SlidersHorizontal, Heart, ArrowRight, Lock, Sparkles, Camera, CheckCircle2, Mail } from 'lucide-react'
 import { BusinessPhotoGallery } from '@/components/BusinessPhotoGallery'
@@ -46,6 +47,12 @@ const DEFAULT_HEAT = { min: 0, max: 100 }
 const DEFAULT_QUALITY = { min: 0, max: 100 }
 
 export default function MarketplacePage() {
+  // When this page is rendered at /deals (re-exported into the dashboard
+  // route), the surrounding AppShell already provides nav chrome — skip
+  // the public site header to avoid a double-header. Everywhere else
+  // (including /marketplace) renders the public header as before.
+  const pathname = usePathname()
+  const embeddedInDashboard = pathname?.startsWith('/deals') ?? false
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState('premium')
@@ -192,7 +199,7 @@ export default function MarketplacePage() {
 
   return (
     <div className="min-h-screen" style={{ background: COLOR_BG_PRIMARY }}>
-      <PublicHeader />
+      {!embeddedInDashboard && <PublicHeader />}
 
       <section className="px-4 md:px-8 py-6 border-b" style={{ borderColor: COLOR_BORDER, background: palette.champagne[50] }}>
         <div className="max-w-7xl mx-auto">
