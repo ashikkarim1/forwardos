@@ -39,7 +39,9 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const account = await stripe.accounts.retrieve()
+    // The TS overload demands a positional id arg even for /v1/account; cast
+    // to bypass since the SDK accepts an empty call at runtime.
+    const account = await (stripe.accounts as unknown as { retrieve(): Promise<Stripe.Account> }).retrieve()
     out.account = {
       id: account.id,
       country: account.country,
