@@ -44,10 +44,21 @@ export async function GET(req: NextRequest) {
 
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, email: true, name: true },
+    select: {
+      id: true, email: true, name: true,
+      buyerPlanTier: true, sellerPlanTier: true, brokerPlanTier: true,
+    },
   })
   if (!user) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 })
+  }
+
+  // Guard against double-subscribing. If the user already has the tier
+  // they're trying to buy, send them to the Customer Portal to manage
+  // (downgrade / cancel / update card) instead of creating a duplicate
+  // Stripe subscription that would charge them again.
+  if (isAlreadyOnTier(tier, user)) {
+    return NextResponse.redirect(new URL('/account/billing?already=1', req.url))
   }
 
   try {
@@ -67,4 +78,14 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     )
   }
+}
+
+function isAlreadyOnTier(
+  tier: string,
+  user: { buyerPlanTier: string | null; sellerPlanTier: string | null; brokerPlanTier: string | null },
+): boolean {
+  if (tier === 'BUYER_PREMIUM')  return user.buyerPlanTier === 'PREMIUM_BUYER'
+  if (tier === 'SELLER_PREMIUM') return user.sellerPlanTier === 'PREMIUM'
+  if (tier === 'BROKER_PRO')     return user.brokerPlanTier === 'BROKER_PRO'
+  return false
 }
