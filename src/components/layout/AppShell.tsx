@@ -110,6 +110,34 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('toggleSidebar', handleToggleSidebar)
   }, [sidebarOpen])
 
+  // Fetch the current user's role so the sidebar can hide dashboards
+  // the user has no business seeing. A BUYER sees only "Buyer Dashboard",
+  // SELLER only "Seller Dashboard", etc. ADMIN sees all three (support).
+  // Until the fetch resolves we hide all three — better a brief gap than
+  // flashing dashboards the user can't open (every other one redirects
+  // away via the role gate on /dashboard/{role}/layout.tsx).
+  const [role, setRole] = useState<'BUYER' | 'SELLER' | 'BROKER' | 'ADMIN' | null>(null)
+
+  useEffect(() => {
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.user?.role) setRole(data.user.role)
+      })
+      .catch(() => {})
+  }, [])
+
+  // Filter MY DASHBOARD to the caller's role (admins see all).
+  const visibleGroups = useMemo(() => {
+    return NAV_GROUPS.map((g) => {
+      if (g.section !== 'MY DASHBOARD') return g
+      if (!role) return { ...g, items: [] }
+      if (role === 'ADMIN') return g
+      const keep = `${role.toLowerCase()}-dashboard`
+      return { ...g, items: g.items.filter((i) => i.key === keep) }
+    })
+  }, [role])
+
   // Collapsible sections state with localStorage persistence
   const [expandedSections, setExpandedSections] = useState<string[]>(['DEALS', 'INTELLIGENCE'])
 
@@ -192,7 +220,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
             {/* Navigation Sections */}
             <nav className="flex-1 overflow-y-auto p-4 space-y-2">
-              {NAV_GROUPS.map(group => (
+              {visibleGroups.map(group => (
                 <div key={group.section}>
                   {/* Section Header */}
                   <button
