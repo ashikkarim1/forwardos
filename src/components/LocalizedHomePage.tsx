@@ -39,18 +39,24 @@ function LocalizedHomePageContent() {
           editorial typography matching the listing pages. The site sells
           life-changing transactions — the hero should feel like one. */}
       <section className="relative overflow-hidden" style={{ background: '#0F1419', minHeight: '88vh' }}>
-        <div className="absolute inset-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=2400&q=80&fit=crop"
-            alt=""
-            aria-hidden
-            className="w-full h-full object-cover"
-            style={{ opacity: 0.55 }}
-          />
-          {/* Ink gradient: readable type up top, image breathing at the bottom */}
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(15,20,25,0.82) 0%, rgba(15,20,25,0.45) 55%, rgba(15,20,25,0.75) 100%)' }} />
-        </div>
+        {/* Typographic hero: ink-on-ink with a subtle champagne radial bloom.
+            Replaces the Unsplash stock photo — luxury reads through restraint,
+            not imagery. The light at the bottom feels like dawn without
+            looking like a brochure. */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(120% 80% at 50% 115%, rgba(184,149,106,0.22) 0%, rgba(184,149,106,0) 55%), ' +
+              'radial-gradient(80% 60% at 50% -10%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0) 60%)',
+          }}
+        />
+        {/* Faint vertical rule — editorial book feel without a hairline border */}
+        <div
+          aria-hidden
+          className="absolute inset-y-0 left-1/2 -translate-x-1/2"
+          style={{ width: '1px', background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.06) 75%, rgba(255,255,255,0) 100%)' }}
+        />
 
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center text-center" style={{ minHeight: '88vh' }}>
           <motion.div

@@ -15,11 +15,24 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowRight, Download, FileSpreadsheet, LayoutGrid, Table as TableIcon } from 'lucide-react'
+import { ArrowRight, Download, FileSpreadsheet, HelpCircle, LayoutGrid, Table as TableIcon } from 'lucide-react'
 import { PublicHeader } from '@/components/Navigation'
-import { Button, DataTable, EmptyState, Heading, Overline, Text, toast } from '@/components/ui'
+import { Button, DataTable, EmptyState, Heading, Overline, Text, Tooltip, toast } from '@/components/ui'
 import type { ColumnDef } from '@/components/ui'
 import { palette, semantic, radius, space } from '@/styles/tokens'
+
+/** Renders a tooltip-anchored column header so the buyer can hover to learn
+ *  what a metric means without leaving the table. */
+function H({ label, explain }: { label: string; explain: string }) {
+  return (
+    <Tooltip content={explain} side="top">
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'help' }}>
+        {label}
+        <HelpCircle size={11} style={{ color: semantic.text.tertiary }} />
+      </span>
+    </Tooltip>
+  )
+}
 
 interface Deal {
   id: string
@@ -130,17 +143,17 @@ export default function MarketplaceTablePage() {
     },
     {
       accessorKey: 'profitMarginPercent',
-      header: 'Margin',
+      header: () => <H label="Margin" explain="EBITDA as a percentage of revenue. Higher = more efficient operations." />,
       cell: ({ getValue }) => <Text size="bodySm" tone="secondary">{fmtPct(Number(getValue() ?? 0))}</Text>,
     },
     {
       accessorKey: 'roiProjection',
-      header: 'ROI',
+      header: () => <H label="ROI" explain="Projected first-year return on the asking price (EBITDA ÷ Asking). Doesn't account for leverage or working-capital changes." />,
       cell: ({ getValue }) => <Text size="bodySm" tone="secondary">{fmtPct(Number(getValue() ?? 0))}</Text>,
     },
     {
       accessorKey: 'heatIndex',
-      header: 'Heat',
+      header: () => <H label="Heat" explain="Buyer-demand momentum signal (0–100). Combines view velocity, inbound inquiries, and saved-search hits over the last 14 days. 80+ = high attention." />,
       cell: ({ getValue }) => {
         const v = Number(getValue() ?? 0)
         const tone = v >= 80 ? 'brand' : v >= 60 ? 'primary' : 'secondary'
@@ -149,12 +162,12 @@ export default function MarketplaceTablePage() {
     },
     {
       accessorKey: 'dealQualityScore',
-      header: 'Quality',
+      header: () => <H label="Quality" explain="Forward's listing-quality score (0–100). Considers financial completeness, verified-financials badge, photo count, and historical close rates for similar deals." />,
       cell: ({ getValue }) => <Text size="bodySm" tone="secondary">{Number(getValue() ?? 0)}</Text>,
     },
     {
       accessorKey: 'daysOnMarket',
-      header: 'Days',
+      header: () => <H label="Days" explain="Days since the listing was published. Use alongside Heat as a freshness check — long DOM with low heat often means stale pricing." />,
       cell: ({ getValue }) => <Text size="bodySm" tone="tertiary">{Number(getValue() ?? 0)}</Text>,
     },
     {
