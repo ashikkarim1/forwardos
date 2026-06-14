@@ -216,6 +216,29 @@ export default function MarketplaceTablePage() {
 
   const isLoading = deals === null && !loadError
 
+  // Aggregate KPIs for the stats banner. Computed client-side from the same
+  // dataset the table renders; doesn't add a round-trip.
+  const stats = useMemo(() => {
+    if (!deals || deals.length === 0) return null
+    const asking = deals.map((d) => Number(d.askingPrice || 0)).filter((n) => n > 0)
+    const ebitda = deals.map((d) => Number(d.ebitda || 0)).filter((n) => n > 0)
+    const heats  = deals.map((d) => Number(d.heatIndex || 0)).filter((n) => n > 0)
+    const total  = asking.reduce((a, b) => a + b, 0)
+    const median = (arr: number[]) => {
+      if (!arr.length) return 0
+      const s = [...arr].sort((a, b) => a - b)
+      const m = Math.floor(s.length / 2)
+      return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2
+    }
+    return {
+      count: deals.length,
+      totalAsking: total,
+      medianAsking: median(asking),
+      medianEbitda: median(ebitda),
+      medianHeat: Math.round(median(heats)),
+    }
+  }, [deals])
+
   return (
     <div style={{ minHeight: '100vh', background: semantic.surface.cream }}>
       <PublicHeader />
@@ -249,6 +272,24 @@ export default function MarketplaceTablePage() {
           </div>
         </div>
       </div>
+
+      {/* Aggregate stats — at-a-glance feel for the market dataset before
+          the analyst dives into rows. Hidden during load / on empty. */}
+      {stats && (
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: `${space[5]} ${space[6]} 0` }}>
+          <div className="fw-stats-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: space[3],
+          }}>
+            <StatTile label="Listings" value={String(stats.count)} />
+            <StatTile label="Total asking" value={fmtUSD(stats.totalAsking)} />
+            <StatTile label="Median asking" value={fmtUSD(stats.medianAsking)} />
+            <StatTile label="Median EBITDA" value={fmtUSD(stats.medianEbitda)} />
+            <StatTile label="Median heat" value={String(stats.medianHeat)} tone="brand" />
+          </div>
+        </div>
+      )}
 
       {/* Table */}
       <div style={{ maxWidth: '1400px', margin: '0 auto', padding: `${space[6]} ${space[6]} ${space[16]}` }}>
@@ -380,6 +421,22 @@ function Stat({ label, value, tone = 'primary' }: { label: string; value: string
     <div>
       <Text size="caption" tone="tertiary" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</Text>
       <Text size="bodyLg" tone={tone} style={{ fontWeight: 600, marginTop: '2px' }}>{value}</Text>
+    </div>
+  )
+}
+
+/** Card-style aggregate KPI used in the stats banner. Same content shape as
+ *  Stat, different chrome: bordered tile that reads as a dashboard panel. */
+function StatTile({ label, value, tone = 'primary' }: { label: string; value: string; tone?: 'primary' | 'brand' }) {
+  return (
+    <div style={{
+      padding: `${space[3]} ${space[4]}`,
+      background: semantic.surface.default,
+      border: `1px solid ${semantic.border.subtle}`,
+      borderRadius: radius.md,
+    }}>
+      <Text size="caption" tone="tertiary" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</Text>
+      <Text size="h4" tone={tone} style={{ marginTop: '2px' }}>{value}</Text>
     </div>
   )
 }

@@ -406,3 +406,24 @@ body {
   0%   { background-position: 100% 0; }
   100% { background-position: -100% 0; }
 }
+
+/* Keyboard-only focus ring for interactive elements. Champagne champagne[300]
+ * provides a luxe ring without screaming primary. Mouse clicks suppress it
+ * via :focus-visible so the UI stays calm when the user has a pointer. */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #D4BB8C;            /* palette.champagne[300] */
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Sliders + checkboxes get their accent color from the form primitive style
+ * prop, but stragglers (legacy form inputs not yet migrated) should still
+ * look on-brand. */
+input[type="range"], input[type="checkbox"] {
+  accent-color: #B8956A;                  /* palette.champagne[500] */
+}

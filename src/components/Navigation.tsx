@@ -109,6 +109,23 @@ export function PublicHeader() {
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-4">
+          {/* Command-palette hint — discoverability for the ⌘K shortcut.
+              Hidden on small screens; clicking dispatches the same Cmd+K
+              event so users can use the affordance without remembering. */}
+          <button
+            type="button"
+            aria-label="Open command palette"
+            onClick={() => {
+              const evt = new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true })
+              window.dispatchEvent(evt)
+            }}
+            className="hidden md:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md border text-xs transition-colors hover:bg-gray-50"
+            style={{ borderColor: COLOR_BORDER, color: '#717171' }}
+          >
+            <span>Search</span>
+            <kbd className="px-1.5 py-0.5 rounded text-[10px]" style={{ background: '#F5F2EC', color: '#1a1a1a', fontFamily: 'IBM Plex Mono, ui-monospace, monospace' }}>⌘K</kbd>
+          </button>
+
           {/* Saved Listings */}
           <Link
             href="/saved"
