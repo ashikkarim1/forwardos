@@ -39,10 +39,10 @@ export type TierId = typeof TIER[keyof typeof TIER]
 // Stripe price ids — set in Vercel env. Falsey while you wire Stripe up.
 export const STRIPE_PRICE_IDS: Record<TierId, string | undefined> = {
   BUYER_FREE: undefined,
-  BUYER_PREMIUM: process.env.STRIPE_BUYER_PREMIUM_PRICE_ID,
+  BUYER_PREMIUM: process.env.STRIPE_PRICE_BUYER_PREMIUM,
   SELLER_FREE: undefined,
-  SELLER_PREMIUM: process.env.STRIPE_SELLER_PREMIUM_PRICE_ID,
-  BROKER_PRO: process.env.STRIPE_BROKER_PRO_PRICE_ID,
+  SELLER_PREMIUM: process.env.STRIPE_PRICE_SELLER_PREMIUM,
+  BROKER_PRO: process.env.STRIPE_PRICE_BROKER_PRO,
 }
 
 // ───────────────────────────────────────────────────────────────────────────

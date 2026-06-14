@@ -4,9 +4,9 @@
  * Uses the real Stripe SDK when STRIPE_SECRET_KEY is set; otherwise runs in a
  * safe mock mode (logs + fake session) so the flow works in dev without keys.
  * Plans map to price IDs via env — set these in your Stripe dashboard + Vercel:
- *   STRIPE_SELLER_PREMIUM_PRICE_ID  (seller Premium, $199/mo)
- *   STRIPE_BUYER_PREMIUM_PRICE_ID   (buyer Premium, $99/mo)
- *   STRIPE_BROKER_PRO_PRICE_ID      (broker Pro, $599/mo)
+ *   STRIPE_PRICE_SELLER_PREMIUM  (seller Premium, $199/mo)
+ *   STRIPE_PRICE_BUYER_PREMIUM   (buyer Premium, $99/mo)
+ *   STRIPE_PRICE_BROKER_PRO      (broker Pro, $599/mo)
  *
  * Plan tier aliases: legacy code passes `premium` for seller premium; we keep
  * that mapping so existing checkout calls don't break.
@@ -24,10 +24,10 @@ export const stripeEnabled = Boolean(secretKey)
 const stripe = secretKey ? new Stripe(secretKey) : null
 
 const PRICE_ENV: Record<PlanTier, string> = {
-  premium: 'STRIPE_SELLER_PREMIUM_PRICE_ID',         // legacy
-  seller_premium: 'STRIPE_SELLER_PREMIUM_PRICE_ID',
-  buyer_premium: 'STRIPE_BUYER_PREMIUM_PRICE_ID',
-  broker_pro: 'STRIPE_BROKER_PRO_PRICE_ID',
+  premium: 'STRIPE_PRICE_SELLER_PREMIUM',         // legacy
+  seller_premium: 'STRIPE_PRICE_SELLER_PREMIUM',
+  buyer_premium: 'STRIPE_PRICE_BUYER_PREMIUM',
+  broker_pro: 'STRIPE_PRICE_BROKER_PRO',
 }
 function priceFor(plan: PlanTier): string | undefined {
   return process.env[PRICE_ENV[plan]]
