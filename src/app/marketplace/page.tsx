@@ -13,6 +13,7 @@ import { useSavedDeals } from '@/hooks/useSavedDeals'
 import { generateNarrative, narrativeEyebrow, maskedHeadline, industryLabel } from '@/lib/listing-narrative'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 import { palette } from '@/styles/tokens'
+import { predictCloseProbability } from '@/lib/predictions'
 
 interface Deal {
   id: string; slug?: string; title: string; location: string; country: string; image: string; askingPrice: number; askingPriceCurrency: string; annualRevenue: number; cashFlowMin: number; cashFlowMax: number; ebitda: number; profitMarginPercent: number; dealQualityScore: number; heatIndex: number; roiProjection: number; paybackPeriod: number; growthRate: number; status: 'NEW' | 'FEATURED' | 'STANDARD'; category: string; dealType: 'SALE' | 'LEASE' | 'QUICK_SALE'; employeeCount: number; sellerVerified: boolean; sellerTrustScore: number; marketTrend: 'up' | 'down' | 'stable'; marketPosition: 'underpriced' | 'fair' | 'premium'; daysOnMarket: number; location_country: string; sellerType: string; sellerMotivation: string; financingEligible?: boolean; upcomingAuction?: boolean
@@ -142,6 +143,23 @@ export default function MarketplacePage() {
       if (sortBy === 'heat') return arr.sort((a, b) => b.heatIndex - a.heatIndex)
       if (sortBy === 'roi') return arr.sort((a, b) => b.roiProjection - a.roiProjection)
       if (sortBy === 'valuation') return arr.sort((a, b) => a.askingPrice - b.askingPrice)
+      if (sortBy === 'closeProbability') {
+        // Use the same scoring model as PredictionBadge + the predictions
+        // page so the sort matches the badge visible on each card.
+        return arr.sort((a, b) => {
+          const pa = predictCloseProbability({
+            dealQualityScore: a.dealQualityScore, heatIndex: a.heatIndex,
+            daysOnMarket: a.daysOnMarket, financingEligible: a.financingEligible,
+            sellerVerified: a.sellerVerified, growthRate: a.growthRate,
+          }).score
+          const pb = predictCloseProbability({
+            dealQualityScore: b.dealQualityScore, heatIndex: b.heatIndex,
+            daysOnMarket: b.daysOnMarket, financingEligible: b.financingEligible,
+            sellerVerified: b.sellerVerified, growthRate: b.growthRate,
+          }).score
+          return pb - pa
+        })
+      }
       return arr.sort((a, b) => b.dealQualityScore - a.dealQualityScore)
     }
     if (sortBy === 'premium') return [...sortResults(featured), ...sortResults(nonFeatured)]
@@ -351,6 +369,7 @@ export default function MarketplacePage() {
               style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
             >
               <option value="premium">⭐ Featured first</option>
+              <option value="closeProbability">🎯 Likely to close</option>
               <option value="newest">✨ Newest</option>
               <option value="oldest">📅 Oldest</option>
               <option value="heat">🔥 Hottest</option>
