@@ -60,12 +60,27 @@ export async function createCheckoutSession(options: CreateCheckoutSessionOption
   const price = priceFor(options.planTier)
   if (!price) throw new Error(`Missing price ID for "${options.planTier}". Set ${PRICE_ENV[options.planTier]} in your environment.`)
 
+  // Tax-compliance config — non-negotiable. Stripe needs the buyer's billing
+  // address to:
+  //   - Substantiate zero-rated VAT exports out of the UAE (FTA audit evidence)
+  //   - Apply correct EU/UK VAT rate when Stripe Tax is on
+  //   - Determine US/Canada sales-tax nexus
+  //   - Match 2-piece location evidence for EU B2C digital services
+  // tax_id_collection lets B2B customers enter a VAT/GST number so the sale
+  // is reverse-charged to them and we don't owe their local VAT.
+  // automatic_tax: { enabled: true } only fires when Stripe Tax is activated
+  // in the dashboard (Settings → Tax). Until then it's a no-op; turning it
+  // on in Stripe makes calculations + filing automatic — no code change needed.
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     customer_email: options.userEmail,
     line_items: [{ price, quantity: 1 }],
     success_url: success,
     cancel_url: cancel,
+    billing_address_collection: 'required',
+    tax_id_collection: { enabled: true },
+    automatic_tax: { enabled: true },
+    customer_update: { address: 'auto', name: 'auto' },
     metadata: { userId: options.userId, dealId: options.dealId || '', planTier: options.planTier },
     subscription_data: { metadata: { userId: options.userId, planTier: options.planTier } },
   })
