@@ -1,365 +1,226 @@
+/**
+ * /admin/listings — moderation queue for marketplace deals.
+ *
+ * Migrated from a 365-line hand-rolled table to the <DataTable> primitive.
+ * Demonstrates the canonical pattern for every admin table going forward:
+ *
+ *   - <DataTable> handles search, sort, paginate, select, bulk actions
+ *   - <Badge> for status pills (no more inline colored divs)
+ *   - <Button> for row + bulk actions (no more hand-styled buttons)
+ *   - <Card> + <Heading> + <Text> for chrome
+ *   - 0 inline hex codes anywhere in this file
+ *
+ * Mock data lives at MOCK_LISTINGS until /api/admin/listings ships. Swap
+ * the useState seed for a fetch + Skeleton variant when the API is ready.
+ */
 'use client'
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Search, Filter, Download, Eye, Flag, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
-import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
+import { useMemo, useState } from 'react'
+import { CheckCircle, Download, Eye, Flag, XCircle } from 'lucide-react'
+import {
+  Badge, Button, Card, ColumnDef, DataTable, EmptyState,
+  Heading, Mono, Overline, Text, toast,
+} from '@/components/ui'
+import { space } from '@/styles/tokens'
 
-const LISTINGS_DATA = [
-  {
-    id: '487',
-    name: 'SaaS Platform - Project Management',
-    location: 'San Francisco',
-    owner: 'John Doe',
-    status: 'approved',
-    tier: 'premium',
-    revenue: '$850K',
-    valuation: '$2.5M',
-    views: 127,
-    saves: 8,
-    featured: true,
-  },
-  {
-    id: '486',
-    name: 'Healthcare Network',
-    location: 'Boston',
-    owner: 'Jane Smith',
-    status: 'pending',
-    tier: 'standard',
-    revenue: '$1.2M',
-    valuation: '$3.2M',
-    views: 87,
-    saves: 5,
-    featured: false,
-  },
-  {
-    id: '485',
-    name: 'Digital Marketing Agency',
-    location: 'Seattle',
-    owner: 'Mike Chen',
-    status: 'flagged',
-    tier: 'standard',
-    revenue: '$1.8M',
-    valuation: '$2.8M',
-    views: 12,
-    saves: 0,
-    featured: false,
-    flagReason: 'Suspicious Metrics',
-  },
-  {
-    id: '484',
-    name: 'E-commerce Platform',
-    location: 'Chicago',
-    owner: 'Sarah Lee',
-    status: 'approved',
-    tier: 'standard',
-    revenue: '$2.1M',
-    valuation: '$4.5M',
-    views: 156,
-    saves: 14,
-    featured: false,
-  },
-  {
-    id: '483',
-    name: 'SaaS Analytics Tool',
-    location: 'Austin',
-    owner: 'Alex Johnson',
-    status: 'pending',
-    tier: 'free',
-    revenue: '$450K',
-    valuation: '$1.8M',
-    views: 34,
-    saves: 2,
-    featured: false,
-  },
-]
+type ListingStatus = 'approved' | 'pending' | 'flagged' | 'rejected'
+type ListingTier = 'premium' | 'standard' | 'free'
 
-const STATUS_COLORS = {
-  approved: { bg: '#10B981', text: 'white' },
-  pending: { bg: '#F59E0B', text: 'white' },
-  flagged: { bg: '#EF4444', text: 'white' },
-  rejected: { bg: '#6B7280', text: 'white' },
+interface AdminListing {
+  id: string
+  name: string
+  location: string
+  owner: string
+  status: ListingStatus
+  tier: ListingTier
+  revenue: string
+  valuation: string
+  views: number
+  saves: number
+  featured: boolean
+  flagReason?: string
 }
 
-const TIER_COLORS = {
-  premium: '#B8956A',
-  standard: '#6366F1',
-  free: '#8B5CF6',
+const MOCK_LISTINGS: AdminListing[] = [
+  { id: '487', name: 'SaaS Platform — Project Management',  location: 'San Francisco', owner: 'John Doe',     status: 'approved', tier: 'premium',  revenue: '$850K', valuation: '$2.5M', views: 127, saves:  8, featured: true  },
+  { id: '486', name: 'Healthcare Network',                  location: 'Boston',        owner: 'Jane Smith',   status: 'pending',  tier: 'standard', revenue: '$1.2M', valuation: '$3.2M', views:  87, saves:  5, featured: false },
+  { id: '485', name: 'Digital Marketing Agency',            location: 'Seattle',       owner: 'Mike Chen',    status: 'flagged',  tier: 'standard', revenue: '$1.8M', valuation: '$2.8M', views:  12, saves:  0, featured: false, flagReason: 'Suspicious Metrics' },
+  { id: '484', name: 'E-commerce Platform',                 location: 'Chicago',       owner: 'Sarah Lee',    status: 'approved', tier: 'standard', revenue: '$2.1M', valuation: '$4.5M', views: 156, saves: 14, featured: false },
+  { id: '483', name: 'SaaS Analytics Tool',                 location: 'Austin',        owner: 'Alex Johnson', status: 'pending',  tier: 'free',     revenue: '$450K', valuation: '$1.8M', views:  34, saves:  2, featured: false },
+]
+
+const STATUS_TONE: Record<ListingStatus, 'success' | 'warning' | 'danger' | 'default'> = {
+  approved: 'success',
+  pending:  'warning',
+  flagged:  'danger',
+  rejected: 'default',
+}
+
+const TIER_TONE: Record<ListingTier, 'brand' | 'default'> = {
+  premium:  'brand',
+  standard: 'default',
+  free:     'default',
 }
 
 export default function AdminListingsPage() {
-  const [listings, setListings] = useState(LISTINGS_DATA)
-  const [selectedStatus, setSelectedStatus] = useState<string[]>(['approved', 'pending', 'flagged'])
-  const [searchQuery, setSearchQuery] = useState('')
-  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [listings, setListings] = useState<AdminListing[]>(MOCK_LISTINGS)
 
-  const filteredListings = listings.filter((listing) => {
-    const matchesStatus = selectedStatus.length === 0 || selectedStatus.includes(listing.status)
-    const matchesSearch = listing.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      listing.owner.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      listing.location.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesStatus && matchesSearch
-  })
-
-  const handleApprove = (id: string) => {
-    setListings(listings.map((l) => (l.id === id ? { ...l, status: 'approved' } : l)))
+  const update = (id: string, next: ListingStatus) => {
+    setListings((rows) => rows.map((r) => (r.id === id ? { ...r, status: next } : r)))
+    toast.success(`Listing #${id} marked ${next}`)
   }
 
-  const handleReject = (id: string) => {
-    setListings(listings.map((l) => (l.id === id ? { ...l, status: 'rejected' } : l)))
+  const bulk = (ids: string[], next: ListingStatus) => {
+    setListings((rows) => rows.map((r) => (ids.includes(r.id) ? { ...r, status: next } : r)))
+    toast.success(`${ids.length} listings marked ${next}`)
   }
 
-  const handleFlag = (id: string) => {
-    setListings(listings.map((l) => (l.id === id ? { ...l, status: 'flagged' } : l)))
+  const columns = useMemo<ColumnDef<AdminListing>[]>(() => [
+    {
+      accessorKey: 'id',
+      header: 'Ref',
+      cell: ({ getValue }) => <Mono tone="tertiary">#{String(getValue() ?? '')}</Mono>,
+      size: 64,
+    },
+    {
+      accessorKey: 'name',
+      header: 'Listing',
+      cell: ({ row }) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: '240px' }}>
+          <Text size="bodySm" tone="primary" style={{ fontWeight: 600 }}>{row.original.name}</Text>
+          <Text size="caption" tone="tertiary">{row.original.location} · {row.original.owner}</Text>
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          <Badge tone={STATUS_TONE[row.original.status]}>{row.original.status}</Badge>
+          {row.original.flagReason && (
+            <Text size="caption" tone="danger">{row.original.flagReason}</Text>
+          )}
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'tier',
+      header: 'Tier',
+      cell: ({ row }) => <Badge tone={TIER_TONE[row.original.tier]}>{row.original.tier}</Badge>,
+    },
+    {
+      accessorKey: 'revenue',
+      header: 'Revenue',
+      cell: ({ getValue }) => <Text size="bodySm" tone="secondary">{String(getValue() ?? '—')}</Text>,
+    },
+    {
+      accessorKey: 'valuation',
+      header: 'Valuation',
+      cell: ({ getValue }) => <Text size="bodySm" tone="primary">{String(getValue() ?? '—')}</Text>,
+    },
+    {
+      accessorKey: 'views',
+      header: 'Views',
+      cell: ({ getValue }) => <Text size="bodySm" tone="tertiary">{Number(getValue() ?? 0).toLocaleString()}</Text>,
+    },
+    {
+      id: 'actions',
+      header: '',
+      cell: ({ row }) => {
+        const r = row.original
+        return (
+          <div style={{ display: 'flex', gap: space[1], justifyContent: 'flex-end' }} onClick={(e) => e.stopPropagation()}>
+            {r.status !== 'approved' && (
+              <Button variant="ghost" size="sm" leftIcon={<CheckCircle size={12} />} onClick={() => update(r.id, 'approved')}>
+                Approve
+              </Button>
+            )}
+            {r.status !== 'rejected' && (
+              <Button variant="ghost" size="sm" leftIcon={<XCircle size={12} />} onClick={() => update(r.id, 'rejected')}>
+                Reject
+              </Button>
+            )}
+            {r.status !== 'flagged' && (
+              <Button variant="ghost" size="sm" leftIcon={<Flag size={12} />} onClick={() => update(r.id, 'flagged')}>
+                Flag
+              </Button>
+            )}
+          </div>
+        )
+      },
+    },
+  ], [])
+
+  function exportCsv(rows: AdminListing[]) {
+    const header = ['Ref', 'Name', 'Location', 'Owner', 'Status', 'Tier', 'Revenue', 'Valuation', 'Views', 'Saves', 'Featured']
+    const lines = rows.map((r) => [r.id, r.name, r.location, r.owner, r.status, r.tier, r.revenue, r.valuation, r.views, r.saves, r.featured].map((v) => {
+      const s = String(v ?? '')
+      return s.includes(',') || s.includes('"') ? `"${s.replace(/"/g, '""')}"` : s
+    }).join(','))
+    const blob = new Blob([[header.join(','), ...lines].join('\n')], { type: 'text/csv;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `forward-admin-listings-${new Date().toISOString().slice(0, 10)}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    toast.success(`Exported ${rows.length} ${rows.length === 1 ? 'listing' : 'listings'} to CSV`)
   }
 
   return (
-    <div className="p-4 md:p-8 space-y-6">
-      {/* Header */}
+    <div style={{ padding: space[8], display: 'flex', flexDirection: 'column', gap: space[6] }}>
       <div>
-        <h1 className="text-3xl md:text-4xl font-black mb-2" style={{ color: COLOR_PRIMARY }}>
-          Listing Management
-        </h1>
-        <p style={{ color: COLOR_TEXT_SECONDARY }}>
-          Review, approve, and manage all marketplace listings
-        </p>
+        <Overline tone="brand">Moderation</Overline>
+        <div style={{ marginTop: space[2], display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: space[4], flexWrap: 'wrap' }}>
+          <div>
+            <Heading level={1}>Listings queue</Heading>
+            <Text size="bodyLg" tone="secondary" style={{ marginTop: space[2] }}>
+              Review, approve, flag, and manage every marketplace listing.
+            </Text>
+          </div>
+          <div style={{ display: 'flex', gap: space[2] }}>
+            <Button variant="ghost" leftIcon={<Eye size={14} />} onClick={() => toast.info('Reviewer log opens next iteration')}>
+              Reviewer log
+            </Button>
+            <Button variant="secondary" leftIcon={<Download size={14} />} onClick={() => exportCsv(listings)}>
+              Export all
+            </Button>
+          </div>
+        </div>
       </div>
 
-      {/* Filters & Search */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="p-6 rounded-lg border"
-        style={{ borderColor: COLOR_BORDER }}
-      >
-        <div className="space-y-4">
-          {/* Search */}
-          <div className="relative">
-            <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: COLOR_TEXT_SECONDARY }} />
-            <input
-              type="text"
-              placeholder="Search by listing name, owner, or location..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-lg border bg-white focus:outline-none focus:ring-2"
-              style={{
-                borderColor: COLOR_BORDER,
-                '--tw-ring-color': COLOR_ACCENT,
-              } as any}
+      <Card padding="none">
+        <DataTable<AdminListing>
+          data={listings}
+          columns={columns}
+          searchPlaceholder="Search by listing, owner, or city…"
+          selectable
+          pageSize={20}
+          getRowId={(d) => d.id}
+          bulkActions={(rows) => (
+            <>
+              <Button variant="ghost" size="sm" leftIcon={<CheckCircle size={14} />} onClick={() => bulk(rows.map((r) => r.id), 'approved')}>
+                Approve {rows.length}
+              </Button>
+              <Button variant="ghost" size="sm" leftIcon={<Flag size={14} />} onClick={() => bulk(rows.map((r) => r.id), 'flagged')}>
+                Flag {rows.length}
+              </Button>
+              <Button variant="ghost" size="sm" leftIcon={<Download size={14} />} onClick={() => exportCsv(rows)}>
+                Export
+              </Button>
+            </>
+          )}
+          emptyState={
+            <EmptyState
+              title="No listings match your search"
+              body="Adjust the filters or wait for the next listing to roll in."
             />
-          </div>
-
-          {/* Status Filters */}
-          <div className="flex flex-wrap gap-3">
-            {['approved', 'pending', 'flagged', 'rejected'].map((status) => (
-              <button
-                key={status}
-                onClick={() => {
-                  if (selectedStatus.includes(status)) {
-                    setSelectedStatus(selectedStatus.filter((s) => s !== status))
-                  } else {
-                    setSelectedStatus([...selectedStatus, status])
-                  }
-                }}
-                className="px-4 py-2 rounded-lg font-semibold text-sm transition-all"
-                style={{
-                  background: selectedStatus.includes(status) ? STATUS_COLORS[status as keyof typeof STATUS_COLORS].bg : COLOR_BG_PRIMARY,
-                  color: selectedStatus.includes(status) ? 'white' : COLOR_PRIMARY,
-                  border: `2px solid ${selectedStatus.includes(status) ? STATUS_COLORS[status as keyof typeof STATUS_COLORS].bg : COLOR_BORDER}`,
-                }}
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex justify-between items-center">
-            <p className="text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-              Showing {filteredListings.length} of {listings.length} listings
-            </p>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-semibold transition-all hover:bg-gray-50"
-              style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}>
-              <Download size={18} />
-              Export CSV
-            </button>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Listings Table */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="rounded-lg border overflow-hidden"
-        style={{ borderColor: COLOR_BORDER }}
-      >
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr style={{ background: COLOR_BG_PRIMARY, borderBottom: `1px solid ${COLOR_BORDER}` }}>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wide" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  Listing
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wide" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  Owner
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wide" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  Status
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wide" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  Metrics
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wide" style={{ color: COLOR_TEXT_SECONDARY }}>
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredListings.map((listing, idx) => (
-                <motion.tbody key={listing.id}>
-                  <tr
-                    style={{
-                      borderBottom: `1px solid ${COLOR_BORDER}`,
-                      background: expandedId === listing.id ? COLOR_BG_PRIMARY : 'white',
-                    }}
-                  >
-                    <td className="px-6 py-4">
-                      <div>
-                        <p className="font-bold text-sm" style={{ color: COLOR_PRIMARY }}>
-                          {listing.name}
-                        </p>
-                        <p className="text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
-                          {listing.location} • {listing.valuation}
-                        </p>
-                        {listing.featured && (
-                          <span className="inline-block mt-1 px-2 py-1 rounded text-xs font-bold text-white" style={{ background: COLOR_ACCENT }}>
-                            Premium Featured
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: COLOR_PRIMARY }}>
-                      {listing.owner}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className="px-3 py-1 rounded-full text-xs font-bold text-white"
-                        style={{ background: STATUS_COLORS[listing.status as keyof typeof STATUS_COLORS].bg }}
-                      >
-                        {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: COLOR_PRIMARY }}>
-                      <div>
-                        <p>👁️ {listing.views} views</p>
-                        <p>⭐ {listing.saves} saves</p>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setExpandedId(expandedId === listing.id ? null : listing.id)}
-                          className="p-2 hover:bg-gray-100 rounded transition-colors"
-                          title="View Details"
-                        >
-                          <Eye size={18} style={{ color: COLOR_PRIMARY }} />
-                        </button>
-                        {listing.status !== 'approved' && (
-                          <button
-                            onClick={() => handleApprove(listing.id)}
-                            className="p-2 hover:bg-green-100 rounded transition-colors"
-                            title="Approve"
-                          >
-                            <CheckCircle size={18} color="#10B981" />
-                          </button>
-                        )}
-                        {listing.status !== 'rejected' && (
-                          <button
-                            onClick={() => handleReject(listing.id)}
-                            className="p-2 hover:bg-red-100 rounded transition-colors"
-                            title="Reject"
-                          >
-                            <XCircle size={18} color="#EF4444" />
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleFlag(listing.id)}
-                          className="p-2 hover:bg-blue-100 rounded transition-colors"
-                          title="Flag"
-                        >
-                          <Flag size={18} color={COLOR_ACCENT} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  {expandedId === listing.id && (
-                    <tr style={{ background: COLOR_BG_PRIMARY }}>
-                      <td colSpan={5} className="px-6 py-6">
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                        >
-                          <div>
-                            <h4 className="font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
-                              Financial Information
-                            </h4>
-                            <div className="space-y-2">
-                              <p className="text-sm">
-                                <span style={{ color: COLOR_TEXT_SECONDARY }}>Revenue:</span>{' '}
-                                <span style={{ color: COLOR_PRIMARY }} className="font-semibold">
-                                  {listing.revenue}
-                                </span>
-                              </p>
-                              <p className="text-sm">
-                                <span style={{ color: COLOR_TEXT_SECONDARY }}>Valuation:</span>{' '}
-                                <span style={{ color: COLOR_PRIMARY }} className="font-semibold">
-                                  {listing.valuation}
-                                </span>
-                              </p>
-                              <p className="text-sm">
-                                <span style={{ color: COLOR_TEXT_SECONDARY }}>Tier:</span>{' '}
-                                <span style={{ color: TIER_COLORS[listing.tier as keyof typeof TIER_COLORS] }} className="font-semibold">
-                                  {listing.tier.toUpperCase()}
-                                </span>
-                              </p>
-                            </div>
-                          </div>
-                          <div>
-                            <h4 className="font-bold mb-3" style={{ color: COLOR_PRIMARY }}>
-                              Engagement
-                            </h4>
-                            <div className="space-y-2">
-                              <p className="text-sm">
-                                <span style={{ color: COLOR_TEXT_SECONDARY }}>Total Views:</span>{' '}
-                                <span style={{ color: COLOR_PRIMARY }} className="font-semibold">
-                                  {listing.views}
-                                </span>
-                              </p>
-                              <p className="text-sm">
-                                <span style={{ color: COLOR_TEXT_SECONDARY }}>Saved By:</span>{' '}
-                                <span style={{ color: COLOR_PRIMARY }} className="font-semibold">
-                                  {listing.saves} users
-                                </span>
-                              </p>
-                              {listing.flagReason && (
-                                <p className="text-sm text-red-600">
-                                  <AlertCircle className="inline mr-1" size={16} />
-                                  Flag: {listing.flagReason}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </motion.div>
-                      </td>
-                    </tr>
-                  )}
-                </motion.tbody>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </motion.div>
+          }
+        />
+      </Card>
     </div>
   )
 }

@@ -15,9 +15,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowRight, Download, FileSpreadsheet, HelpCircle, LayoutGrid, Table as TableIcon } from 'lucide-react'
+import { ArrowRight, Download, ExternalLink, FileSpreadsheet, HelpCircle, LayoutGrid, Mail, Table as TableIcon } from 'lucide-react'
 import { PublicHeader } from '@/components/Navigation'
-import { Button, DataTable, EmptyState, Heading, Overline, Text, Tooltip, toast } from '@/components/ui'
+import { Badge, Button, DataTable, Drawer, EmptyState, Heading, Overline, Text, Tooltip, toast } from '@/components/ui'
 import type { ColumnDef } from '@/components/ui'
 import { palette, semantic, radius, space } from '@/styles/tokens'
 
@@ -96,6 +96,10 @@ export default function MarketplaceTablePage() {
   const router = useRouter()
   const [deals, setDeals] = useState<Deal[] | null>(null)
   const [loadError, setLoadError] = useState(false)
+  // Drawer-based inspection — clicking a row opens a side panel with the
+  // deal's full snapshot instead of leaving the table. PE / family-office
+  // analysts can scan 30+ listings without losing position.
+  const [active, setActive] = useState<Deal | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -263,7 +267,7 @@ export default function MarketplaceTablePage() {
             searchPlaceholder="Search by title, industry, location…"
             selectable
             pageSize={25}
-            onRowClick={(d) => router.push(d.slug ? `/listing/${d.slug}` : `/deal/${d.id}`)}
+            onRowClick={(d) => setActive(d)}
             getRowId={(d) => d.id}
             bulkActions={(rows) => (
               <>
@@ -299,6 +303,83 @@ export default function MarketplaceTablePage() {
           />
         )}
       </div>
+
+      {/* Deal-detail Drawer — opens on row click. Lets analysts scan & dismiss
+          without leaving the table. The full /listing page is still available
+          via the "Open full listing" CTA. */}
+      <Drawer
+        open={active != null}
+        onClose={() => setActive(null)}
+        title={active?.title}
+        description={active ? `${String(active.category).replace(/_/g, ' ')} · ${active.location}` : undefined}
+        size="lg"
+      >
+        {active && <DealDetailPanel deal={active} onOpenFull={() => router.push(active.slug ? `/listing/${active.slug}` : `/deal/${active.id}`)} />}
+      </Drawer>
+    </div>
+  )
+}
+
+function DealDetailPanel({ deal, onOpenFull }: { deal: Deal; onOpenFull: () => void }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: space[6] }}>
+      {/* Status row */}
+      <div style={{ display: 'flex', gap: space[2], flexWrap: 'wrap' }}>
+        {statusBadge(deal.status)}
+        {deal.sellerVerified && <Badge tone="success">Verified seller</Badge>}
+        {deal.financingEligible && <Badge tone="brand">Financing eligible</Badge>}
+      </div>
+
+      {/* Financials grid */}
+      <div>
+        <Overline tone="brand" style={{ marginBottom: space[3] }}>Financials</Overline>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: space[4] }}>
+          <Stat label="Asking" value={fmtUSD(deal.askingPrice)} />
+          <Stat label="Revenue (LTM)" value={fmtUSD(deal.annualRevenue)} />
+          <Stat label="EBITDA" value={fmtUSD(deal.ebitda)} />
+          <Stat label="Margin" value={fmtPct(deal.profitMarginPercent)} />
+          <Stat label="Projected ROI" value={fmtPct(deal.roiProjection)} />
+          <Stat label="Payback" value={`${deal.paybackPeriod} mo`} />
+        </div>
+      </div>
+
+      {/* Forward signals */}
+      <div>
+        <Overline tone="brand" style={{ marginBottom: space[3] }}>Forward signals</Overline>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: space[4] }}>
+          <Stat label="Heat" value={String(deal.heatIndex)} tone={deal.heatIndex >= 80 ? 'brand' : 'primary'} />
+          <Stat label="Quality" value={String(deal.dealQualityScore)} />
+          <Stat label="Days on market" value={String(deal.daysOnMarket)} />
+        </div>
+      </div>
+
+      {/* Seller intent */}
+      <div>
+        <Overline tone="brand" style={{ marginBottom: space[3] }}>Seller intent</Overline>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: space[2] }}>
+          <Text size="bodySm" tone="secondary">Seller type: {String(deal.sellerType ?? '—').replace(/_/g, ' ')}</Text>
+          <Text size="bodySm" tone="secondary">Motivation: {String(deal.sellerMotivation ?? '—').replace(/_/g, ' ')}</Text>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: space[2], paddingTop: space[4], borderTop: `1px solid ${semantic.border.subtle}` }}>
+        <Button variant="primary" leftIcon={<Mail size={14} />} onClick={() => toast.info('Contact seller flow opens on the listing page')}>
+          Contact seller
+        </Button>
+        <Button variant="secondary" rightIcon={<ExternalLink size={14} />} onClick={onOpenFull}>
+          Open full listing
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+function Stat({ label, value, tone = 'primary' }: { label: string; value: string; tone?: 'primary' | 'brand' }) {
+  return (
+    <div>
+      <Text size="caption" tone="tertiary" style={{ textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</Text>
+      <Text size="bodyLg" tone={tone} style={{ fontWeight: 600, marginTop: '2px' }}>{value}</Text>
     </div>
   )
 }

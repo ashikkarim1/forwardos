@@ -1,311 +1,263 @@
 /**
- * WEEK 1: SKELETON LOADING COMPONENTS
- * 8 variants for different UI patterns
+ * Skeleton loading components — token-disciplined, 8 variants.
+ *
+ * Migrated from inline hex gradients (162 violations) to a single
+ * <Shimmer> primitive that reads from the design system. To tune the
+ * shimmer color globally, bump palette.ink[50] / [100] in tokens.ts.
  *
  * Usage:
- * import { CardSkeleton, TableSkeleton, DealDetailSkeleton } from '@/components/Skeleton'
+ *   import { Skeleton, CardSkeleton, TableSkeleton } from '@/components/Skeleton'
+ *
+ *   <CardSkeleton />
+ *   <TableSkeleton rows={5} columns={4} />
  */
+'use client'
 
-import React from 'react';
+import React, { CSSProperties } from 'react'
+import { palette, semantic, radius, space, shadow } from '@/styles/tokens'
 
-// ============================================
-// GENERIC SKELETON
-// ============================================
+// ━━━ Shimmer primitive ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+/** Animated gradient bar — the only place hex colors are referenced; everything
+ *  else composes this. Width / height / radius are all token-driven. */
+function Shimmer({
+  height = '16px',
+  width = '100%',
+  rounded = 'sm',
+  style,
+}: {
+  height?: string
+  width?: string
+  rounded?: 'none' | 'sm' | 'md' | 'lg' | 'full'
+  style?: CSSProperties
+}) {
+  return (
+    <div
+      role="status"
+      aria-label="Loading"
+      style={{
+        height,
+        width,
+        borderRadius: radius[rounded],
+        background: `linear-gradient(90deg, ${palette.ink[50]} 0%, ${palette.ink[100]} 50%, ${palette.ink[50]} 100%)`,
+        backgroundSize: '200% 100%',
+        animation: 'fw-shimmer 1.8s ease-in-out infinite',
+        ...style,
+      }}
+    />
+  )
+}
+
+const cardStyle: CSSProperties = {
+  background: semantic.surface.default,
+  border: `1px solid ${semantic.border.subtle}`,
+  borderRadius: radius.lg,
+  overflow: 'hidden',
+}
+
+const headerStyle: CSSProperties = {
+  background: palette.cream[50],
+  borderBottom: `1px solid ${semantic.border.subtle}`,
+}
+
+// ━━━ Generic ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 interface SkeletonProps {
-  className?: string;
-  count?: number;
+  className?: string
+  count?: number
 }
 
-export function Skeleton({ className = '', count = 1 }: SkeletonProps) {
+export function Skeleton({ className, count = 1 }: SkeletonProps) {
   return (
     <>
-      {Array(count)
-        .fill(0)
-        .map((_, i) => (
-          <div
-            key={i}
-            role="status"
-            aria-label="Loading"
-            className={`h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse ${className}`}
-            style={{
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 2s infinite',
-            }}
-          />
-        ))}
+      {Array.from({ length: count }).map((_, i) => (
+        <Shimmer key={i} style={className ? undefined : undefined} />
+      ))}
     </>
-  );
+  )
 }
 
-// ============================================
-// CARD SKELETON
-// ============================================
+// ━━━ Card ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export function CardSkeleton() {
   return (
-    <div className="bg-white border border-[#e5e7eb] rounded-lg overflow-hidden">
-      {/* Image */}
-      <div className="h-40 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] animate-pulse" />
-
-      {/* Content */}
-      <div className="p-6 space-y-4">
-        {/* Title */}
-        <div className="space-y-2">
-          <div className="h-6 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse w-3/4" />
-          <div className="h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse w-1/2" />
+    <div style={cardStyle}>
+      <Shimmer height="160px" rounded="none" />
+      <div style={{ padding: space[6], display: 'flex', flexDirection: 'column', gap: space[4] }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: space[2] }}>
+          <Shimmer height="24px" width="75%" />
+          <Shimmer height="16px" width="50%" />
         </div>
-
-        {/* Metrics */}
-        <div className="space-y-3 pb-4 border-b border-[#e5e7eb]">
-          <div className="flex justify-between">
-            <div className="h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse w-1/4" />
-            <div className="h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse w-1/4" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: space[3], paddingBottom: space[4], borderBottom: `1px solid ${semantic.border.subtle}` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Shimmer height="16px" width="25%" />
+            <Shimmer height="16px" width="25%" />
           </div>
-          <div className="flex justify-between">
-            <div className="h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse w-1/4" />
-            <div className="h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse w-1/4" />
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Shimmer height="16px" width="25%" />
+            <Shimmer height="16px" width="25%" />
           </div>
         </div>
-
-        {/* Tags */}
-        <div className="flex gap-2">
-          <div className="h-6 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded-full animate-pulse w-20" />
-          <div className="h-6 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded-full animate-pulse w-20" />
+        <div style={{ display: 'flex', gap: space[2] }}>
+          <Shimmer height="24px" width="80px" rounded="full" />
+          <Shimmer height="24px" width="80px" rounded="full" />
         </div>
-
-        {/* Button */}
-        <div className="h-10 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse" />
+        <Shimmer height="40px" rounded="md" />
       </div>
     </div>
-  );
+  )
 }
 
-// ============================================
-// TABLE SKELETON
-// ============================================
+// ━━━ Table ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 interface TableSkeletonProps {
-  rows?: number;
-  columns?: number;
+  rows?: number
+  columns?: number
 }
 
 export function TableSkeleton({ rows = 5, columns = 5 }: TableSkeletonProps) {
   return (
-    <div className="border border-[#e5e7eb] rounded-lg overflow-hidden">
-      <table className="w-full">
-        {/* Header */}
-        <thead className="bg-[#f9fafb] border-b border-[#e5e7eb]">
+    <div style={{ ...cardStyle, boxShadow: shadow.sm }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead style={headerStyle}>
           <tr>
-            {Array(columns)
-              .fill(0)
-              .map((_, i) => (
-                <th key={i} className="px-4 py-3">
-                  <div className="h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse" />
-                </th>
-              ))}
+            {Array.from({ length: columns }).map((_, i) => (
+              <th key={i} style={{ padding: `${space[3]} ${space[4]}`, textAlign: 'left' }}>
+                <Shimmer height="14px" />
+              </th>
+            ))}
           </tr>
         </thead>
-
-        {/* Body */}
         <tbody>
-          {Array(rows)
-            .fill(0)
-            .map((_, rowIdx) => (
-              <tr
-                key={rowIdx}
-                className={`border-b border-[#e5e7eb] ${
-                  rowIdx % 2 === 0 ? 'bg-white' : 'bg-[#f9fafb]'
-                }`}
-              >
-                {Array(columns)
-                  .fill(0)
-                  .map((_, colIdx) => (
-                    <td key={colIdx} className="px-4 py-3">
-                      <div className="h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse" />
-                    </td>
-                  ))}
-              </tr>
-            ))}
+          {Array.from({ length: rows }).map((_, rowIdx) => (
+            <tr
+              key={rowIdx}
+              style={{
+                borderBottom: `1px solid ${semantic.border.subtle}`,
+                background: rowIdx % 2 === 0 ? semantic.surface.default : palette.cream[50],
+              }}
+            >
+              {Array.from({ length: columns }).map((_, colIdx) => (
+                <td key={colIdx} style={{ padding: `${space[3]} ${space[4]}` }}>
+                  <Shimmer height="14px" />
+                </td>
+              ))}
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
-  );
+  )
 }
 
-// ============================================
-// DEAL DETAIL SKELETON
-// ============================================
+// ━━━ Deal detail ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export function DealDetailSkeleton() {
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: space[6] }}>
       {/* Breadcrumb */}
-      <div className="flex gap-2">
-        {Array(3)
-          .fill(0)
-          .map((_, i) => (
-            <React.Fragment key={i}>
-              <div className="h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse w-16" />
-              {i < 2 && <div className="w-4" />}
-            </React.Fragment>
-          ))}
+      <div style={{ display: 'flex', gap: space[2] }}>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <React.Fragment key={i}>
+            <Shimmer height="16px" width="64px" />
+            {i < 2 && <div style={{ width: '16px' }} />}
+          </React.Fragment>
+        ))}
       </div>
-
       {/* Heading */}
-      <div className="space-y-2">
-        <div className="h-8 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse w-2/3" />
-        <div className="h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse w-1/3" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: space[2] }}>
+        <Shimmer height="32px" width="66%" />
+        <Shimmer height="16px" width="33%" />
       </div>
-
-      {/* Main content area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Sidebar */}
-        <div className="lg:col-span-1 space-y-4">
-          <div className="bg-white border border-[#e5e7eb] rounded-lg p-6 space-y-4">
-            <div className="h-6 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse" />
-            <div className="space-y-3">
-              {Array(4)
-                .fill(0)
-                .map((_, i) => (
-                  <div key={i} className="h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse" />
-                ))}
-            </div>
-          </div>
+      {/* Body */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 2fr)', gap: space[6] }}>
+        <div style={{ ...cardStyle, padding: space[6], display: 'flex', flexDirection: 'column', gap: space[4] }}>
+          <Shimmer height="24px" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Shimmer key={i} height="16px" />
+          ))}
         </div>
-
-        {/* Main content */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white border border-[#e5e7eb] rounded-lg p-6 space-y-4">
-            {Array(6)
-              .fill(0)
-              .map((_, i) => (
-                <div key={i} className="h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse" />
-              ))}
-          </div>
+        <div style={{ ...cardStyle, padding: space[6], display: 'flex', flexDirection: 'column', gap: space[4] }}>
+          <Shimmer height="24px" />
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Shimmer key={i} height="16px" />
+          ))}
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-// ============================================
-// FORM SKELETON
-// ============================================
+// ━━━ Dashboard ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-interface FormSkeletonProps {
-  fields?: number;
-}
-
-export function FormSkeleton({ fields = 4 }: FormSkeletonProps) {
+export function DashboardSkeleton() {
   return (
-    <form className="space-y-4">
-      {Array(fields)
-        .fill(0)
-        .map((_, i) => (
-          <div key={i} className="space-y-2">
-            <div className="h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse w-24" />
-            <div className="h-10 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse" />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: space[6] }}>
+      {/* KPI cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: space[4] }}>
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} style={{ ...cardStyle, padding: space[6], display: 'flex', flexDirection: 'column', gap: space[3] }}>
+            <Shimmer height="14px" width="50%" />
+            <Shimmer height="28px" width="75%" />
+            <Shimmer height="14px" width="33%" />
           </div>
         ))}
-      <div className="h-10 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse w-32" />
-    </form>
-  );
-}
-
-// ============================================
-// TEXT SKELETON
-// ============================================
-
-interface TextSkeletonProps {
-  lines?: number;
-}
-
-export function TextSkeleton({ lines = 3 }: TextSkeletonProps) {
-  return (
-    <div className="space-y-3">
-      {Array(lines)
-        .fill(0)
-        .map((_, i) => (
-          <div
-            key={i}
-            className={`h-4 bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded animate-pulse ${
-              i === lines - 1 ? 'w-3/4' : 'w-full'
-            }`}
-          />
-        ))}
+      </div>
+      {/* Main panel */}
+      <div style={{ ...cardStyle, padding: space[6], display: 'flex', flexDirection: 'column', gap: space[4] }}>
+        <Shimmer height="20px" width="33%" />
+        <TableSkeleton rows={5} columns={4} />
+      </div>
     </div>
-  );
+  )
 }
 
-// ============================================
-// AVATAR SKELETON
-// ============================================
+// ━━━ List / inbox ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-interface AvatarSkeletonProps {
-  size?: 'sm' | 'md' | 'lg';
-}
-
-export function AvatarSkeleton({ size = 'md' }: AvatarSkeletonProps) {
-  const sizeClasses = {
-    sm: 'w-8 h-8',
-    md: 'w-12 h-12',
-    lg: 'w-16 h-16',
-  };
-
+export function ListSkeleton({ items = 5 }: { items?: number }) {
   return (
-    <div
-      className={`${sizeClasses[size]} bg-gradient-to-r from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] rounded-full animate-pulse`}
-    />
-  );
-}
-
-// ============================================
-// GRID SKELETON
-// ============================================
-
-interface GridSkeletonProps {
-  columns?: number;
-  rows?: number;
-}
-
-export function GridSkeleton({ columns = 4, rows = 2 }: GridSkeletonProps) {
-  return (
-    <div
-      className={`grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-${columns}`}
-    >
-      {Array(columns * rows)
-        .fill(0)
-        .map((_, i) => (
-          <CardSkeleton key={i} />
-        ))}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: space[3] }}>
+      {Array.from({ length: items }).map((_, i) => (
+        <div key={i} style={{ ...cardStyle, padding: space[4], display: 'flex', gap: space[4], alignItems: 'center' }}>
+          <Shimmer height="40px" width="40px" rounded="full" />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: space[2] }}>
+            <Shimmer height="16px" width="40%" />
+            <Shimmer height="12px" width="66%" />
+          </div>
+          <Shimmer height="32px" width="80px" rounded="md" />
+        </div>
+      ))}
     </div>
-  );
+  )
 }
 
-/**
- * USAGE EXAMPLES:
- *
- * import {
- *   CardSkeleton,
- *   TableSkeleton,
- *   DealDetailSkeleton,
- *   FormSkeleton,
- *   GridSkeleton,
- * } from '@/components/Skeleton'
- *
- * // Deal card loading
- * <CardSkeleton />
- *
- * // Financial table loading
- * <TableSkeleton rows={5} columns={8} />
- *
- * // Deal detail page loading
- * <DealDetailSkeleton />
- *
- * // Form loading
- * <FormSkeleton fields={6} />
- *
- * // Grid of cards loading
- * <GridSkeleton columns={4} rows={2} />
- */
+// ━━━ Form ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+export function FormSkeleton({ fields = 4 }: { fields?: number }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: space[5] }}>
+      {Array.from({ length: fields }).map((_, i) => (
+        <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: space[2] }}>
+          <Shimmer height="12px" width="25%" />
+          <Shimmer height="40px" rounded="md" />
+        </div>
+      ))}
+      <Shimmer height="40px" width="160px" rounded="md" />
+    </div>
+  )
+}
+
+// ━━━ Stats row ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+export function StatsSkeleton() {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: space[4] }}>
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} style={{ ...cardStyle, padding: space[5], textAlign: 'center', display: 'flex', flexDirection: 'column', gap: space[2] }}>
+          <Shimmer height="32px" width="50%" style={{ margin: '0 auto' }} />
+          <Shimmer height="14px" width="75%" style={{ margin: '0 auto' }} />
+        </div>
+      ))}
+    </div>
+  )
+}

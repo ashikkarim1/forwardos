@@ -400,3 +400,9 @@ body {
 .space-y-5   > * + * { margin-top: 1.25rem; }
 .space-y-6   > * + * { margin-top: 1.5rem; }
 .space-y-8   > * + * { margin-top: 2rem; }
+
+/* Skeleton shimmer animation — driven by Skeleton.tsx. */
+@keyframes fw-shimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
