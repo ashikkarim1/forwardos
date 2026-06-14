@@ -50,9 +50,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" style={{ colorScheme: 'light' }}>
       <head>
         <meta name="theme-color" content="#B8956A" />
+        {/* Force light mode site-wide: prevents OS-level "dark mode" preference
+            from styling native form controls / scrollbars dark, which would
+            break the champagne-on-cream brand. */}
+        <meta name="color-scheme" content="light" />
         {/* Favicon is served from src/app/icon.svg (the brand mark) automatically. */}
         {/* Structured data: Organization + WebSite (enables sitelinks search box) */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(organizationLd()) }} />

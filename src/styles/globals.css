@@ -427,3 +427,25 @@ textarea:focus-visible {
 input[type="range"], input[type="checkbox"] {
   accent-color: #B8956A;                  /* palette.champagne[500] */
 }
+
+/* Light-mode lock — never inherit the visitor's OS dark preference.
+ * Belt-and-braces alongside the <html style="color-scheme:light"> and
+ * <meta name="color-scheme" content="light"> declarations in layout.tsx.
+ * If we ever want to opt back into dark mode, replace `light` with `light dark`
+ * and add a proper dark token resolver in tokens.ts. */
+:root {
+  color-scheme: light;
+}
+
+/* Even if the OS strongly prefers dark, force the page background/text to
+ * stay light. Some browsers (Safari) override our root color-scheme; this
+ * pins it. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: light;
+  }
+  html, body {
+    background: #FFFFFF !important;
+    color: #0F1419 !important;
+  }
+}
