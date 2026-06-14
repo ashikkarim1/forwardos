@@ -21,6 +21,7 @@ import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { LockedFeature } from '@/components/dashboard/LockedFeature'
 import { PublicHeader } from '@/components/Navigation'
+import { IntelligenceNav } from '@/components/intelligence/IntelligenceNav'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Comparables · Forward Intelligence' }
@@ -172,6 +173,8 @@ export default async function ComparablesPage() {
             <div>{rows.length} comparable cells</div>
           </div>
         </div>
+
+        <IntelligenceNav active="comparables" />
 
         {!hasAccess && (
           <div style={{

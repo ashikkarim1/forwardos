@@ -26,6 +26,7 @@ import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { LockedFeature } from '@/components/dashboard/LockedFeature'
 import { PublicHeader } from '@/components/Navigation'
+import { IntelligenceNav } from '@/components/intelligence/IntelligenceNav'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Heat Maps · Forward Intelligence' }
@@ -163,6 +164,8 @@ export default async function HeatMapsPage() {
             <div>Refreshed just now</div>
           </div>
         </div>
+
+        <IntelligenceNav active="heat-maps" />
 
         {!hasAccess && (
           <div style={{

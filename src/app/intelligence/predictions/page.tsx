@@ -26,6 +26,7 @@ import { prisma } from '@/lib/prisma'
 import { predictCloseProbability, BAND_COPY, type Prediction } from '@/lib/predictions'
 import { LockedFeature } from '@/components/dashboard/LockedFeature'
 import { PublicHeader } from '@/components/Navigation'
+import { IntelligenceNav } from '@/components/intelligence/IntelligenceNav'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'M&A Predictions · Forward Intelligence' }
@@ -136,6 +137,8 @@ export default async function PredictionsPage() {
             <span style={{ fontSize: 11, color: '#6C7480' }}>{headerCount}</span>
           </div>
         </div>
+
+        <IntelligenceNav active="predictions" />
 
         {!hasAccess && (
           <div style={{
