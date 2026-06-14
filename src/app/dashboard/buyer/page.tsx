@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   Search, Filter, Eye, Clock, TrendingUp, Zap, Lock, CheckCircle2, AlertCircle,
@@ -1028,13 +1029,13 @@ export default function BuyerDashboardV2() {
                 <div className="lg:col-span-2 flex flex-col gap-2">
                   {access.status === 'active' && (
                     <>
-                      <button className="px-4 py-2 rounded-lg font-bold text-white transition-all hover:opacity-90" style={{ background: COLOR_ACCENT }}>
+                      <Link href="/data-rooms" className="px-4 py-2 rounded-lg font-bold text-white text-center transition-all hover:opacity-90" style={{ background: COLOR_ACCENT }}>
                         Open Data Room →
-                      </button>
+                      </Link>
                       {access.daysRemaining && access.daysRemaining <= 2 && (
-                        <button className="px-4 py-2 rounded-lg font-bold border" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
+                        <Link href="/data-rooms" className="px-4 py-2 rounded-lg font-bold border text-center" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
                           Request Extension
-                        </button>
+                        </Link>
                       )}
                     </>
                   )}
@@ -1044,9 +1045,9 @@ export default function BuyerDashboardV2() {
                     </p>
                   )}
                   {access.status === 'expired' && (
-                    <button className="px-4 py-2 rounded-lg font-bold border" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
+                    <Link href="/data-rooms" className="px-4 py-2 rounded-lg font-bold border text-center" style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
                       Request Access Again
-                    </button>
+                    </Link>
                   )}
                 </div>
               </div>

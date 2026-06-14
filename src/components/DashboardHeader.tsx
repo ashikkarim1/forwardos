@@ -170,14 +170,20 @@ export function DashboardHeader({
 
                 {/* Menu Items */}
                 <div className="p-2 space-y-1">
-                  <button
+                  <Link
+                    href="/account"
                     className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left"
                     style={{ color: COLOR_PRIMARY }}
                   >
                     <Settings className="w-4 h-4" />
                     <span className="text-sm font-medium">Account Settings</span>
-                  </button>
+                  </Link>
                   <button
+                    type="button"
+                    onClick={async () => {
+                      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {})
+                      window.location.href = '/'
+                    }}
                     className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors text-left"
                     style={{ color: COLOR_PRIMARY }}
                   >
