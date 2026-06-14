@@ -78,5 +78,41 @@ export async function GET(req: NextRequest) {
   }
   out.prices = prices
 
+  // Create a fresh session right now and report what Stripe says about it.
+  // If anything's wrong on Stripe's side, we'll see it here.
+  try {
+    const priceId = process.env.STRIPE_PRICE_SELLER_PREMIUM
+    if (priceId) {
+      const session = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        customer_email: 'diag-buyer@forwardos.ai',
+        line_items: [{ price: priceId, quantity: 1 }],
+        success_url: 'https://www.forwardos.ai/seller/checkout/success?sessionId={CHECKOUT_SESSION_ID}',
+        cancel_url: 'https://www.forwardos.ai/pricing',
+      })
+      out.testSession = {
+        id: session.id,
+        livemode: session.livemode,
+        status: session.status,
+        url: session.url,
+        expiresAt: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : null,
+        currency: session.currency,
+        amountTotal: session.amount_total,
+      }
+      // Now retrieve it back to see what status Stripe reports.
+      const retrieved = await stripe.checkout.sessions.retrieve(session.id)
+      out.testSessionRetrieved = {
+        status: retrieved.status,
+        paymentStatus: retrieved.payment_status,
+        url: retrieved.url,
+      }
+    }
+  } catch (e) {
+    out.testSessionError = e instanceof Error ? e.message : String(e)
+    if (e instanceof Error && 'raw' in e) {
+      out.testSessionRaw = (e as unknown as { raw: unknown }).raw
+    }
+  }
+
   return NextResponse.json(out, { status: 200 })
 }
