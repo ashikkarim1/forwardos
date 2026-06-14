@@ -203,7 +203,18 @@ export function DailyIntelligenceDashboard({
       </motion.div>
 
       {/* ==================== MARKET SIGNALS TAB ==================== */}
-      {selectedTab === 'signals' && (
+      {selectedTab === 'signals' && marketSignals.length === 0 && (
+        <motion.div
+          className="p-8 rounded-lg border-2 text-center"
+          style={{ borderColor: COLOR_BORDER, background: '#FFFFFF' }}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+        >
+          <p style={{ color: COLOR_TEXT_SECONDARY, margin: 0, fontSize: 14 }}>
+            Market signals are computed from live Forward listing activity. As more deals come online, your personalized signals will land here.
+          </p>
+        </motion.div>
+      )}
+      {selectedTab === 'signals' && marketSignals.length > 0 && (
         <motion.div
           className="grid grid-cols-1 lg:grid-cols-2 gap-4"
           initial={{ opacity: 0, y: 10 }}

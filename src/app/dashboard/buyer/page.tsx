@@ -1,8 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+
+// Real market signals fetched from /api/dashboard/signals on mount.
+// Replaces the previously hardcoded "Healthcare Sector Heat Spike +34%"
+// strings that misled customers into thinking they were buying real intel.
+interface MarketSignal {
+  id: string; title: string; description: string
+  type: 'hot' | 'cold' | 'trend' | 'alert'
+  metric: string; change: number; industry?: string
+  insight: string; action?: string; actionHref?: string
+}
 import {
   Search, Filter, Eye, Clock, TrendingUp, Zap, Lock, CheckCircle2, AlertCircle,
   ChevronRight, Calendar, MessageSquare, Share2, Download, X, Star, Building2, MapPin
@@ -535,6 +545,16 @@ export default function BuyerDashboardV2() {
   const [saved, setSaved] = useState<string[]>(['1', '4', '7', '12', '14'])
   const [showAccessRequest, setShowAccessRequest] = useState(false)
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null)
+  const [marketSignals, setMarketSignals] = useState<MarketSignal[]>([])
+
+  // Pull real signals on mount. Empty array if we haven't loaded yet or
+  // the compute errored — better blank than stale mock numbers.
+  useEffect(() => {
+    fetch('/api/dashboard/signals?role=buyer', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : { signals: [] }))
+      .then((d) => setMarketSignals(Array.isArray(d?.signals) ? d.signals : []))
+      .catch(() => setMarketSignals([]))
+  }, [])
 
   const filteredDeals = mockFeaturedDeals.filter(d =>
     d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -648,55 +668,7 @@ export default function BuyerDashboardV2() {
           <motion.div className="mb-12" variants={itemVariants}>
             <DailyIntelligenceDashboard
               userType="buyer"
-              marketSignals={[
-                {
-                  id: '1',
-                  title: 'Healthcare Sector Heat Spike',
-                  description: '5 new healthcare deals uploaded in last 24 hours. Buyer interest up 34%.',
-                  type: 'hot',
-                  metric: '34%',
-                  change: 18,
-                  industry: 'Healthcare',
-                  insight: 'Healthcare M&A activity is accelerating. This is a rare window of opportunity. Current multiples are 4.2-4.8x revenue.',
-                  action: 'View all healthcare deals',
-                  actionHref: '/deals?industry=HEALTHCARE',
-                },
-                {
-                  id: '2',
-                  title: 'SaaS Valuations Stabilizing',
-                  description: 'After volatility, SaaS multiples are settling at historical averages.',
-                  type: 'trend',
-                  metric: '3.8x',
-                  change: -8,
-                  industry: 'SaaS',
-                  insight: 'This might be a good entry point for SaaS acquisitions. Previous peak was 5.2x.',
-                  action: 'Compare SaaS valuations',
-                  actionHref: '/deals/comparables',
-                },
-                {
-                  id: '3',
-                  title: 'Real Estate: Buyer Retreat',
-                  description: 'Real estate deal interest down 22% month-over-month.',
-                  type: 'cold',
-                  metric: '-22%',
-                  change: -22,
-                  industry: 'Real Estate',
-                  insight: 'Low competition in real estate right now. Sellers more flexible on terms.',
-                  action: 'Explore real estate deals',
-                  actionHref: '/deals?industry=REAL_ESTATE',
-                },
-                {
-                  id: '4',
-                  title: 'ALERT: Seller KYC Issue',
-                  description: 'One of your saved deals has unresolved KYC compliance.',
-                  type: 'alert',
-                  metric: '1 deal',
-                  change: 0,
-                  insight: 'CloudCore Infrastructure awaiting seller identity verification. Data room access may be delayed.',
-                  action: 'Follow up',
-                  actionHref: '/my-favourites',
-                },
-              ]}
+              marketSignals={marketSignals}
               dealMomentum={[
                 {
                   id: '1',

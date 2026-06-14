@@ -72,7 +72,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/account', icon: Settings, label: 'Account Settings', badge: null, key: 'account' },
       { href: '/account/billing', icon: CreditCard, label: 'Plans & Billing', badge: null, key: 'billing' },
-      { href: '/notifications', icon: Bell, label: 'Notifications', badge: null, key: 'notifications' },
+      { href: '/account/notifications', icon: Bell, label: 'Notifications', badge: null, key: 'notifications' },
       { href: '/help', icon: HelpCircle, label: 'Help & Docs', badge: null, key: 'help' },
     ],
   },

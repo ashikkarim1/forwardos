@@ -1,6 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+// Real signals fetched from /api/dashboard/signals — see same hook on
+// buyer/broker dashboards. Replaces previously hardcoded "Healthcare
+// Spike +45%" mocks.
+interface MarketSignal {
+  id: string; title: string; description: string
+  type: 'hot' | 'cold' | 'trend' | 'alert'
+  metric: string; change: number; industry?: string
+  insight: string; action?: string; actionHref?: string
+}
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
@@ -172,6 +182,14 @@ const mockDeals: Deal[] = [
 export default function SellerDashboardV2() {
   const [activeTab, setActiveTab] = useState<'inbox' | 'deals' | 'analytics' | 'settings' | 'pipeline'>('inbox')
   const [expandedRequest, setExpandedRequest] = useState<string | null>(null)
+  const [marketSignals, setMarketSignals] = useState<MarketSignal[]>([])
+
+  useEffect(() => {
+    fetch('/api/dashboard/signals?role=seller', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : { signals: [] }))
+      .then((d) => setMarketSignals(Array.isArray(d?.signals) ? d.signals : []))
+      .catch(() => setMarketSignals([]))
+  }, [])
   const [showApprovalModal, setShowApprovalModal] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<DataRoomRequest | null>(null)
   const [showDealCreation, setShowDealCreation] = useState(false)
@@ -411,50 +429,7 @@ export default function SellerDashboardV2() {
       <motion.div variants={itemVariants} className="mb-12">
         <DailyIntelligenceDashboard
           userType="seller"
-          marketSignals={[
-            {
-              id: '1',
-              title: 'Buyer Interest: Healthcare Spike',
-              description: '8 qualified buyers browsing healthcare sector today. Your deals are in high demand.',
-              type: 'hot',
-              metric: '+8 viewers',
-              change: 45,
-              industry: 'Healthcare',
-              insight: 'Healthcare buyers are actively searching. Now is an optimal time to engage with serious prospects.',
-              action: 'View interested buyers',
-            },
-            {
-              id: '2',
-              title: 'Market Comparables Updated',
-              description: 'Similar SaaS companies trading at 4.2-4.8x revenue multiples.',
-              type: 'trend',
-              metric: '4.5x avg',
-              change: 5,
-              industry: 'SaaS',
-              insight: 'Your SaaS company at 3.8x revenue is attractively priced. Consider this window.',
-              action: 'View comparables',
-            },
-            {
-              id: '3',
-              title: 'Broker Network Activity',
-              description: '2 brokers are actively pitching your deal to their buyer networks.',
-              type: 'hot',
-              metric: '2 brokers',
-              change: 100,
-              insight: 'Broker engagement is high. Multiple channels increasing buyer visibility.',
-              action: 'Track broker deals',
-            },
-            {
-              id: '4',
-              title: 'ALERT: Deal Stalling Risk',
-              description: 'TechFlow in Due Diligence for 32 days. Industry average is 21 days.',
-              type: 'alert',
-              metric: '32 days',
-              change: 0,
-              insight: 'This deal may lose momentum. Consider proactive outreach to accelerate.',
-              action: 'Take action',
-            },
-          ]}
+          marketSignals={marketSignals}
           dealMomentum={[
             {
               id: '1',
@@ -649,11 +624,17 @@ export default function SellerDashboardV2() {
                         ? Request Info
                       </Link>
                       <button
-                        onClick={() => {
-                          if (confirm(`Decline ${request.buyerName}'s data room request for ${request.dealName}?`)) {
-                            // TODO(api): POST /api/seller/data-room/decline once endpoint lands
-                            alert('Request marked declined. Buyer will be notified.')
-                          }
+                        onClick={async () => {
+                          if (!confirm(`Decline ${request.buyerName}'s data room request for ${request.dealName}?`)) return
+                          const message = prompt('Optional note to send the buyer with the decline?') || undefined
+                          const r = await fetch(`/api/data-room/access/${request.id}`, {
+                            method: 'POST',
+                            credentials: 'include',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'decline', message }),
+                          })
+                          if (r.ok) alert('Declined. Buyer notified by email.')
+                          else alert('Could not decline. Check that the inquiry is still open.')
                         }}
                         className="px-4 py-2 rounded-lg font-bold border"
                         style={{ borderColor: '#EF4444', color: '#EF4444' }}

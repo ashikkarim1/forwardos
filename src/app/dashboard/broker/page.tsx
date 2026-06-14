@@ -1,6 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+// Real signals fetched from /api/dashboard/signals on mount. Replaces
+// previously hardcoded portfolio metrics (Portfolio Heat: SaaS Spike,
+// Commission Opportunity AED 450K, etc.) that misled paying brokers.
+interface MarketSignal {
+  id: string; title: string; description: string
+  type: 'hot' | 'cold' | 'trend' | 'alert'
+  metric: string; change: number; industry?: string
+  insight: string; action?: string; actionHref?: string
+}
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
@@ -126,6 +136,14 @@ const mockDeals: PipelineDeal[] = [
 export default function BrokerDashboardV2() {
   const [activeTab, setActiveTab] = useState<'inbox' | 'deals' | 'pipeline' | 'commissions' | 'analytics'>('inbox')
   const [delegatedBroker, setDelegatedBroker] = useState(true) // For this example, assume delegated
+  const [marketSignals, setMarketSignals] = useState<MarketSignal[]>([])
+
+  useEffect(() => {
+    fetch('/api/dashboard/signals?role=broker', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : { signals: [] }))
+      .then((d) => setMarketSignals(Array.isArray(d?.signals) ? d.signals : []))
+      .catch(() => setMarketSignals([]))
+  }, [])
 
   const totalCommissionEarned = 195000
   const thisMonthCommission = 87500
@@ -268,50 +286,7 @@ export default function BrokerDashboardV2() {
       <motion.div className="mb-12">
         <DailyIntelligenceDashboard
           userType="broker"
-          marketSignals={[
-            {
-              id: '1',
-              title: 'Portfolio Heat: SaaS Spike',
-              description: '12 qualified buyers browsing 4 of your SaaS portfolio companies.',
-              type: 'hot',
-              metric: '+45%',
-              change: 45,
-              industry: 'SaaS',
-              insight: 'Your SaaS clients are in high demand. Expected 2-3 term sheets this week.',
-              action: 'Alert clients',
-            },
-            {
-              id: '2',
-              title: 'Market Window: Healthcare Closing',
-              description: 'Healthcare M&A window peaked. Multiples moving down 8% this week.',
-              type: 'alert',
-              metric: '4.2x',
-              change: -8,
-              industry: 'Healthcare',
-              insight: 'If you have healthcare clients, this is final window. Recommend acceleration.',
-              action: 'Client alert',
-            },
-            {
-              id: '3',
-              title: 'Commission Opportunity',
-              description: 'Two deals in your pipeline approaching close. Combined AED 450K commission.',
-              type: 'trend',
-              metric: 'AED 450K',
-              change: 100,
-              insight: 'TechFlow and Emirates likely to close in next 30 days. Plan cash flow.',
-              action: 'Track deals',
-            },
-            {
-              id: '4',
-              title: 'ALERT: Broker Matching',
-              description: 'Your SaaS seller matches 8 interested buyers. Multi-broker competition.',
-              type: 'alert',
-              metric: '8 buyers',
-              change: 0,
-              insight: 'Need to accelerate TechFlow deal or risk losing to competing brokers.',
-              action: 'Escalate',
-            },
-          ]}
+          marketSignals={marketSignals}
           dealMomentum={[
             {
               id: '1',
@@ -501,11 +476,16 @@ export default function BrokerDashboardV2() {
 
                   <div className="lg:col-span-2 flex gap-2">
                     <button
-                      onClick={() => {
-                        if (confirm(`Approve ${request.buyerName}'s data room access for ${request.dealName}?`)) {
-                          // TODO(api): POST /api/broker/data-room/approve once endpoint lands
-                          alert('Approved. Buyer notified and data room access granted.')
-                        }
+                      onClick={async () => {
+                        if (!confirm(`Approve ${request.buyerName}'s data room access for ${request.dealName}?`)) return
+                        const r = await fetch(`/api/data-room/access/${request.id}`, {
+                          method: 'POST',
+                          credentials: 'include',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ action: 'approve' }),
+                        })
+                        if (r.ok) alert('Approved. Buyer notified by email and data room access granted.')
+                        else alert('Could not approve. The inquiry may have been closed.')
                       }}
                       className="flex-1 px-4 py-2 rounded-lg font-bold text-white transition-all hover:opacity-90"
                       style={{ background: '#10B981' }}
@@ -520,11 +500,17 @@ export default function BrokerDashboardV2() {
                       ? Request Info
                     </Link>
                     <button
-                      onClick={() => {
-                        if (confirm(`Decline ${request.buyerName}'s request for ${request.dealName}?`)) {
-                          // TODO(api): POST /api/broker/data-room/decline once endpoint lands
-                          alert('Request declined. Buyer notified.')
-                        }
+                      onClick={async () => {
+                        if (!confirm(`Decline ${request.buyerName}'s request for ${request.dealName}?`)) return
+                        const message = prompt('Optional note to send the buyer with the decline?') || undefined
+                        const r = await fetch(`/api/data-room/access/${request.id}`, {
+                          method: 'POST',
+                          credentials: 'include',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ action: 'decline', message }),
+                        })
+                        if (r.ok) alert('Declined. Buyer notified by email.')
+                        else alert('Could not decline. The inquiry may have been closed.')
                       }}
                       className="px-4 py-2 rounded-lg font-bold border"
                       style={{ borderColor: '#EF4444', color: '#EF4444' }}
