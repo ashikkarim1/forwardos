@@ -125,13 +125,21 @@ async function loadComps(): Promise<CompRow[]> {
 }
 
 export default async function ComparablesPage() {
+  // HARD GATE: Buyer Premium ($99/mo) or ADMIN only. Anonymous and free
+  // signed-in users see the pitch only — no industry/region/count/median
+  // leakage, since even structure is a competitive advantage.
   const session = await getSession()
-  if (!session) {
+  const user = session ? await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { buyerPlanTier: true, role: true },
+  }) : null
+  const hasAccess = user?.role === 'ADMIN' || user?.buyerPlanTier === 'PREMIUM_BUYER'
+  if (!hasAccess) {
     return (
       <LockedFeature
         kicker="Intelligence"
         title="Deal Comparables"
-        pitch="Sign in to anchor your valuation in real transactions, not gut feel."
+        pitch="Anchor your valuation in real transactions, not gut feel. Live multiples by industry × region, computed from every active Forward listing."
         bullets={[
           'Median EBITDA & revenue multiples by sector × region',
           'Range (p25 / median / p75) for every cell',
@@ -142,12 +150,6 @@ export default async function ComparablesPage() {
       />
     )
   }
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
-    select: { buyerPlanTier: true, role: true },
-  })
-  const hasAccess = user?.role === 'ADMIN' || user?.buyerPlanTier === 'PREMIUM_BUYER'
 
   const rows = await loadComps()
   const totalDeals = rows.reduce((s, r) => s + r.count, 0)
@@ -176,30 +178,6 @@ export default async function ComparablesPage() {
 
         <IntelligenceNav active="comparables" />
 
-        {!hasAccess && (
-          <div style={{
-            background: 'linear-gradient(135deg, #FAF6EF 0%, #F2EAD9 100%)',
-            border: '1px solid #E5D5B5', borderRadius: 14, padding: '18px 22px',
-            marginBottom: 24, display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap',
-          }}>
-            <div style={{ width: 40, height: 40, borderRadius: 999, background: '#0F1419', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
-              <Sparkles size={18} />
-            </div>
-            <div style={{ flex: 1, minWidth: 260 }}>
-              <p style={{ margin: 0, fontWeight: 700, color: '#0F1419', fontSize: 14 }}>Unlock revenue and EBITDA multiples per cell</p>
-              <p style={{ margin: 0, fontSize: 12, color: '#454D58' }}>Buyer Premium · $99/mo · cancel anytime. Free buyers see the structure; Premium sees the numbers.</p>
-            </div>
-            <Link href="/api/billing/checkout?tier=BUYER_PREMIUM" style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '9px 16px', borderRadius: 8,
-              background: '#0F1419', color: '#fff',
-              fontSize: 13, fontWeight: 600, textDecoration: 'none',
-            }}>
-              Upgrade <ArrowRight size={13} />
-            </Link>
-          </div>
-        )}
-
         {rows.length === 0 ? (
           <div style={{ background: '#fff', border: '1px solid #E8EAED', borderRadius: 12, padding: '48px 24px', textAlign: 'center', color: '#6C7480' }}>
             Not enough active listings to compute comparables yet. We need at least 3 priced listings per industry × region to publish multiples.
@@ -226,10 +204,10 @@ export default async function ComparablesPage() {
                     <td style={td}>{r.count}</td>
                     <td style={td}>{r.medianAskingMillions ? `$${r.medianAskingMillions}M` : '—'}</td>
                     <td style={td}>
-                      {hasAccess ? <MultipleCell mult={r.revMultiple} suffix="x" /> : <LockedCell />}
+                      <MultipleCell mult={r.revMultiple} suffix="x" />
                     </td>
                     <td style={td}>
-                      {hasAccess ? <MultipleCell mult={r.ebitdaMultiple} suffix="x" /> : <LockedCell />}
+                      <MultipleCell mult={r.ebitdaMultiple} suffix="x" />
                     </td>
                     <td style={{ ...td, textAlign: 'right' }}>
                       <Link href={`/deals?industry=${r.industry}`} style={{

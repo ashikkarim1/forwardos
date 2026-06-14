@@ -319,6 +319,10 @@ model User {
   // Billing & Subscriptions
   subscription          Subscription? @relation("UserSubscription")
 
+  // Notifications v1
+  notificationPreference NotificationPreference?
+  pendingAlerts          PendingAlert[]
+
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
   lastLoginAt           DateTime?
@@ -560,6 +564,7 @@ model Deal {
   savedBy               SavedDeal[]
   photos                BusinessPhoto[] @relation("DealPhotos")
   messages              Message[] @relation("DealMessages")
+  pendingAlerts         PendingAlert[]
   dataRoom              DataRoom?
   enquiries             Enquiry[]
   seriousnessScores     BuyerSeriousness[]
@@ -1301,6 +1306,93 @@ model AlertDelivery {
   sentAt                DateTime  @default(now())
 
   @@index([savedSearchId])
+}
+
+// ==================== NOTIFICATIONS v1 ====================
+// Per-user notification preferences + a buffer table that smooths
+// match events into digest emails. The retention discipline lives here:
+// hard daily caps, quiet hours, smart batching, per-category opt-outs,
+// and engagement-decay all flow through these two models.
+
+model NotificationPreference {
+  id                    String    @id @default(cuid())
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String    @unique
+
+  // Default cadence for match alerts. Free users default to WEEKLY,
+  // Premium defaults to DAILY ("Smart Daily" — one morning digest).
+  // INSTANT is opt-in only, and even then is batched in 15-min windows.
+  matchAlertCadence     AlertFrequency @default(WEEKLY)
+
+  // Quiet hours in user's local time. 21 → 7 means no emails 9pm–7am.
+  // Anything that would land in the quiet window gets queued to the
+  // first send slot after quietHoursEnd.
+  quietHoursStart       Int       @default(21)    // 0-23
+  quietHoursEnd         Int       @default(7)
+  // Minutes from UTC. e.g. +240 = Gulf, -300 = US East. We default to 0
+  // and let the client/profile flow set this from browser timezone.
+  timezoneOffsetMin     Int       @default(0)
+
+  // Hard cap on emails per 24h. Even Premium INSTANT respects this.
+  // 2 by default — conservative anti-fatigue setting.
+  maxDailyEmails        Int       @default(2)
+
+  // JSON array of disabled non-transactional categories, e.g.
+  // ["match", "price-change", "heat-spike"]. Transactional categories
+  // (security, billing, inquiry-response, NDA, KYC) are NEVER listed
+  // here and cannot be opted out of — they always send.
+  disabledCategories    String    @db.Text @default("[]")
+
+  // Engagement-decay: set whenever the user opens or clicks an email.
+  // If older than 14 days, the send-window auto-steps the user down a
+  // cadence tier to protect inbox trust.
+  lastEmailEngagedAt    DateTime?
+
+  // Audit: when we last sent ANY non-transactional email to this user.
+  // Used together with maxDailyEmails to enforce the daily cap.
+  lastNonTxEmailSentAt  DateTime?
+  emailsSentToday       Int       @default(0)
+  emailsSentTodayDate   DateTime? // the date the counter applies to
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+// Buffer between match-evaluation and email-send. Each row is one
+// (user, deal, savedSearch) match. The send-window cron drains it
+// according to each user's preferences and tier, batches into a single
+// digest email per send, dedupes the same deal across multiple of a
+// user's saved searches, and clears sent rows.
+//
+// Why a buffer table instead of computing matches at send time?
+// (1) Match work runs ON DEAL PUBLISH (fast path, no batched queries),
+// (2) Send work decides WHO to send to and WHEN (slow path, every 15
+//     min), and (3) the table is the natural retry queue if email
+//     delivery fails.
+model PendingAlert {
+  id                    String    @id @default(cuid())
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                String
+  deal                  Deal      @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId                String
+  savedSearchId         String?
+
+  // 'match' for new-listing matches. Extensible: 'price-change',
+  // 'pre-listing', 'heat-spike', 'comparable-closed', etc.
+  category              String    @default("match")
+
+  // 0-100 importance. Cron may filter low-importance into the weekly
+  // digest even for INSTANT users to protect their attention.
+  importance            Int       @default(50)
+
+  createdAt             DateTime  @default(now())
+
+  // Same (user, deal, savedSearch, category) tuple can't double-buffer.
+  @@unique([userId, dealId, savedSearchId, category])
+  @@index([userId, createdAt])
+  @@index([createdAt])
 }
 
 // ==================== FINANCE CENTER (UAE + CANADA) ====================

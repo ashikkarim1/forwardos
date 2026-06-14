@@ -116,13 +116,21 @@ const INDUSTRY_LABEL: Record<Industry, string> = {
 }
 
 export default async function HeatMapsPage() {
+  // HARD GATE: this page is Buyer Premium ($99/mo) or ADMIN only.
+  // Anyone else — anonymous OR signed-in-but-free — sees the pitch.
+  // No structural leak: counts, bands, industries are NOT rendered.
   const session = await getSession()
-  if (!session) {
+  const user = session ? await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { buyerPlanTier: true, role: true },
+  }) : null
+  const hasAccess = user?.role === 'ADMIN' || user?.buyerPlanTier === 'PREMIUM_BUYER'
+  if (!hasAccess) {
     return (
       <LockedFeature
         kicker="Intelligence"
         title="Heat Maps"
-        pitch="Sign in to see where buyer demand is concentrating by industry × region."
+        pitch="See where buyer demand is concentrating in real time — by industry, region, and revenue band — so you can move on a deal before the market does."
         bullets={[
           'Live heat scores on every active listing',
           'Sector-by-region demand overlays for USA, Canada & UAE',
@@ -133,12 +141,6 @@ export default async function HeatMapsPage() {
       />
     )
   }
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
-    select: { buyerPlanTier: true, role: true },
-  })
-  const hasAccess = user?.role === 'ADMIN' || user?.buyerPlanTier === 'PREMIUM_BUYER'
 
   const grid = await loadGrid()
   const totalCount = INDUSTRIES.reduce((s, i) => s + REGIONS.reduce((t, r) => t + grid[i][r].count, 0), 0)
@@ -166,30 +168,6 @@ export default async function HeatMapsPage() {
         </div>
 
         <IntelligenceNav active="heat-maps" />
-
-        {!hasAccess && (
-          <div style={{
-            background: 'linear-gradient(135deg, #FAF6EF 0%, #F2EAD9 100%)',
-            border: '1px solid #E5D5B5', borderRadius: 14, padding: '18px 22px',
-            marginBottom: 24, display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap',
-          }}>
-            <div style={{ width: 40, height: 40, borderRadius: 999, background: '#0F1419', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
-              <Sparkles size={18} />
-            </div>
-            <div style={{ flex: 1, minWidth: 260 }}>
-              <p style={{ margin: 0, fontWeight: 700, color: '#0F1419', fontSize: 14 }}>Unlock cell-level heat scores and weekly trend lines</p>
-              <p style={{ margin: 0, fontSize: 12, color: '#454D58' }}>Buyer Premium · $99/mo · cancel anytime.</p>
-            </div>
-            <Link href="/api/billing/checkout?tier=BUYER_PREMIUM" style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              padding: '9px 16px', borderRadius: 8,
-              background: '#0F1419', color: '#fff',
-              fontSize: 13, fontWeight: 600, textDecoration: 'none',
-            }}>
-              Upgrade <ArrowRight size={13} />
-            </Link>
-          </div>
-        )}
 
         {/* Grid */}
         <div style={{
@@ -228,18 +206,10 @@ export default async function HeatMapsPage() {
                               {cell.count === 1 ? 'deal' : 'deals'}
                             </span>
                           </div>
-                          {hasAccess ? (
-                            cell.count > 0 && (
-                              <div style={{ fontSize: 11, fontWeight: 600, marginTop: 6 }}>
-                                heat {cell.medianHeat} · top {cell.topHeat}
-                              </div>
-                            )
-                          ) : (
-                            cell.count > 0 && (
-                              <div style={{ fontSize: 10, fontWeight: 600, marginTop: 6, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                                <Lock size={9} /> unlock heat
-                              </div>
-                            )
+                          {cell.count > 0 && (
+                            <div style={{ fontSize: 11, fontWeight: 600, marginTop: 6 }}>
+                              heat {cell.medianHeat} · top {cell.topHeat}
+                            </div>
                           )}
                         </Link>
                       </td>

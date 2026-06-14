@@ -85,14 +85,20 @@ async function loadScoredDeals(limit: number): Promise<ScoredDeal[]> {
 }
 
 export default async function PredictionsPage() {
+  // HARD GATE: Buyer Premium ($99/mo) or ADMIN only. Anonymous + free
+  // see the pitch with no scores, deals, or rationales leaked.
   const session = await getSession()
-
-  if (!session) {
+  const user = session ? await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { buyerPlanTier: true, role: true },
+  }) : null
+  const hasAccess = user?.role === 'ADMIN' || user?.buyerPlanTier === 'PREMIUM_BUYER'
+  if (!hasAccess) {
     return (
       <LockedFeature
         kicker="Intelligence"
         title="M&A Predictions"
-        pitch="Sign in to see close-probability scores on every active listing."
+        pitch="Our patent-pending model scores every active listing on close probability — and how soon. See which deals will actually close before the rest of the market does."
         bullets={[
           'Close-probability score on every active listing',
           'Predicted close window per deal',
@@ -104,15 +110,8 @@ export default async function PredictionsPage() {
     )
   }
 
-  // Plan tier gate — only PREMIUM_BUYER + ADMIN see real numbers.
-  const user = await prisma.user.findUnique({
-    where: { id: session.userId },
-    select: { buyerPlanTier: true, role: true },
-  })
-  const hasAccess = user?.role === 'ADMIN' || user?.buyerPlanTier === 'PREMIUM_BUYER'
-
-  const deals = await loadScoredDeals(hasAccess ? 50 : 5)
-  const headerCount = hasAccess ? deals.length : `${deals.length} of 50+ shown`
+  const deals = await loadScoredDeals(50)
+  const headerCount = deals.length
 
   return (
     <div style={{ minHeight: '100vh', background: '#FAF6EF' }}>
@@ -127,9 +126,7 @@ export default async function PredictionsPage() {
               Which deals are about to close?
             </h1>
             <p style={{ fontSize: 16, color: '#454D58', margin: 0, maxWidth: 640 }}>
-              Every active listing scored from 0–100 on close probability. {hasAccess
-                ? 'Drivers exposed on every card so you can act with the model, not against it.'
-                : 'Free buyers see the top 5 — Premium sees the full ranked list with drivers.'}
+              Every active listing scored from 0–100 on close probability. Drivers exposed on every card so you can act with the model, not against it.
             </p>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
@@ -140,41 +137,13 @@ export default async function PredictionsPage() {
 
         <IntelligenceNav active="predictions" />
 
-        {!hasAccess && (
-          <div style={{
-            background: 'linear-gradient(135deg, #FAF6EF 0%, #F2EAD9 100%)',
-            border: '1px solid #E5D5B5', borderRadius: 14, padding: '20px 24px',
-            marginBottom: 28, display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap',
-          }}>
-            <div style={{ width: 44, height: 44, borderRadius: 999, background: '#0F1419', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#fff', flexShrink: 0 }}>
-              <Sparkles size={20} />
-            </div>
-            <div style={{ flex: 1, minWidth: 260 }}>
-              <h3 style={{ margin: 0, marginBottom: 4, fontSize: 16, fontWeight: 700, color: '#0F1419' }}>
-                Unlock the full ranked list & driver signals
-              </h3>
-              <p style={{ margin: 0, fontSize: 13, color: '#454D58' }}>
-                Buyer Premium · $99/mo · cancel anytime. See every active deal scored, with the top three signals behind each score and a predicted close window.
-              </p>
-            </div>
-            <Link href="/api/billing/checkout?tier=BUYER_PREMIUM" style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '11px 20px', borderRadius: 10,
-              background: '#0F1419', color: '#fff',
-              fontSize: 14, fontWeight: 600, textDecoration: 'none',
-            }}>
-              Upgrade <ArrowRight size={14} />
-            </Link>
-          </div>
-        )}
-
         {deals.length === 0 ? (
           <div style={{ background: '#fff', border: '1px solid #E8EAED', borderRadius: 12, padding: '48px 24px', textAlign: 'center', color: '#6C7480' }}>
             No published deals to score yet. Check back shortly.
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {deals.map((d, i) => <PredictionRow key={d.id} rank={i + 1} deal={d} blurScore={!hasAccess} />)}
+            {deals.map((d, i) => <PredictionRow key={d.id} rank={i + 1} deal={d} />)}
           </div>
         )}
 
@@ -186,7 +155,7 @@ export default async function PredictionsPage() {
   )
 }
 
-function PredictionRow({ rank, deal, blurScore }: { rank: number; deal: ScoredDeal; blurScore: boolean }) {
+function PredictionRow({ rank, deal }: { rank: number; deal: ScoredDeal }) {
   const { prediction } = deal
   const band = BAND_COPY[prediction.band]
   const href = deal.slug ? `/listing/${deal.slug}` : `/deal/${deal.id}`
@@ -209,44 +178,29 @@ function PredictionRow({ rank, deal, blurScore }: { rank: number; deal: ScoredDe
           )}
         </div>
         <p style={{ margin: 0, fontSize: 13, color: '#454D58' }}>{prediction.rationale}</p>
-        {!blurScore && (
-          <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {prediction.drivers.map((dr) => (
-              <span key={dr.key} title={dr.detail} style={{
-                fontSize: 11, fontWeight: 600,
-                background: '#F4EFE5', color: '#8C6D45',
-                padding: '4px 8px', borderRadius: 999,
-              }}>
-                {dr.label} · {Math.round(dr.contribution * 100)}
-              </span>
-            ))}
-          </div>
-        )}
+        <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {prediction.drivers.map((dr) => (
+            <span key={dr.key} title={dr.detail} style={{
+              fontSize: 11, fontWeight: 600,
+              background: '#F4EFE5', color: '#8C6D45',
+              padding: '4px 8px', borderRadius: 999,
+            }}>
+              {dr.label} · {Math.round(dr.contribution * 100)}
+            </span>
+          ))}
+        </div>
       </div>
 
       <div style={{ textAlign: 'right', minWidth: 140 }}>
-        {blurScore ? (
-          <Link href="/api/billing/checkout?tier=BUYER_PREMIUM" style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            padding: '6px 10px', borderRadius: 8,
-            background: '#0F1419', color: '#fff',
-            fontSize: 12, fontWeight: 600, textDecoration: 'none',
-          }}>
-            <Lock size={11} /> Unlock score
-          </Link>
-        ) : (
-          <>
-            <div style={{ fontSize: 30, fontWeight: 800, color: band.color, lineHeight: 1 }}>
-              {prediction.score}
-            </div>
-            <div style={{ fontSize: 11, fontWeight: 600, color: band.color, marginTop: 4, letterSpacing: '0.04em' }}>
-              {band.label}
-            </div>
-            <div style={{ fontSize: 11, color: '#6C7480', marginTop: 6, display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
-              <TrendingUp size={11} /> Close in {prediction.closeWindowMonths.min}–{prediction.closeWindowMonths.max} mo
-            </div>
-          </>
-        )}
+        <div style={{ fontSize: 30, fontWeight: 800, color: band.color, lineHeight: 1 }}>
+          {prediction.score}
+        </div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: band.color, marginTop: 4, letterSpacing: '0.04em' }}>
+          {band.label}
+        </div>
+        <div style={{ fontSize: 11, color: '#6C7480', marginTop: 6, display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+          <TrendingUp size={11} /> Close in {prediction.closeWindowMonths.min}–{prediction.closeWindowMonths.max} mo
+        </div>
       </div>
     </div>
   )

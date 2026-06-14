@@ -178,6 +178,20 @@ export async function POST(request: NextRequest) {
       select: { id: true, slug: true, title: true },
     })
 
+    // ─── notification match-evaluation (fire-and-forget) ─────────────────
+    // Buffer matches into PendingAlert so the send-window cron can deliver
+    // them respecting each user's preferences. Never block the publish
+    // response on this — a slow query here would slow every listing.
+    void (async () => {
+      try {
+        const { evaluateNewListing } = await import('@/lib/notifications/match-evaluator')
+        const r = await evaluateNewListing(deal.id)
+        console.log('[notifications] match-evaluation', r)
+      } catch (e) {
+        console.error('[notifications] match-evaluation failed:', e)
+      }
+    })()
+
     // ─── persist uploaded photos (best-effort; do not block listing) ──────
     if (photos.length > 0) {
       try {
