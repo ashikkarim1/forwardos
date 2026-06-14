@@ -179,6 +179,44 @@ export default function BrokerDashboardV2() {
       />
 
       <motion.div className="max-w-7xl mx-auto px-8 py-8">
+        {/* Pipeline CTA — the Broker Pro flagship feature. Lives at top
+            of every broker dashboard view so brokers default to running
+            their day from here instead of context-switching to HubSpot. */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 p-6 rounded-2xl border flex items-center gap-6 flex-wrap"
+          style={{
+            background: 'linear-gradient(135deg, #FAF6EF 0%, #F2EAD9 100%)',
+            borderColor: '#E5D5B5',
+          }}
+        >
+          <div
+            className="flex items-center justify-center rounded-full flex-shrink-0"
+            style={{ width: 56, height: 56, background: '#0F1419', color: 'white' }}
+          >
+            <BarChart3 className="w-6 h-6" />
+          </div>
+          <div style={{ flex: 1, minWidth: 240 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#8C6D45', margin: 0, marginBottom: 4 }}>
+              Broker Pro · Pipeline
+            </p>
+            <h3 style={{ margin: 0, marginBottom: 4, fontSize: 18, fontWeight: 800, color: '#0F1419' }}>
+              Run every inquiry through one Kanban
+            </h3>
+            <p style={{ margin: 0, fontSize: 14, color: '#454D58' }}>
+              Auto-derived stages from NDA + data room signals. Replace your CRM + spreadsheet — every buyer, deal, and conversation in one place.
+            </p>
+          </div>
+          <Link
+            href="/dashboard/broker/pipeline"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-bold text-white text-sm"
+            style={{ background: '#0F1419', textDecoration: 'none' }}
+          >
+            Open pipeline <ChevronRight className="w-4 h-4" />
+          </Link>
+        </motion.div>
+
         {/* Header removed - now in DashboardHeader */}
         <motion.div className="mb-8" style={{ display: 'none' }}>
           <div className="flex items-center justify-between mb-6">

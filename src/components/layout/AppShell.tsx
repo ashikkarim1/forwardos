@@ -27,6 +27,7 @@ const NAV_GROUPS = [
     collapsible: true,
     items: [
       { href: '/deals', icon: Target, label: 'Marketplace', badge: 'Hot', key: 'deal-discovery' },
+      { href: '/dashboard/broker/pipeline', icon: BarChart3, label: 'Pipeline (Broker)', badge: 'Pro', key: 'broker-pipeline', roles: ['BROKER', 'ADMIN'] as string[] },
       { href: '/deals/heat-maps', icon: Zap, label: 'Heat Maps', badge: null, key: 'heat-maps' },
       { href: '/deals/comparables', icon: BarChart3, label: 'Comparables', badge: 'New', key: 'comparables' },
     ],
@@ -126,14 +127,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       .catch(() => {})
   }, [])
 
-  // Filter MY DASHBOARD to the caller's role (admins see all).
+  // Filter nav items by role.
+  //   - MY DASHBOARD section: keep only the caller's own role dashboard
+  //     (admins see all three for support).
+  //   - Any other item with an explicit `roles` list: visible only to
+  //     those roles (e.g. Pipeline is BROKER/ADMIN only).
   const visibleGroups = useMemo(() => {
     return NAV_GROUPS.map((g) => {
-      if (g.section !== 'MY DASHBOARD') return g
+      // Strip items that declare a roles allowlist the caller isn't in.
+      const items = g.items.filter((i) => {
+        const allowed = (i as { roles?: string[] }).roles
+        if (!allowed) return true
+        if (!role) return false
+        return allowed.includes(role)
+      })
+      if (g.section !== 'MY DASHBOARD') return { ...g, items }
       if (!role) return { ...g, items: [] }
-      if (role === 'ADMIN') return g
+      if (role === 'ADMIN') return { ...g, items }
       const keep = `${role.toLowerCase()}-dashboard`
-      return { ...g, items: g.items.filter((i) => i.key === keep) }
+      return { ...g, items: items.filter((i) => i.key === keep) }
     })
   }, [role])
 
