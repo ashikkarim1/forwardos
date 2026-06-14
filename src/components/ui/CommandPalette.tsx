@@ -76,7 +76,15 @@ export function CommandPaletteProvider() {
   }
 
   return (
-    <Command.Dialog
+    <>
+      {/* Backdrop must be a SIBLING of Command.Dialog — not a child.
+          The dialog uses `transform: translateX(-50%)`, which makes any
+          `position: fixed` descendant get positioned relative to (and
+          clipped by) the dialog box instead of the viewport. Nesting it
+          inside made the overlay paint only inside the popup, which is
+          why the panel looked washed-out grey. */}
+      <Backdrop visible={open} onClick={() => setOpen(false)} />
+      <Command.Dialog
       open={open}
       onOpenChange={setOpen}
       label="Command palette"
@@ -95,7 +103,6 @@ export function CommandPaletteProvider() {
         overflow: 'hidden',
       }}
     >
-      <Backdrop visible={open} onClick={() => setOpen(false)} />
       <div style={{ display: 'flex', alignItems: 'center', gap: space[3], padding: `${space[3]} ${space[4]}`, borderBottom: `1px solid ${semantic.border.subtle}` }}>
         <Search size={16} style={{ color: semantic.text.tertiary }} />
         <Command.Input
@@ -188,6 +195,7 @@ export function CommandPaletteProvider() {
         </span>
       </div>
     </Command.Dialog>
+    </>
   )
 }
 
