@@ -70,6 +70,19 @@ export default function MarketplacePage() {
   const [selectedSellerTypes, setSelectedSellerTypes] = useState<string[]>([])
   const [selectedMotivations, setSelectedMotivations] = useState<string[]>([])
 
+  // Honour ?industry=X (comma-separated lists supported) on first mount so
+  // deep links from dashboard CTAs land on the right filtered view. Read
+  // from window.location to keep this page statically renderable — using
+  // next/navigation's useSearchParams() forces dynamic rendering of every
+  // re-exporter (e.g. /deals), which breaks build-time prerender.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const raw = new URLSearchParams(window.location.search).get('industry')
+    if (!raw) return
+    const list = raw.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean)
+    if (list.length) setSelectedIndustries(list)
+  }, [])
+
   // Live deals from the database — no hardcoded fallback (see git history:
   // the old sample-data fallback caused filters to apply to fake listings).
   const [dbDeals, setDbDeals] = useState<Deal[] | null>(null)

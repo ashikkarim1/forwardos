@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   TrendingUp, TrendingDown, AlertTriangle, Flame, Zap, Eye, Clock, DollarSign,
@@ -20,6 +21,7 @@ interface MarketSignal {
   industry?: string
   insight: string
   action?: string
+  actionHref?: string
 }
 
 interface DealMomentum {
@@ -57,6 +59,7 @@ interface IntegratedIntelligence {
     description: string
     timestamp: string
     action?: string
+    actionHref?: string
   }>
   personalizedInsights: string[]
   lastUpdated: string
@@ -281,10 +284,20 @@ export function DailyIntelligenceDashboard({
               </div>
 
               {signal.action && (
-                <button className="w-full mt-3 px-3 py-2 rounded-lg text-xs font-bold border transition-all hover:bg-white"
-                  style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
-                  {signal.action}
-                </button>
+                signal.actionHref ? (
+                  <Link href={signal.actionHref}
+                    className="block w-full mt-3 px-3 py-2 rounded-lg text-xs font-bold border text-center transition-all hover:bg-white"
+                    style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
+                    {signal.action}
+                  </Link>
+                ) : (
+                  <button disabled
+                    className="w-full mt-3 px-3 py-2 rounded-lg text-xs font-bold border cursor-not-allowed opacity-50"
+                    style={{ borderColor: COLOR_BORDER, color: COLOR_TEXT_SECONDARY }}
+                    title="Action not yet wired">
+                    {signal.action}
+                  </button>
+                )
               )}
             </motion.div>
           ))}
@@ -535,12 +548,20 @@ export function DailyIntelligenceDashboard({
                     </p>
                   </div>
                   {alert.action && (
-                    <button className="px-3 py-1 rounded text-xs font-bold whitespace-nowrap border" style={{
-                      borderColor: COLOR_ACCENT,
-                      color: COLOR_ACCENT,
-                    }}>
-                      {alert.action}
-                    </button>
+                    alert.actionHref ? (
+                      <Link href={alert.actionHref}
+                        className="px-3 py-1 rounded text-xs font-bold whitespace-nowrap border"
+                        style={{ borderColor: COLOR_ACCENT, color: COLOR_ACCENT }}>
+                        {alert.action}
+                      </Link>
+                    ) : (
+                      <button disabled
+                        className="px-3 py-1 rounded text-xs font-bold whitespace-nowrap border cursor-not-allowed opacity-50"
+                        style={{ borderColor: COLOR_BORDER, color: COLOR_TEXT_SECONDARY }}
+                        title="Action not yet wired">
+                        {alert.action}
+                      </button>
+                    )
                   )}
                 </div>
               </motion.div>

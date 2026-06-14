@@ -658,6 +658,7 @@ export default function BuyerDashboardV2() {
                   industry: 'Healthcare',
                   insight: 'Healthcare M&A activity is accelerating. This is a rare window of opportunity. Current multiples are 4.2-4.8x revenue.',
                   action: 'View all healthcare deals',
+                  actionHref: '/deals?industry=HEALTHCARE',
                 },
                 {
                   id: '2',
@@ -669,6 +670,7 @@ export default function BuyerDashboardV2() {
                   industry: 'SaaS',
                   insight: 'This might be a good entry point for SaaS acquisitions. Previous peak was 5.2x.',
                   action: 'Compare SaaS valuations',
+                  actionHref: '/deals/comparables',
                 },
                 {
                   id: '3',
@@ -680,6 +682,7 @@ export default function BuyerDashboardV2() {
                   industry: 'Real Estate',
                   insight: 'Low competition in real estate right now. Sellers more flexible on terms.',
                   action: 'Explore real estate deals',
+                  actionHref: '/deals?industry=REAL_ESTATE',
                 },
                 {
                   id: '4',
@@ -690,6 +693,7 @@ export default function BuyerDashboardV2() {
                   change: 0,
                   insight: 'CloudCore Infrastructure awaiting seller identity verification. Data room access may be delayed.',
                   action: 'Follow up',
+                  actionHref: '/my-favourites',
                 },
               ]}
               dealMomentum={[
