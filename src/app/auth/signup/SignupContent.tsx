@@ -214,7 +214,12 @@ export function SignupContent() {
             className="w-full px-6 py-3.5 rounded-lg font-bold text-white text-sm hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
             style={{ background: COLOR_PRIMARY }}
           >
-            {loading ? <><Loader size={15} className="animate-spin" /> Creating account…</> : <>Create free account <ArrowRight size={15} /></>}
+            {loading
+              ? <><Loader size={15} className="animate-spin" /> Creating account…</>
+              : upgradeTier
+                ? <>Continue to payment <ArrowRight size={15} /></>
+                : <>Create free account <ArrowRight size={15} /></>
+            }
           </button>
 
           <p className="text-center text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
