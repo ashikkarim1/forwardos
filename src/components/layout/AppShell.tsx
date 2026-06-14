@@ -11,8 +11,22 @@ import {
 } from 'lucide-react'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from '@/styles/forward-colors'
 
+// Single item shape so heterogeneous rows (some with roles, some with
+// requiresPaid, some plain) unify into one type — keeps the
+// visibleGroups filter map cleanly assignable back to itself.
+type NavItem = {
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  label: string
+  badge: string | null
+  key: string
+  roles?: string[]
+  requiresPaid?: boolean
+}
+type NavGroup = { section: string; collapsible: boolean; items: NavItem[] }
+
 // Navigation organized into semantic groups for deal discovery mission
-const NAV_GROUPS = [
+const NAV_GROUPS: NavGroup[] = [
   {
     section: 'MY DASHBOARD',
     collapsible: false,
@@ -27,9 +41,9 @@ const NAV_GROUPS = [
     collapsible: true,
     items: [
       { href: '/deals', icon: Target, label: 'Marketplace', badge: 'Hot', key: 'deal-discovery' },
-      { href: '/dashboard/broker/pipeline', icon: BarChart3, label: 'Pipeline (Broker)', badge: 'Pro', key: 'broker-pipeline', roles: ['BROKER', 'ADMIN'] as string[] },
-      { href: '/deals/heat-maps', icon: Zap, label: 'Heat Maps', badge: null, key: 'heat-maps' },
-      { href: '/deals/comparables', icon: BarChart3, label: 'Comparables', badge: 'New', key: 'comparables' },
+      { href: '/dashboard/broker/pipeline', icon: BarChart3, label: 'Pipeline (Broker)', badge: 'Pro', key: 'broker-pipeline', roles: ['BROKER', 'ADMIN'] },
+      { href: '/deals/heat-maps', icon: Zap, label: 'Heat Maps', badge: 'Premium', key: 'heat-maps', requiresPaid: true },
+      { href: '/deals/comparables', icon: BarChart3, label: 'Comparables', badge: 'Premium', key: 'comparables', requiresPaid: true },
     ],
   },
   {
@@ -37,19 +51,19 @@ const NAV_GROUPS = [
     collapsible: true,
     items: [
       { href: '/market-insights', icon: TrendingUp, label: 'Market Trends', badge: null, key: 'market-trends' },
-      { href: '/intelligence/predictions', icon: Eye, label: 'M&A Predictions', badge: null, key: 'predictions' },
-      { href: '/intelligence/feeds', icon: Bell, label: 'Real-Time Feeds', badge: null, key: 'feeds' },
-      { href: '/intelligence/signals', icon: Zap, label: 'Deal Signals', badge: null, key: 'signals' },
+      { href: '/intelligence/predictions', icon: Eye, label: 'M&A Predictions', badge: 'Premium', key: 'predictions', requiresPaid: true },
+      { href: '/intelligence/feeds', icon: Bell, label: 'Real-Time Feeds', badge: 'Premium', key: 'feeds', requiresPaid: true },
+      { href: '/intelligence/signals', icon: Zap, label: 'Deal Signals', badge: 'Premium', key: 'signals', requiresPaid: true },
     ],
   },
   {
     section: 'TOOLS',
     collapsible: true,
     items: [
-      { href: '/diligence', icon: Award, label: 'Advanced Diligence', badge: null, key: 'diligence' },
+      { href: '/diligence', icon: Award, label: 'Advanced Diligence', badge: 'Premium', key: 'diligence', requiresPaid: true },
       { href: '/data-rooms', icon: FileText, label: 'Data Room', badge: null, key: 'data-room' },
       { href: '/messages', icon: MessageSquare, label: 'Messaging', badge: null, key: 'messaging' },
-      { href: '/cap-table', icon: PieChart, label: 'Cap Table', badge: null, key: 'cap-table' },
+      { href: '/cap-table', icon: PieChart, label: 'Cap Table', badge: 'Premium', key: 'cap-table', requiresPaid: true },
     ],
   },
   {
@@ -82,6 +96,16 @@ function BadgeChip({ badge }: { badge: string | null }) {
       <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold"
         style={{ background: COLOR_ACCENT, color: 'white', opacity: 0.8 }}>
         {badge}
+      </span>
+    )
+  }
+  // Premium / Pro markers — only surface to users who are eligible to
+  // see the item at all, so the badge is a confirmation, not a tease.
+  if (badge === 'Premium' || badge === 'Pro') {
+    return (
+      <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold tracking-wide"
+        style={{ background: '#0F1419', color: '#F2EAD9', letterSpacing: '0.04em' }}>
+        {badge.toUpperCase()}
       </span>
     )
   }
@@ -136,29 +160,51 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // flashing dashboards the user can't open (every other one redirects
   // away via the role gate on /dashboard/{role}/layout.tsx).
   const [role, setRole] = useState<'BUYER' | 'SELLER' | 'BROKER' | 'ADMIN' | null>(null)
+  const [hasPaid, setHasPaid] = useState(false)
+  const [authLoaded, setAuthLoaded] = useState(false)
 
   useEffect(() => {
     fetch('/api/auth/me', { credentials: 'include' })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data?.user?.role) setRole(data.user.role)
+        if (data?.user) {
+          const paid =
+            data.user.role === 'ADMIN' ||
+            data.user.buyerPlanTier === 'PREMIUM_BUYER' ||
+            data.user.sellerPlanTier === 'PREMIUM' ||
+            data.user.brokerPlanTier === 'BROKER_PRO'
+          setHasPaid(!!paid)
+        }
+        setAuthLoaded(true)
       })
-      .catch(() => {})
+      .catch(() => setAuthLoaded(true))
   }, [])
 
-  // Filter nav items by role.
+  // Filter nav items by role + plan tier.
   //   - MY DASHBOARD section: keep only the caller's own role dashboard
   //     (admins see all three for support).
-  //   - Any other item with an explicit `roles` list: visible only to
-  //     those roles (e.g. Pipeline is BROKER/ADMIN only).
+  //   - `roles` allowlist: shown only to listed roles.
+  //   - `requiresPaid`: hidden until the caller holds ANY paid tier
+  //     (PREMIUM_BUYER / SELLER PREMIUM / BROKER_PRO / ADMIN).
+  //
+  // We wait for /api/auth/me before showing requiresPaid items — better
+  // a brief moment without them than flashing Premium links to free
+  // users (the user's exact complaint).
   const visibleGroups = useMemo(() => {
     return NAV_GROUPS.map((g) => {
-      // Strip items that declare a roles allowlist the caller isn't in.
       const items = g.items.filter((i) => {
         const allowed = (i as { roles?: string[] }).roles
-        if (!allowed) return true
-        if (!role) return false
-        return allowed.includes(role)
+        if (allowed) {
+          if (!role) return false
+          if (!allowed.includes(role)) return false
+        }
+        const requiresPaid = (i as { requiresPaid?: boolean }).requiresPaid
+        if (requiresPaid) {
+          if (!authLoaded) return false
+          if (!hasPaid) return false
+        }
+        return true
       })
       if (g.section !== 'MY DASHBOARD') return { ...g, items }
       if (!role) return { ...g, items: [] }
@@ -166,7 +212,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       const keep = `${role.toLowerCase()}-dashboard`
       return { ...g, items: items.filter((i) => i.key === keep) }
     })
-  }, [role])
+  }, [role, hasPaid, authLoaded])
 
   // Collapsible sections state with localStorage persistence
   const [expandedSections, setExpandedSections] = useState<string[]>(['DEALS', 'INTELLIGENCE'])

@@ -147,6 +147,9 @@ export async function runSendWindow(opts: RunOptions = {}): Promise<SendResult> 
       const sentIds = activeCategories.filter((a) => seen.has(a.dealId)).map((a) => a.id)
       await prisma.pendingAlert.deleteMany({ where: { id: { in: sentIds } } })
       await recordEmailSent(userId)
+      // Resend free tier caps at 2/sec. Pause 600ms between sends so a
+      // queue of 50 digests doesn't fail half the batch.
+      await new Promise((r) => setTimeout(r, 600))
     }
 
     digests.push({ userId, email: user.email, dealCount: deals.length })

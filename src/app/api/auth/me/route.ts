@@ -9,7 +9,12 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
-    select: { id: true, name: true, email: true, role: true, company: true, kycStatus: true },
+    select: {
+      id: true, name: true, email: true, role: true, company: true, kycStatus: true,
+      // Plan tiers — drives sidebar gating so non-paid users don't even
+      // see the Premium intelligence nav items.
+      buyerPlanTier: true, sellerPlanTier: true, brokerPlanTier: true,
+    },
   }).catch(() => null)
 
   return NextResponse.json({ user: user ?? { id: session.userId, email: session.email, role: session.role } })
