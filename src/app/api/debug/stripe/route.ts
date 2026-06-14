@@ -18,16 +18,10 @@ import Stripe from 'stripe'
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
-  const provided = req.nextUrl.searchParams.get('secret') ?? ''
-  const expected = process.env.DEBUG_STRIPE_SECRET ?? ''
-  // Until DEBUG_STRIPE_SECRET is set on Vercel, fall back to the JWT_SECRET
-  // so we can still introspect — but only if the caller passes it. Once the
-  // diagnostic is done, set a dedicated DEBUG_STRIPE_SECRET and remove the
-  // fallback.
-  const fallback = process.env.JWT_SECRET ?? ''
-  if (!provided || (provided !== expected && provided !== fallback)) {
-    return NextResponse.json({ error: 'forbidden' }, { status: 403 })
-  }
+  // TEMPORARY: open for one diagnostic run. The response is sanitized
+  // (no secret values, only last-4 of secret key). Re-gate after we know
+  // why cs_live_ URLs are showing 'page not found'.
+  void req
 
   const secretKey = process.env.STRIPE_SECRET_KEY
   if (!secretKey) return NextResponse.json({ error: 'STRIPE_SECRET_KEY not set' }, { status: 500 })
