@@ -96,8 +96,27 @@ function BadgeChip({ badge }: { badge: string | null }) {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  // Sidebar: open by default on desktop, closed on mobile. We measure
+  // once on mount and again whenever the pathname changes — clicking a
+  // link on mobile should auto-close the overlay so the user lands on
+  // the page they tapped, not a screen full of sidebar.
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [showNotifications, setShowNotifications] = useState(false)
+
+  useEffect(() => {
+    // md breakpoint = 768px. Sync once on mount and on every resize.
+    const apply = () => setSidebarOpen(window.innerWidth >= 768)
+    apply()
+    window.addEventListener('resize', apply)
+    return () => window.removeEventListener('resize', apply)
+  }, [])
+
+  useEffect(() => {
+    // Auto-close on mobile after the user navigates.
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setSidebarOpen(false)
+    }
+  }, [pathname])
 
   // Listen for sidebar toggle events from DashboardHeader
   useEffect(() => {
@@ -201,7 +220,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-white" style={{ background: '#FFFFFF' }}>
-      {/* Sidebar */}
+      {/* Mobile backdrop — only shown when sidebar is open on small screens.
+          Tap to dismiss. Hidden at md+ where the sidebar is persistent. */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 z-40 bg-black/50 md:hidden"
+            aria-hidden
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar — overlay on mobile, in-flow on desktop. */}
       <AnimatePresence mode="wait">
         {sidebarOpen && (
           <motion.aside
@@ -209,7 +244,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             animate={{ x: 0 }}
             exit={{ x: -320 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="w-80 border-r bg-white overflow-y-auto flex flex-col"
+            className="
+              fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw]
+              md:relative md:max-w-none md:z-auto
+              border-r bg-white overflow-y-auto flex flex-col
+            "
             style={{
               borderColor: COLOR_BORDER,
               backgroundColor: '#FFFFFF',
@@ -217,7 +256,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           >
             {/* Logo Section — must match PublicHeader brand mark so the
                 dashboard and the public site read as the same product. */}
-            <div className="p-6 border-b" style={{ borderColor: COLOR_BORDER }}>
+            <div className="p-6 border-b flex items-center justify-between gap-3" style={{ borderColor: COLOR_BORDER }}>
               <Link href="/" className="flex items-center gap-3 group hover:opacity-80 transition-opacity">
                 <div
                   className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -236,6 +275,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   </span>
                 </div>
               </Link>
+              {/* Mobile-only close button. On desktop the sidebar is
+                  persistent so this would just be confusing. */}
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(false)}
+                className="md:hidden p-1.5 rounded-md hover:bg-gray-100"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" style={{ color: COLOR_TEXT_SECONDARY }} />
+              </button>
             </div>
 
             {/* Navigation Sections */}
@@ -302,30 +351,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               ))}
             </nav>
 
-            {/* Design System Stats */}
-            <div className="p-4 border-t space-y-3" style={{ borderColor: COLOR_BORDER }}>
-              <div className="text-xs font-bold uppercase tracking-wider" style={{ color: COLOR_TEXT_SECONDARY }}>
-                Design System
-              </div>
-              <div className="space-y-2 text-xs" style={{ color: COLOR_TEXT_SECONDARY }}>
-                <div className="flex justify-between">
-                  <span>• Design Tokens</span>
-                  <span className="font-semibold">100+</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>• Components</span>
-                  <span className="font-semibold">8+</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>• WCAG AA</span>
-                  <span className="font-semibold">✓</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>• Grade</span>
-                  <span className="font-semibold" style={{ color: COLOR_ACCENT }}>A+</span>
-                </div>
-              </div>
-            </div>
+            {/* Internal debug stats removed — was design-system token
+                counts which is meaningless to customers and took space.
+                Customer-visible status (e.g. system health, beta badge)
+                can return here later. */}
 
             {/* Footer in Sidebar */}
             <div className="border-t text-center py-4" style={{ borderColor: COLOR_BORDER }}>

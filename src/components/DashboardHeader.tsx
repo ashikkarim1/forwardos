@@ -53,10 +53,16 @@ export function DashboardHeader({
       <div className="px-6 py-3 flex items-center justify-between border-b" style={{ borderColor: COLOR_BORDER }}>
         {/* Left: Hamburger + Breadcrumbs */}
         <div className="flex items-center gap-3">
-          {/* Hamburger Menu */}
+          {/* Hamburger Menu — dispatches `toggleSidebar` so AppShell
+              picks it up regardless of whether the parent wired
+              onMenuToggle. The icon mirrors current sidebar state. */}
           <button
-            onClick={() => onMenuToggle?.(!sidebarOpen)}
+            onClick={() => {
+              onMenuToggle?.(!sidebarOpen)
+              window.dispatchEvent(new CustomEvent('toggleSidebar', { detail: { open: !sidebarOpen } }))
+            }}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors -ml-2"
+            aria-label={sidebarOpen ? 'Close menu' : 'Open menu'}
           >
             {sidebarOpen ? (
               <X className="w-5 h-5" style={{ color: COLOR_PRIMARY }} />
