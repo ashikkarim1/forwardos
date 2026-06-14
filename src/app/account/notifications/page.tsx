@@ -38,9 +38,19 @@ export default function NotificationPrefsPage() {
 
   useEffect(() => {
     fetch('/api/notifications/preferences', { credentials: 'include' })
-      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then((r) => {
+        // 401 from an email-footer click → kick to login with a return
+        // URL so the same one-click adjustment lands after sign-in.
+        if (r.status === 401) {
+          const here = encodeURIComponent(window.location.pathname + window.location.search)
+          window.location.href = `/auth/login?redirect=${here}`
+          return Promise.reject(401)
+        }
+        if (!r.ok) return Promise.reject(r.status)
+        return r.json()
+      })
       .then((d) => setPrefs(d.prefs))
-      .catch(() => setError('Sign in to manage notification preferences.'))
+      .catch(() => setError('Could not load preferences. Try again shortly.'))
   }, [])
 
   // Honor ?switch=daily/weekly from email footers so one click switches.

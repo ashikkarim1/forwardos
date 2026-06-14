@@ -31,6 +31,7 @@ import { ArrowRight, MessageSquare, FileText, Clock, TrendingUp, ChevronRight } 
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { LockedFeature } from '@/components/dashboard/LockedFeature'
+import { PipelineActions } from './PipelineActions'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Pipeline · Forward Broker Pro' }
@@ -297,6 +298,10 @@ function Card({ card }: { card: PipelineCard }) {
         {card.hasUnread && (
           <span title="Unread" style={{ width: 7, height: 7, borderRadius: 999, background: '#B8956A' }} />
         )}
+        {/* Client-only kebab → Mark Contacted / Close / Reopen. NDA,
+            data room, diligence transitions stay auto-derived from
+            buyer signals so we don't expose them as manual buttons. */}
+        <PipelineActions enquiryId={card.enquiryId} stage={card.stage} />
       </div>
 
       <Link href={listingHref} style={{ textDecoration: 'none' }}>
