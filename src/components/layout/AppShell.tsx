@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -214,6 +214,42 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     })
   }, [role, hasPaid, authLoaded])
 
+  // Swipe-to-dismiss on mobile. Track the horizontal drag delta while
+  // the finger is down; commit a close if the user has dragged the
+  // sidebar > 80px to the left OR swiped fast enough at release.
+  //
+  // - Only active below md (desktop sidebar is persistent, no swipe).
+  // - Only LEFT drags translate the sidebar — right drags do nothing
+  //   (avoids competing with iOS edge-swipe-back).
+  // - Released near origin → spring back to 0 via CSS transition.
+  const [dragX, setDragX] = useState(0)              // px offset while dragging; 0 when idle
+  const dragStartRef = useRef<{ x: number; t: number } | null>(null)
+  const isMobile = () => typeof window !== 'undefined' && window.innerWidth < 768
+
+  function onSidebarTouchStart(e: React.TouchEvent) {
+    if (!isMobile()) return
+    const t = e.touches[0]
+    dragStartRef.current = { x: t.clientX, t: Date.now() }
+  }
+  function onSidebarTouchMove(e: React.TouchEvent) {
+    if (!dragStartRef.current) return
+    const dx = e.touches[0].clientX - dragStartRef.current.x
+    // Only react to LEFT drags. Right drags would compete with iOS edge-swipe-back.
+    if (dx < 0) setDragX(dx)
+  }
+  function onSidebarTouchEnd() {
+    if (!dragStartRef.current) return
+    const elapsed = Date.now() - dragStartRef.current.t
+    const finalDx = dragX
+    dragStartRef.current = null
+    // Threshold OR velocity: > 80px OR > 0.5px/ms while moving left.
+    const fastFlick = finalDx < 0 && Math.abs(finalDx) / elapsed > 0.5
+    if (finalDx < -80 || fastFlick) {
+      setSidebarOpen(false)
+    }
+    setDragX(0)  // either way, reset — the close animation owns the slide-out
+  }
+
   // Collapsible sections state with localStorage persistence
   const [expandedSections, setExpandedSections] = useState<string[]>(['DEALS', 'INTELLIGENCE'])
 
@@ -290,6 +326,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             animate={{ x: 0 }}
             exit={{ x: -320 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            onTouchStart={onSidebarTouchStart}
+            onTouchMove={onSidebarTouchMove}
+            onTouchEnd={onSidebarTouchEnd}
+            onTouchCancel={onSidebarTouchEnd}
             className="
               fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw]
               md:relative md:max-w-none md:z-auto
@@ -298,6 +338,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             style={{
               borderColor: COLOR_BORDER,
               backgroundColor: '#FFFFFF',
+              // Live-track the finger while dragging. Once the user
+              // releases, we reset dragX → 0 and the spring/exit
+              // animation owns the slide.
+              transform: dragX ? `translateX(${dragX}px)` : undefined,
+              touchAction: 'pan-y',  // allow vertical scroll; we own horizontal
             }}
           >
             {/* Logo Section — must match PublicHeader brand mark so the
