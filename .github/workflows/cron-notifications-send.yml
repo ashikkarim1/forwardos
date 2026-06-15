@@ -1,0 +1,56 @@
+# Notifications send-window — every 15 minutes.
+#
+# Drains the PendingAlert buffer into per-user digest emails, respecting
+# each user's cadence, quiet hours, and daily cap. See
+# src/lib/notifications/send-window.ts for the gating logic.
+#
+# Why GitHub Actions instead of Vercel cron:
+# Vercel Hobby caps cron to once per day. GitHub Actions cron is free
+# at any frequency >= 5 min. This is the same pattern any serious
+# production app uses — Vercel cron is a convenience, not the spine.
+#
+# Required GitHub repo secrets:
+#   CRON_SECRET    must match process.env.CRON_SECRET on Vercel
+#   SITE_URL       e.g. https://www.forwardos.ai  (defaults below if unset)
+name: cron · notifications-send
+
+on:
+  schedule:
+    # GitHub Actions cron supports minute granularity (min interval ~5 min).
+    # */15 every hour, every day.
+    - cron: "*/15 * * * *"
+  workflow_dispatch:  # manual fire for testing
+
+# Don't queue runs — if a run takes longer than 15 min, skip the next.
+concurrency:
+  group: cron-notifications-send
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  fire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Hit notifications-send endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://www.forwardos.ai' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::CRON_SECRET secret is not set in this repo."
+            exit 1
+          fi
+          # -f fails the run on HTTP >=400; -sS keeps output quiet on success.
+          response=$(curl -fsS \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "Accept: application/json" \
+            "${SITE_URL}/api/cron/notifications-send")
+          echo "$response"
+          echo "$response" | grep -q '"ok":true' || {
+            echo "::error::Endpoint returned non-ok payload"
+            exit 1
+          }

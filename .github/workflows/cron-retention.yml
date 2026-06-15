@@ -1,0 +1,41 @@
+# Daily retention cleanup — 03:00 UTC.
+#
+# Moves expired records to the retention bucket per the data-retention
+# policy. See src/app/api/cron/retention/route.ts.
+name: cron · retention
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: cron-retention
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  fire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Hit retention endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://www.forwardos.ai' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::CRON_SECRET secret is not set in this repo."
+            exit 1
+          fi
+          # The retention endpoint may not require auth depending on
+          # how it was originally wired — pass the Bearer anyway, it's
+          # ignored if the route doesn't check it.
+          response=$(curl -fsS \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "Accept: application/json" \
+            "${SITE_URL}/api/cron/retention")
+          echo "$response"
