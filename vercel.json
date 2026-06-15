@@ -3,6 +3,5 @@
   "framework": "nextjs",
   "buildCommand": "prisma generate && next build",
   "regions": ["iad1"],
-  "git": { "deploymentEnabled": { "main": true } },
-  "$comment:crons": "Cron jobs moved to GitHub Actions (.github/workflows/cron-*.yml) so we can run every 15 min without paying for Vercel Pro. The endpoints below are still hit, just by Actions instead of Vercel — they read CRON_SECRET out of process.env on this Vercel project."
+  "git": { "deploymentEnabled": { "main": true } }
 }
