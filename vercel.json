@@ -6,7 +6,7 @@
   "git": { "deploymentEnabled": { "main": true } },
   "crons": [
     { "path": "/api/cron/retention", "schedule": "0 3 * * *" },
-    { "path": "/api/cron/notifications-send",   "schedule": "*/15 * * * *" },
+    { "path": "/api/cron/notifications-send",   "schedule": "0 7 * * *" },
     { "path": "/api/cron/notifications-weekly", "schedule": "0 7 * * 1" }
   ]
 }
