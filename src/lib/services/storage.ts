@@ -42,7 +42,19 @@ export async function uploadFile(options: UploadOptions): Promise<UploadResult> 
     return { url: blob.url, key, bucket: getBucketName(bucket) }
   }
 
-  // 2) Local filesystem (dev) — genuinely persists under /public/uploads
+  // 2) On Vercel without a Blob token there's no working path — Vercel's
+  // filesystem is read-only. Throw a diagnostic error instead of silently
+  // failing through to the local-fs branch (which would say only
+  // "Failed to upload file" and waste someone's afternoon).
+  if (process.env.VERCEL === '1') {
+    throw new Error(
+      'Photo storage not configured. Connect a Vercel Blob store to this ' +
+      'project so BLOB_READ_WRITE_TOKEN is available. ' +
+      'Dashboard → Project → Storage → Connect Store → choose forwardos-uploads.'
+    )
+  }
+
+  // 3) Local filesystem (dev) — genuinely persists under /public/uploads
   try {
     const buf = Buffer.from(await options.file.arrayBuffer())
     const dest = path.join(process.cwd(), 'public', 'uploads', key)
