@@ -157,3 +157,68 @@ export const QUICK_LIST_COUNTRIES = [
   { value: 'UAE', label: 'United Arab Emirates' },
   { value: 'KSA', label: 'Saudi Arabia' },
 ] as const
+
+// Country-marker hints used by the soft city/region warning on /list.
+// Lowercase, single-word tokens that are *strongly indicative* of a
+// country. Cross-country ambiguity (e.g. "London" → UK or Ontario) is
+// the reason this is a warning, not a block — the seller may know
+// something we don't. Keep the list short and high-precision.
+const COUNTRY_MARKERS: Record<string, string[]> = {
+  USA: [
+    'usa', 'united states', 'us', 'america',
+    // major US-only cities
+    'new york', 'nyc', 'manhattan', 'brooklyn', 'queens', 'bronx',
+    'los angeles', 'la', 'san francisco', 'sf', 'silicon valley',
+    'chicago', 'austin', 'dallas', 'houston', 'denver', 'seattle',
+    'portland', 'phoenix', 'miami', 'atlanta', 'boston', 'detroit',
+    'philadelphia', 'philly', 'san diego', 'minneapolis', 'pittsburgh',
+    // US state names (high signal)
+    'california', 'texas', 'florida', 'illinois', 'new jersey',
+    'pennsylvania', 'ohio', 'georgia', 'michigan', 'virginia',
+    'washington state', 'massachusetts', 'colorado', 'arizona',
+  ],
+  Canada: [
+    'canada', 'canadian',
+    'toronto', 'ottawa', 'vancouver', 'montreal', 'calgary', 'edmonton',
+    'winnipeg', 'quebec city', 'quebec', 'halifax', 'mississauga', 'brampton',
+    'hamilton', 'kitchener', 'waterloo', 'victoria',
+    'ontario', 'british columbia', 'alberta', 'saskatchewan', 'manitoba',
+    'nova scotia', 'new brunswick', 'newfoundland',
+  ],
+  UAE: [
+    'uae', 'emirates',
+    'dubai', 'abu dhabi', 'sharjah', 'ajman', 'fujairah',
+    'ras al khaimah', 'umm al quwain', 'al ain', 'jebel ali',
+    'dxb', 'jvc', 'difc', 'jlt',
+  ],
+  KSA: [
+    'ksa', 'saudi arabia', 'saudi',
+    'riyadh', 'jeddah', 'mecca', 'medina', 'dammam', 'khobar',
+    'tabuk', 'taif', 'abha', 'neom',
+  ],
+} as const
+
+/**
+ * Returns the country code that the given free-text region/city *appears*
+ * to belong to, or null if no marker matched. Lowercases + word-boundary
+ * matches so "Sandiego Plaza, Toronto" picks Canada (toronto match)
+ * before USA (substring "sandiego" is not in the marker list).
+ */
+export function inferCountryFromRegion(text: string): keyof typeof COUNTRY_MARKERS | null {
+  if (!text) return null
+  const t = text.toLowerCase()
+  for (const [country, markers] of Object.entries(COUNTRY_MARKERS) as Array<[keyof typeof COUNTRY_MARKERS, string[]]>) {
+    for (const m of markers) {
+      // Word-boundary check: the marker is preceded + followed by a non-letter
+      // (or string edge). Avoids matching "san" in "Sandiego".
+      const re = new RegExp(`(^|[^a-z])${m.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^a-z]|$)`, 'i')
+      if (re.test(t)) return country
+    }
+  }
+  return null
+}
+
+export function countryLabel(value: string): string {
+  const found = QUICK_LIST_COUNTRIES.find((c) => c.value === value)
+  return found ? found.label : value
+}

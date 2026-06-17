@@ -11,6 +11,7 @@ import { ImageUploader, type UploadedPhoto } from '@/components/ImageUploader'
 import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 import {
   QUICK_LIST_INDUSTRIES, QUICK_LIST_COUNTRIES,
+  inferCountryFromRegion, countryLabel,
   REVENUE_RANGES, ASKING_RANGES, EBITDA_RANGES, CASH_FLOW_RANGES,
 } from '@/lib/listing-helpers'
 
@@ -211,6 +212,22 @@ function ListInner() {
 
         <Field label="City or region (optional)" hint="Public listing will mask this to the broader metro for confidentiality">
           <input type="text" value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Toronto, Dubai, Austin" className="w-full px-3 py-3 rounded-lg border bg-white text-sm" style={{ borderColor: COLOR_BORDER }} />
+          {/* Soft warning when the free-text region appears to belong
+              to a different country than the selected dropdown. NOT a
+              block — the seller may know something we don't, so submit
+              still goes through. We just flag it. */}
+          {(() => {
+            const inferred = inferCountryFromRegion(city)
+            if (!inferred || inferred === country) return null
+            return (
+              <div role="status" className="mt-2 px-3 py-2 rounded-md text-xs flex items-start gap-2" style={{ background: '#FFFAE6', border: '1px solid #FFEEB5', color: '#7A3608' }}>
+                <span style={{ flexShrink: 0 }}>⚠️</span>
+                <span>
+                  "{city}" looks like a <strong>{countryLabel(inferred)}</strong> location, but you selected <strong>{countryLabel(country)}</strong>. Double-check the country dropdown — or continue if this is correct.
+                </span>
+              </div>
+            )
+          })()}
         </Field>
 
         <Field label="Annual revenue *" hint="A range is fine — exact numbers stay private">
