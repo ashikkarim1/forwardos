@@ -65,7 +65,7 @@ function LocalizedHomePageContent() {
             transition={{ duration: 0.8 }}
           >
             <p className="text-[11px] md:text-xs font-bold tracking-[0.32em] mb-6" style={{ color: '#B8956A' }}>
-              THE MARKETPLACE FOR LIFE&apos;S BIGGEST EXIT
+              THE TRANSPARENT MARKETPLACE FOR EVERY BUSINESS TRANSACTION
             </p>
             <h1 className="text-5xl md:text-7xl font-black mb-6 text-white leading-[1.05] tracking-tight">
               {t('hero.title', locale)}
@@ -108,6 +108,77 @@ function LocalizedHomePageContent() {
           >
             CONFIDENTIAL · VERIFIED · USA · CANADA · UAE
           </motion.p>
+        </div>
+      </section>
+
+      {/* ─── Forward Serves — explicit positioning ──────────────────────
+          The hero compresses the value to four verbs. This section
+          unpacks it: who Forward is for, what kinds of transactions
+          we handle, and the transparency promise (every listing tells
+          you WHY the seller is exiting). Keeps the deck simple — two
+          columns + a banner — so it reads at a glance on mobile. */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8" style={{ background: '#FFFFFF' }}>
+        <div className="max-w-5xl mx-auto">
+          <p className="text-[11px] font-bold tracking-[0.28em] text-center mb-4" style={{ color: '#B8956A' }}>
+            ONE PLATFORM · EVERY TRANSACTION
+          </p>
+          <h2 className="text-3xl md:text-4xl font-black text-center mb-3" style={{ color: COLOR_PRIMARY }}>
+            Built for the full M&amp;A lifecycle.
+          </h2>
+          <p className="text-base md:text-lg text-center max-w-3xl mx-auto mb-12" style={{ color: COLOR_TEXT_SECONDARY }}>
+            SMB acquisitions, corporate M&amp;A, roll-ups, succession sales, distressed assets, strategic carve-outs — Forward handles them all in one workspace.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* For Buyers */}
+            <div className="p-7 rounded-2xl" style={{ background: '#FAF6EF', border: '1px solid #EDE6D8' }}>
+              <p className="text-[10px] font-bold tracking-[0.22em] uppercase mb-3" style={{ color: '#8C6D45' }}>
+                For Buyers
+              </p>
+              <h3 className="text-xl font-bold mb-4" style={{ color: COLOR_PRIMARY }}>
+                Find the right deal. Know it&apos;ll close.
+              </h3>
+              <ul className="space-y-2 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
+                <li>· Individual buyers &amp; search funds</li>
+                <li>· Private equity &amp; holding companies</li>
+                <li>· Corporate development &amp; strategic acquirers</li>
+                <li>· Family offices &amp; HNW investors</li>
+                <li>· Roll-up sponsors &amp; consolidators</li>
+              </ul>
+            </div>
+
+            {/* For Sellers */}
+            <div className="p-7 rounded-2xl" style={{ background: '#FAF6EF', border: '1px solid #EDE6D8' }}>
+              <p className="text-[10px] font-bold tracking-[0.22em] uppercase mb-3" style={{ color: '#8C6D45' }}>
+                For Sellers
+              </p>
+              <h3 className="text-xl font-bold mb-4" style={{ color: COLOR_PRIMARY }}>
+                Tell your story. On your terms.
+              </h3>
+              <ul className="space-y-2 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
+                <li>· Owner-operators (retirement, lifestyle change)</li>
+                <li>· Corporate divestitures &amp; carve-outs</li>
+                <li>· Succession &amp; family transitions</li>
+                <li>· Distressed sales &amp; restructuring</li>
+                <li>· Brokers &amp; M&amp;A advisors</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Transparency banner — the differentiator vs BizBuySell etc. */}
+          <div className="mt-8 p-6 rounded-2xl flex items-start gap-4" style={{ background: '#0F1419', border: '1px solid #0F1419' }}>
+            <span className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-full text-base" style={{ background: 'rgba(184,149,106,0.18)' }} aria-hidden>
+              <span style={{ color: '#E5C9A8' }}>★</span>
+            </span>
+            <div>
+              <p className="text-[10px] font-bold tracking-[0.22em] uppercase mb-2" style={{ color: '#B8956A' }}>
+                Transparent by design
+              </p>
+              <p className="text-sm md:text-base" style={{ color: 'rgba(255,255,255,0.86)', lineHeight: 1.55 }}>
+                Every Forward listing tells you <strong style={{ color: '#fff' }}>why the seller is exiting</strong> — retirement, succession, distressed sale, strategic divestiture, growth capital, partnership split. No surprises in diligence, no awkward calls. Make decisions with the full picture from day one.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

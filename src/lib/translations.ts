@@ -9,11 +9,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     'nav.signIn': 'Sign In',
 
     // Hero Section
-    'hero.title': 'Sell Your Company with Forward Momentum.',
-    'hero.subtitle': 'Publish a confidential listing in 90 seconds. Reach verified buyers across the USA, Canada & the UAE — anonymous by default, zero commission.',
-    'hero.cta1': 'List my company free',
-    'hero.cta2': 'Browse Marketplace',
-    'hero.trust': '✅ Anonymous by default • ✅ No credit card • ✅ Zero success commission',
+    'hero.title': 'Buy. Sell. Roll up. Consolidate.',
+    'hero.subtitle': 'The transparent marketplace for SMB acquisitions and corporate M&A. Every listing tells you why the seller is exiting — retirement, succession, distressed sale, strategic divestiture — so you can act without surprises. USA, Canada & UAE.',
+    'hero.cta1': 'List a business',
+    'hero.cta2': 'Browse the marketplace',
+    'hero.trust': '✅ Verified buyers & sellers • ✅ Confidential by default • ✅ Zero success commission',
 
     // Features Section
     'features.title': 'Why Forward OS',
@@ -199,11 +199,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     'nav.signIn': 'Se connecter',
 
     // Hero Section
-    'hero.title': 'Vendez votre entreprise. Avancez avec Forward.',
-    'hero.subtitle': 'Publiez une annonce confidentielle en 90 secondes. Atteignez des acheteurs vérifiés aux États-Unis, au Canada et aux Émirats — anonyme par défaut, sans commission.',
-    'hero.cta1': 'Vendre mon entreprise gratuitement',
+    'hero.title': 'Achetez. Vendez. Consolidez.',
+    'hero.subtitle': 'La place de marché transparente pour les acquisitions de PME et les fusions-acquisitions. Chaque annonce indique pourquoi le vendeur se retire — retraite, succession, vente sous pression, cession stratégique — pour agir sans surprises. États-Unis, Canada & Émirats.',
+    'hero.cta1': 'Lister une entreprise',
     'hero.cta2': 'Parcourir la place de marché',
-    'hero.trust': '✅ Anonyme par défaut • ✅ Pas de carte de crédit • ✅ Aucune commission sur la vente',
+    'hero.trust': '✅ Acheteurs et vendeurs vérifiés • ✅ Confidentiel par défaut • ✅ Aucune commission sur la vente',
 
     // Features Section
     'features.title': 'Pourquoi Forward OS',
@@ -380,11 +380,11 @@ export const translations: Record<Locale, Record<string, string>> = {
     'nav.signIn': 'تسجيل الدخول',
 
     // Hero Section
-    'hero.title': 'بِعْ شركتك بزَخَم Forward.',
-    'hero.subtitle': 'انشر إعلانك السري في 90 ثانية. اعرض شركتك على مشترين موثقين في الولايات المتحدة وكندا والإمارات — مجهول الهوية افتراضياً، بدون أي عمولة.',
-    'hero.cta1': 'بيع شركتي مجاناً',
+    'hero.title': 'اشترِ. بِعْ. ادمج.',
+    'hero.subtitle': 'السوق الشفاف للاستحواذات الصغيرة والمتوسطة وعمليات الاندماج المؤسسي. كل إعلان يوضح سبب خروج البائع — التقاعد، نقل الملكية، البيع تحت الضغط، التخارج الاستراتيجي — لتتصرف دون مفاجآت. الولايات المتحدة، كندا، الإمارات.',
+    'hero.cta1': 'إدراج شركة',
     'hero.cta2': 'استعرض السوق',
-    'hero.trust': '✅ مجهول الهوية افتراضياً • ✅ لا تحتاج إلى بطاقة ائتمان • ✅ بدون عمولة على البيع',
+    'hero.trust': '✅ مشترون وبائعون موثقون • ✅ خاص افتراضياً • ✅ بدون عمولة على البيع',
 
     // Features Section
     'features.title': 'لماذا Forward OS',
