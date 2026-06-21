@@ -20,7 +20,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'features.ai.title': 'Forward Intelligence',
     'features.ai.desc': 'Close-probability scoring, demand heat maps, live comparables, buyer matching — built from real platform activity, not vendor slides.',
     'features.intelligence.title': 'Market Intelligence',
-    'features.intelligence.desc': '500+ verified deals, real comparables, sector benchmarking, confidence scoring.',
+    'features.intelligence.desc': 'Live comparables, sector benchmarking, demand heat maps and close-probability scoring — built from real platform activity.',
     'features.network.title': 'Institutional Network',
     'features.network.desc': 'Verified brokers, integrations, white-label API, professional services network.',
 
@@ -54,7 +54,7 @@ export const translations: Record<Locale, Record<string, string>> = {
 
     // CTA Section
     'cta.title': 'Ready to Win?',
-    'cta.subtitle': 'Join 500+ deal professionals using Forward OS to source, analyze, and close M&A transactions.',
+    'cta.subtitle': 'Source, analyze and close M&A transactions on one platform — across the USA, Canada and the UAE.',
     'cta.button1': 'List my company free →',
     'cta.button2': 'Enterprise Demo',
 
@@ -215,7 +215,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'features.ai.title': 'Forward Intelligence',
     'features.ai.desc': 'Probabilité de clôture, cartes de chaleur de la demande, comparables en direct, mise en relation avec les acheteurs — construit à partir de l\'activité réelle de la plateforme.',
     'features.intelligence.title': 'Intelligence de marché',
-    'features.intelligence.desc': '500+ transactions vérifiées, comparables réels, analyse sectorielle, notation de confiance.',
+    'features.intelligence.desc': 'Comparables en direct, analyse sectorielle, cartes de chaleur de la demande et probabilité de clôture — construits à partir de l’activité réelle de la plateforme.',
     'features.network.title': 'Réseau institutionnel',
     'features.network.desc': 'Courtiers vérifiés, intégrations, API label blanc, réseau de services professionnels.',
 
@@ -247,7 +247,7 @@ export const translations: Record<Locale, Record<string, string>> = {
 
     // CTA Section
     'cta.title': 'Prêt à gagner ?',
-    'cta.subtitle': 'Rejoignez 500+ professionnels des transactions utilisant Forward OS pour sourcer, analyser et conclure des transactions M&A.',
+    'cta.subtitle': 'Sourcez, analysez et concluez des transactions M&A sur une seule plateforme — aux États-Unis, au Canada et aux Émirats.',
     'cta.button1': 'Vendre mon entreprise gratuitement →',
     'cta.button2': 'Démo d\'entreprise',
 
@@ -399,7 +399,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     'features.ai.title': 'Forward Intelligence',
     'features.ai.desc': 'تقييم احتمالية الإغلاق، وخرائط حرارة الطلب، والمقارنات المباشرة، ومطابقة المشترين — مبنية من نشاط المنصة الفعلي.',
     'features.intelligence.title': 'ذكاء السوق',
-    'features.intelligence.desc': '500+ صفقة مُتحقق منها وقيمها الحقيقية ومعايير القطاع وتقييم الثقة.',
+    'features.intelligence.desc': 'مقارنات مباشرة، ومعايير قطاعية، وخرائط حرارة الطلب، وتقييم احتمالية الإغلاق — مبنية من نشاط المنصة الفعلي.',
     'features.network.title': 'الشبكة المؤسسية',
     'features.network.desc': 'الوسطاء المتحقق منهم والتكاملات وواجهة برمجية بدون علامات تجارية وشبكة الخدمات الاحترافية.',
 
@@ -431,7 +431,7 @@ export const translations: Record<Locale, Record<string, string>> = {
 
     // CTA Section
     'cta.title': 'هل أنت مستعد للفوز؟',
-    'cta.subtitle': 'انضم إلى 500+ محترف في الصفقات باستخدام Forward OS لإيجاد وتحليل وإغلاق صفقات الاندماج والاستحواذ.',
+    'cta.subtitle': 'ابحث وحلّل وأغلق صفقات الاندماج والاستحواذ على منصة واحدة — في الولايات المتحدة وكندا والإمارات.',
     'cta.button1': 'بيع شركتي مجاناً →',
     'cta.button2': 'عرض توضيحي للمؤسسة',
 
