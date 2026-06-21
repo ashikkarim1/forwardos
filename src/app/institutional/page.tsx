@@ -72,14 +72,14 @@ export default function InstitutionalPage() {
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="#"
+                href="/contact-sales"
                 className="px-6 py-3 rounded-lg font-bold text-white transition-all hover:opacity-90"
                 style={{ background: COLOR_ACCENT }}
               >
                 Request Demo
               </Link>
               <Link
-                href="#"
+                href="/pricing"
                 className="px-6 py-3 rounded-lg font-bold border transition-all hover:bg-gray-50"
                 style={{ borderColor: COLOR_BORDER, color: COLOR_PRIMARY }}
               >
@@ -249,10 +249,14 @@ export default function InstitutionalPage() {
               Ready to Win More Deals?
             </h3>
             <p className="text-lg mb-6" style={{ color: COLOR_TEXT_SECONDARY }}>
-              Join 500+ institutional investors using Forward OS to source, analyze, and close M&A deals
+              Source, analyze, and close M&amp;A deals across the USA, Canada and the UAE with one platform.
             </p>
+            {/* '500+ institutional investors' claim removed — we can't
+                substantiate it on day one. The line above leads with what
+                the product DOES; bring the proof claim back once we have
+                a real count we can defend with screenshots. */}
             <Link
-              href="#"
+              href="/contact-sales"
               className="inline-block px-8 py-4 rounded-lg font-bold text-white transition-all hover:opacity-90"
               style={{ background: COLOR_ACCENT }}
             >

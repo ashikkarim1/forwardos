@@ -17,18 +17,23 @@ export const translations: Record<Locale, Record<string, string>> = {
 
     // Features Section
     'features.title': 'Why Forward OS',
-    'features.ai.title': '5 AI Models',
-    'features.ai.desc': 'Success probability, optimal timing, fair pricing, growth forecasts, buyer matching.',
+    'features.ai.title': 'Forward Intelligence',
+    'features.ai.desc': 'Close-probability scoring, demand heat maps, live comparables, buyer matching — built from real platform activity, not vendor slides.',
     'features.intelligence.title': 'Market Intelligence',
     'features.intelligence.desc': '500+ verified deals, real comparables, sector benchmarking, confidence scoring.',
     'features.network.title': 'Institutional Network',
     'features.network.desc': 'Verified brokers, integrations, white-label API, professional services network.',
 
     // Stats Section
-    'stats.market': 'Annual M&A Market',
-    'stats.deals': 'Verified Deals',
-    'stats.accuracy': 'Prediction Accuracy',
-    'stats.moat': 'Competitive Moat',
+    'stats.market': 'Annual M&A market',
+    'stats.regions': 'Regions live (USA · Canada · UAE)',
+    'stats.fee': 'Success commission on sales',
+    'stats.transparent': 'Reason-for-sale disclosed',
+    // Legacy keys kept for any cached/SSR pages mid-deploy — safe to
+    // delete once all environments are refreshed.
+    'stats.deals': 'Verified listings on Forward today',
+    'stats.accuracy': 'Listings refreshed every 15 min',
+    'stats.moat': 'Listings refreshed every 15 min',
 
     // User Types Section
     'users.title': 'Built for Every Role',
@@ -207,18 +212,21 @@ export const translations: Record<Locale, Record<string, string>> = {
 
     // Features Section
     'features.title': 'Pourquoi Forward OS',
-    'features.ai.title': '5 modèles d\'IA',
-    'features.ai.desc': 'Probabilité de succès, timing optimal, tarification équitable, prévisions de croissance, correspondance des acheteurs.',
+    'features.ai.title': 'Forward Intelligence',
+    'features.ai.desc': 'Probabilité de clôture, cartes de chaleur de la demande, comparables en direct, mise en relation avec les acheteurs — construit à partir de l\'activité réelle de la plateforme.',
     'features.intelligence.title': 'Intelligence de marché',
     'features.intelligence.desc': '500+ transactions vérifiées, comparables réels, analyse sectorielle, notation de confiance.',
     'features.network.title': 'Réseau institutionnel',
     'features.network.desc': 'Courtiers vérifiés, intégrations, API label blanc, réseau de services professionnels.',
 
     // Stats Section
-    'stats.market': 'Marché annuel de M&A',
-    'stats.deals': 'Transactions vérifiées',
-    'stats.accuracy': 'Précision des prédictions',
-    'stats.moat': 'Avantage concurrentiel',
+    'stats.market': 'Marché annuel des fusions-acquisitions',
+    'stats.regions': 'Régions actives (États-Unis · Canada · Émirats)',
+    'stats.fee': 'Commission sur les ventes',
+    'stats.transparent': 'Raison de vente divulguée',
+    'stats.deals': 'Annonces vérifiées sur Forward aujourd’hui',
+    'stats.accuracy': 'Annonces rafraîchies toutes les 15 min',
+    'stats.moat': 'Annonces rafraîchies toutes les 15 min',
 
     // User Types Section
     'users.title': 'Conçu pour chaque rôle',
@@ -388,18 +396,21 @@ export const translations: Record<Locale, Record<string, string>> = {
 
     // Features Section
     'features.title': 'لماذا Forward OS',
-    'features.ai.title': '5 نماذج ذكاء اصطناعي',
-    'features.ai.desc': 'احتمالية النجاح والتوقيت الأمثل والتسعير العادل وتوقعات النمو ومطابقة المشترين.',
+    'features.ai.title': 'Forward Intelligence',
+    'features.ai.desc': 'تقييم احتمالية الإغلاق، وخرائط حرارة الطلب، والمقارنات المباشرة، ومطابقة المشترين — مبنية من نشاط المنصة الفعلي.',
     'features.intelligence.title': 'ذكاء السوق',
     'features.intelligence.desc': '500+ صفقة مُتحقق منها وقيمها الحقيقية ومعايير القطاع وتقييم الثقة.',
     'features.network.title': 'الشبكة المؤسسية',
     'features.network.desc': 'الوسطاء المتحقق منهم والتكاملات وواجهة برمجية بدون علامات تجارية وشبكة الخدمات الاحترافية.',
 
     // Stats Section
-    'stats.market': 'سوق الاندماج السنوي',
-    'stats.deals': 'الصفقات المُتحقق منها',
-    'stats.accuracy': 'دقة التنبؤ',
-    'stats.moat': 'الميزة التنافسية',
+    'stats.market': 'حجم سوق الاندماج والاستحواذ السنوي',
+    'stats.regions': 'المناطق النشطة (الولايات المتحدة · كندا · الإمارات)',
+    'stats.fee': 'عمولة على البيع',
+    'stats.transparent': 'سبب البيع موضّح',
+    'stats.deals': 'القوائم الموثقة على Forward اليوم',
+    'stats.accuracy': 'تحديث القوائم كل 15 دقيقة',
+    'stats.moat': 'تحديث القوائم كل 15 دقيقة',
 
     // User Types Section
     'users.title': 'مبني لكل دور',

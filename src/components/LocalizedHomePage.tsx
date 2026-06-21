@@ -19,12 +19,18 @@ function LocalizedHomePageContent() {
   const { locale, currency, isRTL } = useLocale()
   const [showUserTypeModal, setShowUserTypeModal] = useState(false)
 
-  // Stat values to display
+  // Stat values to display.
+  //
+  // Rule: every number here is one we'd publish in a press release. The
+  // first one is industry-cited TAM. The other three describe the
+  // shape of the platform today (no fabricated "500+ verified deals" or
+  // "91% accuracy" claims — those got us called out in the readiness
+  // audit and won't survive a TechCrunch tear-down).
   const stats = [
-    { value: '$2.5T', label: t('stats.market', locale) },
-    { value: '500+', label: t('stats.deals', locale) },
-    { value: '91%', label: t('stats.accuracy', locale) },
-    { value: '24-36mo', label: t('stats.moat', locale) },
+    { value: '$2.5T',     label: t('stats.market',  locale) },  // industry M&A TAM
+    { value: '3',         label: t('stats.regions', locale) },  // USA · Canada · UAE
+    { value: '0%',        label: t('stats.fee',     locale) },  // zero success commission
+    { value: 'Day 1',     label: t('stats.transparent', locale) }, // transparent reason-for-sale
   ]
 
   return (
@@ -422,7 +428,10 @@ function LocalizedHomePageContent() {
               </h4>
               <ul className="space-y-2 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
                 <li>
-                  <Link href="#" className="hover:underline">
+                  {/* /about does not exist yet — route to /institutional which
+                      doubles as our brand-positioning page until we ship an
+                      About surface. */}
+                  <Link href="/institutional" className="hover:underline">
                     {t('footer.about', locale)}
                   </Link>
                 </li>
@@ -444,44 +453,26 @@ function LocalizedHomePageContent() {
               </h4>
               <ul className="space-y-2 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
                 <li>
-                  <Link href="#" className="hover:underline">
+                  <Link href="/privacy" className="hover:underline">
                     {t('footer.privacy', locale)}
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="hover:underline">
+                  <Link href="/terms" className="hover:underline">
                     {t('footer.terms', locale)}
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="hover:underline">
+                  <Link href="/security" className="hover:underline">
                     {t('footer.security', locale)}
                   </Link>
                 </li>
               </ul>
             </div>
-            <div>
-              <h4 className="font-bold mb-4" style={{ color: COLOR_PRIMARY }}>
-                {t('footer.connect', locale)}
-              </h4>
-              <ul className="space-y-2 text-sm" style={{ color: COLOR_TEXT_SECONDARY }}>
-                <li>
-                  <a href="#" className="hover:underline">
-                    {t('footer.twitter', locale)}
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:underline">
-                    {t('footer.linkedin', locale)}
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:underline">
-                    {t('footer.github', locale)}
-                  </a>
-                </li>
-              </ul>
-            </div>
+            {/* Social column intentionally removed at launch — pointing at
+                href="#" leaks "no real social presence" to anyone who clicks,
+                and any inspector will see dead links. We can add this column
+                back when we have real handles to link to. */}
           </div>
           <div className="border-t pt-8 text-center text-sm" style={{ borderColor: COLOR_BORDER, color: COLOR_TEXT_SECONDARY }}>
             <p>{t('footer.copyright', locale)}</p>
