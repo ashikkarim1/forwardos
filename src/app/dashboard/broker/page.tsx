@@ -137,17 +137,30 @@ export default function BrokerDashboardV2() {
   const [activeTab, setActiveTab] = useState<'inbox' | 'deals' | 'pipeline' | 'commissions' | 'analytics'>('inbox')
   const [delegatedBroker, setDelegatedBroker] = useState(true) // For this example, assume delegated
   const [marketSignals, setMarketSignals] = useState<MarketSignal[]>([])
+  const [counts, setCounts] = useState<{
+    clientDeals: number; pendingApprovals: number
+    activeEnquiries: number; unreadMessages: number
+  } | null>(null)
 
   useEffect(() => {
     fetch('/api/dashboard/signals?role=broker', { credentials: 'include' })
       .then((r) => (r.ok ? r.json() : { signals: [] }))
       .then((d) => setMarketSignals(Array.isArray(d?.signals) ? d.signals : []))
       .catch(() => setMarketSignals([]))
+
+    fetch('/api/dashboard/counts?role=broker', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : { counts: null }))
+      .then((d) => setCounts(d?.counts ?? null))
+      .catch(() => setCounts(null))
   }, [])
 
-  const totalCommissionEarned = 195000
-  const thisMonthCommission = 87500
-  const estimatedMonthEnd = thisMonthCommission + 45000
+  // Commission figures previously hardcoded (AED 195K total, AED 87.5K
+  // this month, AED 132.5K projected). With no per-broker commission
+  // tracking yet, surface zeros so a brand-new broker doesn't see
+  // misleading "you've earned AED 87.5K this month" numbers.
+  const totalCommissionEarned = 0
+  const thisMonthCommission   = 0
+  const estimatedMonthEnd     = 0
 
   return (
     <>
@@ -172,9 +185,9 @@ export default function BrokerDashboardV2() {
           },
           {
             label: 'Active Deals',
-            value: mockClientDeals.length,
-            trend: 'up',
-            trendValue: '2 negotiating',
+            value: counts?.clientDeals ?? 0,
+            trend: 'neutral',
+            trendValue: '',
           },
           {
             label: 'This Month Earned',
@@ -254,10 +267,10 @@ export default function BrokerDashboardV2() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {[
               { label: 'Seller Clients', value: 3, icon: Users },
-              { label: 'Active Deals', value: mockClientDeals.length, icon: FileText },
+              { label: 'Active Deals', value: counts?.clientDeals ?? 0, icon: FileText },
               { label: 'This Month Earned', value: `AED ${thisMonthCommission / 1000}K`, icon: DollarSign },
               { label: 'Total Commission', value: `AED ${totalCommissionEarned / 1000}K`, icon: TrendingUp },
-              delegatedBroker && { label: 'Pending Approvals', value: mockApprovalRequests.length, icon: Lock },
+              delegatedBroker && { label: 'Pending Approvals', value: counts?.pendingApprovals ?? 0, icon: Lock },
             ].filter(Boolean).map((stat: any) => {
             const Icon = stat.icon
             return (
@@ -390,7 +403,7 @@ export default function BrokerDashboardV2() {
       {/* Tab Navigation */}
       <motion.div className="mb-8 flex gap-3 border-b" style={{ borderColor: COLOR_BORDER }}>
         {[
-          delegatedBroker && { id: 'inbox', label: '📬 Inbox', icon: Lock, badge: mockApprovalRequests.length },
+          delegatedBroker && { id: 'inbox', label: '📬 Inbox', icon: Lock, badge: counts?.pendingApprovals ?? 0 },
           { id: 'deals', label: '📊 Client Deals', icon: FileText },
           { id: 'pipeline', label: '🔄 Pipeline', icon: TrendingUp },
           { id: 'commissions', label: '💰 Commissions', icon: DollarSign },
@@ -421,12 +434,19 @@ export default function BrokerDashboardV2() {
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2" style={{ color: COLOR_PRIMARY }}>
             🚪 Data Room Approval Requests
             <span className="px-3 py-1 rounded-full text-sm font-bold text-white" style={{ background: COLOR_ACCENT }}>
-              {mockApprovalRequests.length} Pending
+              {counts?.pendingApprovals ?? 0} Pending
             </span>
           </h2>
 
           <div className="space-y-4">
-            {mockApprovalRequests.map((request) => (
+            {(counts?.pendingApprovals ?? 0) === 0 && (
+              <div className="p-6 rounded-lg border text-center" style={{ borderColor: COLOR_BORDER, background: '#FAFAF8' }}>
+                <p style={{ color: COLOR_TEXT_SECONDARY, fontSize: 14, margin: 0 }}>
+                  No pending data room requests. New buyer requests on your client deals appear here.
+                </p>
+              </div>
+            )}
+            {(counts?.pendingApprovals ?? 0) > 0 && mockApprovalRequests.map((request) => (
               <motion.div
                 key={request.id}
                 className="p-6 rounded-lg border-2 hover:shadow-lg transition-all"
@@ -529,11 +549,18 @@ export default function BrokerDashboardV2() {
       {activeTab === 'deals' && (
         <motion.div initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: 0.1 } } }}>
           <h2 className="text-xl font-bold mb-6" style={{ color: COLOR_PRIMARY }}>
-            📊 Client Deals ({mockClientDeals.length})
+            📊 Client Deals ({counts?.clientDeals ?? 0})
           </h2>
 
           <div className="space-y-4">
-            {mockClientDeals.map((deal) => (
+            {(counts?.clientDeals ?? 0) === 0 && (
+              <div className="p-6 rounded-lg border text-center" style={{ borderColor: COLOR_BORDER, background: '#FAFAF8' }}>
+                <p style={{ color: COLOR_TEXT_SECONDARY, fontSize: 14, margin: 0 }}>
+                  No client deals yet. Listings you broker on Forward appear here.
+                </p>
+              </div>
+            )}
+            {(counts?.clientDeals ?? 0) > 0 && mockClientDeals.map((deal) => (
               <motion.div
                 key={deal.id}
                 className="p-6 rounded-lg border-2 hover:shadow-lg transition-all"

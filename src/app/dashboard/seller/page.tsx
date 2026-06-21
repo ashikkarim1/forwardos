@@ -183,12 +183,24 @@ export default function SellerDashboardV2() {
   const [activeTab, setActiveTab] = useState<'inbox' | 'deals' | 'analytics' | 'settings' | 'pipeline'>('inbox')
   const [expandedRequest, setExpandedRequest] = useState<string | null>(null)
   const [marketSignals, setMarketSignals] = useState<MarketSignal[]>([])
+  // Real per-user counters fetched on mount. Until they load we treat
+  // them as null so the stat cards show "—" instead of last-render
+  // mock numbers. A new account never sees "Total Deals: 5".
+  const [counts, setCounts] = useState<{
+    publishedDeals: number; pendingDeals: number; totalViews: number
+    pendingDataRoomRequests: number; unreadMessages: number; totalEnquiries: number
+  } | null>(null)
 
   useEffect(() => {
     fetch('/api/dashboard/signals?role=seller', { credentials: 'include' })
       .then((r) => (r.ok ? r.json() : { signals: [] }))
       .then((d) => setMarketSignals(Array.isArray(d?.signals) ? d.signals : []))
       .catch(() => setMarketSignals([]))
+
+    fetch('/api/dashboard/counts?role=seller', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : { counts: null }))
+      .then((d) => setCounts(d?.counts ?? null))
+      .catch(() => setCounts(null))
   }, [])
   const [showApprovalModal, setShowApprovalModal] = useState(false)
   const [selectedRequest, setSelectedRequest] = useState<DataRoomRequest | null>(null)
@@ -216,10 +228,14 @@ export default function SellerDashboardV2() {
     setShowDealCreation(false)
   }
 
-  const publishedDeals = mockDeals.filter(d => d.status === 'published')
-  const pendingDeals = mockDeals.filter(d => d.status === 'kyc-pending')
-  const totalViews = mockDeals.reduce((sum, d) => sum + d.views, 0)
-  const totalRevenue = mockDeals.length * 8 // Avg AED 8M
+  // Real counts from /api/dashboard/counts when they've loaded, else 0.
+  // We deliberately do NOT fall back to mockDeals.length here — a
+  // brand-new seller seeing "5 Active Listings" before they've done
+  // anything is exactly the screenshot we want to avoid.
+  const publishedDeals = { length: counts?.publishedDeals ?? 0 }
+  const pendingDeals   = { length: counts?.pendingDeals   ?? 0 }
+  const totalViews     = counts?.totalViews ?? 0
+  const totalRevenue   = 0  // displayed dashboard "Total Revenue" was a derived mock — leave 0 until we track real revenue per seller
 
   return (
     <>
@@ -241,27 +257,27 @@ export default function SellerDashboardV2() {
         stats={[
           {
             label: 'Total Deals',
-            value: mockDeals.length,
-            trend: 'up',
-            trendValue: '+2 this month',
+            value: (counts?.publishedDeals ?? 0) + (counts?.pendingDeals ?? 0),
+            trend: 'neutral',
+            trendValue: '',
           },
           {
             label: 'Published',
             value: publishedDeals.length,
-            trend: 'up',
-            trendValue: 'All active',
+            trend: 'neutral',
+            trendValue: '',
           },
           {
             label: 'Total Views',
             value: totalViews,
-            trend: 'up',
-            trendValue: '+156 today',
+            trend: 'neutral',
+            trendValue: '',
           },
           {
             label: 'Data Room Requests',
-            value: mockDataRoomRequests.length,
+            value: counts?.pendingDataRoomRequests ?? 0,
             trend: 'neutral',
-            trendValue: '2 pending',
+            trendValue: counts?.pendingDataRoomRequests ? `${counts.pendingDataRoomRequests} pending` : '',
           },
         ]}
         userProfile={{
@@ -301,10 +317,10 @@ export default function SellerDashboardV2() {
           {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: 'Total Deals', value: mockDeals.length, icon: FileText },
+              { label: 'Total Deals', value: (counts?.publishedDeals ?? 0) + (counts?.pendingDeals ?? 0), icon: FileText },
               { label: 'Published', value: publishedDeals.length, icon: CheckCircle2 },
               { label: 'Total Views', value: totalViews, icon: Eye },
-              { label: 'Data Room Requests', value: mockDataRoomRequests.length, badge: true, icon: Inbox },
+              { label: 'Data Room Requests', value: counts?.pendingDataRoomRequests ?? 0, badge: true, icon: Inbox },
             ].map((stat) => {
             const Icon = stat.icon
             return (
@@ -369,11 +385,11 @@ export default function SellerDashboardV2() {
       {/* Impact Dashboard Summary */}
       <motion.div variants={itemVariants} className="mb-12">
         <SellerDashboardSummary
-          companyName="TechFlow Solutions"
-          totalDeals={mockDeals.length}
+          companyName="Your portfolio"
+          totalDeals={(counts?.publishedDeals ?? 0) + (counts?.pendingDeals ?? 0)}
           activeDeals={publishedDeals.length}
-          totalPipelineValue={48000000}
-          currency="AED"
+          totalPipelineValue={0}
+          currency="USD"
           dealsByStage={[
             {
               stage: 'Interest',
@@ -525,7 +541,7 @@ export default function SellerDashboardV2() {
       {/* Tab Navigation */}
       <motion.div className="mb-8 flex gap-3 border-b overflow-x-auto" style={{ borderColor: COLOR_BORDER }} variants={itemVariants}>
         {[
-          { id: 'inbox', label: 'Inbox', icon: Inbox, badge: mockDataRoomRequests.length + mockMessages.filter(m => m.unread).length },
+          { id: 'inbox', label: 'Inbox', icon: Inbox, badge: (counts?.pendingDataRoomRequests ?? 0) + (counts?.unreadMessages ?? 0) },
           { id: 'deals', label: 'Deals', icon: FileText },
           { id: 'pipeline', label: 'Pipeline', icon: TrendingUp },
           { id: 'analytics', label: 'Analytics', icon: BarChart3 },
@@ -659,13 +675,23 @@ export default function SellerDashboardV2() {
                 <MessageSquare className="w-5 h-5" style={{ color: COLOR_ACCENT }} />
                 Messages Requiring Response
                 <span className="px-2 py-0.5 rounded-full text-xs font-bold text-white" style={{ background: '#B8956A' }}>
-                  {mockMessages.filter(m => m.unread).length}
+                  {counts?.unreadMessages ?? 0}
                 </span>
               </h3>
               <ChevronRight className="w-5 h-5" style={{ transform: collapsedSections.messages ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
             </button>
 
-            {!collapsedSections.messages && (
+            {!collapsedSections.messages && (counts?.unreadMessages ?? 0) === 0 && (
+              <motion.div className="mt-4 p-6 rounded-lg border text-center"
+                style={{ borderColor: COLOR_BORDER, background: '#FAFAF8' }}
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <p style={{ color: COLOR_TEXT_SECONDARY, fontSize: 14, margin: 0 }}>
+                  No unread messages. Buyer inquiries on your listings show up here.
+                </p>
+              </motion.div>
+            )}
+
+            {!collapsedSections.messages && (counts?.unreadMessages ?? 0) > 0 && (
               <motion.div className="mt-4 space-y-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 {mockMessages.map((msg) => (
                   <div

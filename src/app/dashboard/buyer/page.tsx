@@ -546,6 +546,10 @@ export default function BuyerDashboardV2() {
   const [showAccessRequest, setShowAccessRequest] = useState(false)
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null)
   const [marketSignals, setMarketSignals] = useState<MarketSignal[]>([])
+  const [counts, setCounts] = useState<{
+    savedDeals: number; activeEnquiries: number
+    pendingDataRoomRequests: number; unreadMessages: number
+  } | null>(null)
 
   // Pull real signals on mount. Empty array if we haven't loaded yet or
   // the compute errored — better blank than stale mock numbers.
@@ -554,7 +558,16 @@ export default function BuyerDashboardV2() {
       .then((r) => (r.ok ? r.json() : { signals: [] }))
       .then((d) => setMarketSignals(Array.isArray(d?.signals) ? d.signals : []))
       .catch(() => setMarketSignals([]))
+
+    fetch('/api/dashboard/counts?role=buyer', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : { counts: null }))
+      .then((d) => setCounts(d?.counts ?? null))
+      .catch(() => setCounts(null))
   }, [])
+
+  // Real per-user counters fetched on mount. Until they load we show
+  // 0 instead of mockDeals.length so a brand-new buyer never sees fake
+  // "My Active Deals: 3" in their first session.
 
   const filteredDeals = mockFeaturedDeals.filter(d =>
     d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -1034,10 +1047,14 @@ export default function BuyerDashboardV2() {
           {/* Pipeline Stats */}
           <motion.div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6" variants={itemVariants}>
             {[
-              { label: 'My Active Deals', value: mockDeals.filter(d => d.currentStage !== 'CLOSED').length, color: COLOR_ACCENT },
-              { label: 'In Due Diligence', value: mockDeals.filter(d => d.currentStage === 'DUE_DILIGENCE').length, color: '#FF9C3D' },
-              { label: 'In Negotiation', value: mockDeals.filter(d => d.currentStage === 'NEGOTIATION').length, color: '#F59E0B' },
-              { label: 'Total Pipeline Value', value: `AED ${((mockDeals.reduce((sum, d) => sum + (d.valuation || 0), 0) / 1000000).toFixed(1))}M`, color: '#10B981' },
+              // Pipeline stage breakdowns require per-stage tracking we
+              // don't yet capture per-user. Until we wire the per-stage
+              // counts through /api/dashboard/counts, show the topline
+              // active count and zero the rest — never the mock numbers.
+              { label: 'My Active Deals', value: counts?.activeEnquiries ?? 0, color: COLOR_ACCENT },
+              { label: 'In Due Diligence', value: 0, color: '#FF9C3D' },
+              { label: 'In Negotiation', value: 0, color: '#F59E0B' },
+              { label: 'Total Pipeline Value', value: '—', color: '#10B981' },
             ].map((stat, idx) => (
               <motion.div
                 key={idx}
