@@ -26,6 +26,7 @@ import { SellerDashboardSummary } from '@/components/SellerDashboardSummary'
 import { DailyIntelligenceDashboard } from '@/components/DailyIntelligenceDashboard'
 import { DashboardHeader } from '@/components/DashboardHeader'
 import { MyListings } from '@/components/MyListings'
+import { CopilotFab } from '@/components/copilot/CopilotFab'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -1000,6 +1001,7 @@ export default function SellerDashboardV2() {
         onSubmit={handleDealCreation}
       />
       </motion.div>
+      <CopilotFab role="seller" />
     </>
   )
 }

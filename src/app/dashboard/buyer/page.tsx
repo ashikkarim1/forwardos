@@ -21,6 +21,7 @@ import { COLOR_PRIMARY, COLOR_ACCENT, COLOR_TEXT_SECONDARY, COLOR_BORDER } from 
 import { DealPipeline } from '@/components/DealPipeline'
 import { DashboardHeader } from '@/components/DashboardHeader'
 import { DailyIntelligenceDashboard } from '@/components/DailyIntelligenceDashboard'
+import { CopilotFab } from '@/components/copilot/CopilotFab'
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -1345,6 +1346,7 @@ export default function BuyerDashboardV2() {
         </motion.div>
       )}
       </motion.div>
+      <CopilotFab role="buyer" />
     </>
   )
 }

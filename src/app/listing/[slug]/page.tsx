@@ -2,10 +2,13 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import { getSession } from '@/lib/auth'
 import { PublicHeader } from '@/components/Navigation'
+import { CopilotFab } from '@/components/copilot/CopilotFab'
 import { pageMetadata, breadcrumbLd, jsonLdScript } from '@/lib/seo'
 import { confidentialTitle, maskCity } from '@/lib/listing-helpers'
 import { generateNarrative, industryLabel } from '@/lib/listing-narrative'
+import { getComparables, CONFIDENCE_LABEL } from '@/lib/services/comparables'
 import { COLOR_PRIMARY, COLOR_TEXT_SECONDARY, COLOR_BORDER, COLOR_ACCENT, COLOR_BG_PRIMARY } from '@/styles/forward-colors'
 import {
   ChevronRight, MapPin, Users, Calendar, ShieldCheck, Sparkles, TrendingUp,
@@ -86,6 +89,16 @@ export default async function ListingPage({ params }: Props) {
   const deal = await getDeal(params.slug).catch(() => null)
   if (!deal) notFound()
   if (deal.status !== 'ACTIVE' && deal.status !== 'PUBLISHED') notFound()
+
+  const session = await getSession()
+  const copilotRole = session ? roleForCopilot(session.role) : null
+
+  const comps = await getComparables({
+    industry: deal.industry,
+    country: deal.country,
+    revenueUsd: deal.revenue ? Number(deal.revenue) / 100 : null,
+    excludeDealId: deal.id,
+  }).catch(() => null)
 
   // Bump the view counter (best-effort, never blocks the page render).
   // This is intentionally not deduped per-IP at the page level — the
@@ -205,7 +218,7 @@ export default async function ListingPage({ params }: Props) {
             <div className="grid sm:grid-cols-2 gap-4">
               <MetricCard label="Forward Score" value={`${deal.heatScore ?? '—'}°`} sub="Platform-wide engagement signal" tone={deal.heatScore && deal.heatScore >= 85 ? 'hot' : 'neutral'} />
               <MetricCard label="Quality Score" value={`${deal.dealQualityScore ?? '—'}/100`} sub="Financial consistency + transferability" />
-              <MetricCard label="Predicted Close" value={`${Math.round(deal.predictedCloseProb ?? 0)}%`} sub="Forward ML close-probability model" />
+              <MetricCard label="Predicted Close" value={`${Math.round(deal.predictedCloseProb ?? 0)}%`} sub="Signal-based close-probability score" />
               <MetricCard label="EBITDA Multiple" value={deal.pricingMultiple ? `${deal.pricingMultiple.toFixed(1)}x` : '—'} sub="Implied at the asking price" />
             </div>
             {deal.financingEligible && (
@@ -233,6 +246,38 @@ export default async function ListingPage({ params }: Props) {
               </p>
             )}
           </Section>
+
+          {/* Live comparables */}
+          {comps && comps.sampleSize >= 3 && (
+            <Section eyebrow="How this compares" title="Live market comparables" icon={<BarChart3 size={14} style={{ color: '#B8956A' }} />}>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {comps.askingPriceUsd && (
+                  <CompBand
+                    label="Asking price — comparable range"
+                    p25={fmtUsd(comps.askingPriceUsd.p25)}
+                    median={fmtUsd(comps.askingPriceUsd.median)}
+                    p75={fmtUsd(comps.askingPriceUsd.p75)}
+                    subject={deal.askingPrice ? fmtMoney(deal.askingPrice) : null}
+                    subjectLabel="This listing"
+                  />
+                )}
+                {comps.ebitdaMultiple && (
+                  <CompBand
+                    label="EBITDA multiple — comparable range"
+                    p25={`${comps.ebitdaMultiple.p25.toFixed(1)}x`}
+                    median={`${comps.ebitdaMultiple.median.toFixed(1)}x`}
+                    p75={`${comps.ebitdaMultiple.p75.toFixed(1)}x`}
+                    subject={deal.pricingMultiple ? `${deal.pricingMultiple.toFixed(1)}x` : null}
+                    subjectLabel="This listing"
+                  />
+                )}
+              </div>
+              <p className="mt-4 text-xs leading-relaxed" style={{ color: COLOR_TEXT_SECONDARY }}>
+                <strong style={{ color: COLOR_PRIMARY }}>{CONFIDENCE_LABEL[comps.confidence]}.</strong>{' '}
+                {comps.basis}, computed live from Forward marketplace data — not a static industry table. Small samples are directional; use them to frame diligence, not to price a deal.
+              </p>
+            </Section>
+          )}
 
           {/* Strengths */}
           {strengths.length > 0 && (
@@ -308,9 +353,30 @@ export default async function ListingPage({ params }: Props) {
               <div className="p-4 border-t flex items-center justify-around" style={{ borderColor: COLOR_BORDER }}>
                 <SideAction label="Save"><Heart size={14} /></SideAction>
                 <SideAction label="Share"><Share2 size={14} /></SideAction>
-                <SideAction label="Brief"><FileText size={14} /></SideAction>
+                <Link
+                  href={`/listing/${deal.slug}/report`}
+                  className="flex flex-col items-center gap-1 px-2 py-1 hover:opacity-70 transition-opacity"
+                  style={{ color: COLOR_TEXT_SECONDARY }}
+                >
+                  <FileText size={14} />
+                  <span className="text-[10px] font-bold tracking-wide uppercase">Report</span>
+                </Link>
               </div>
             </div>
+
+            <Link
+              href={`/listing/${deal.slug}/report`}
+              className="block rounded-xl border p-4 hover:opacity-90 transition-opacity"
+              style={{ borderColor: '#D6C5A8', background: '#FAF6EF' }}
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <BarChart3 size={14} style={{ color: '#B8956A' }} />
+                <p className="text-xs font-bold" style={{ color: COLOR_PRIMARY }}>Intelligence Report</p>
+              </div>
+              <p className="text-[11px] leading-snug" style={{ color: COLOR_TEXT_SECONDARY }}>
+                One-page brief: live comparables, demand signal, scores, and transaction readiness. Print-ready PDF.
+              </p>
+            </Link>
 
             {/* Financing helper */}
             {deal.financingEligible && (
@@ -336,8 +402,17 @@ export default async function ListingPage({ params }: Props) {
           </div>
         </aside>
       </div>
+      {copilotRole && (
+        <CopilotFab role={copilotRole} dealContext={{ dealId: deal.id, title: headline }} />
+      )}
     </div>
   )
+}
+
+function roleForCopilot(sessionRole: string): 'buyer' | 'seller' | 'broker' {
+  if (sessionRole === 'SELLER') return 'seller'
+  if (sessionRole === 'BROKER') return 'broker'
+  return 'buyer'
 }
 
 /* ─── Section helpers ─────────────────────────────────────────────── */
@@ -411,6 +486,45 @@ function SideMetric({ label, value }: { label: string; value: string }) {
     <div className="bg-white p-4 text-center">
       <p className="text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: COLOR_TEXT_SECONDARY }}>{label}</p>
       <p className="text-base font-black" style={{ color: COLOR_PRIMARY }}>{value}</p>
+    </div>
+  )
+}
+
+const fmtUsd = (dollars: number): string => {
+  if (dollars >= 1_000_000) return `$${(dollars / 1_000_000).toFixed(2)}M`
+  if (dollars >= 1_000) return `$${Math.round(dollars / 1_000)}K`
+  return `$${Math.round(dollars)}`
+}
+
+function CompBand({
+  label, p25, median, p75, subject, subjectLabel,
+}: {
+  label: string; p25: string; median: string; p75: string
+  subject: string | null; subjectLabel: string
+}) {
+  return (
+    <div className="rounded-xl border p-4" style={{ borderColor: COLOR_BORDER, background: '#FFFFFF' }}>
+      <p className="text-[10px] font-bold tracking-widest uppercase mb-3" style={{ color: COLOR_TEXT_SECONDARY }}>{label}</p>
+      <div className="flex items-end justify-between gap-2">
+        <div className="text-center">
+          <p className="text-[10px] mb-0.5" style={{ color: COLOR_TEXT_SECONDARY }}>P25</p>
+          <p className="text-sm font-semibold" style={{ color: COLOR_PRIMARY }}>{p25}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[10px] mb-0.5" style={{ color: COLOR_TEXT_SECONDARY }}>Median</p>
+          <p className="text-lg font-black" style={{ color: COLOR_PRIMARY }}>{median}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[10px] mb-0.5" style={{ color: COLOR_TEXT_SECONDARY }}>P75</p>
+          <p className="text-sm font-semibold" style={{ color: COLOR_PRIMARY }}>{p75}</p>
+        </div>
+      </div>
+      {subject && (
+        <div className="mt-3 pt-3 border-t flex items-center justify-between" style={{ borderColor: COLOR_BORDER }}>
+          <p className="text-[10px] font-bold tracking-widest uppercase" style={{ color: '#B8956A' }}>{subjectLabel}</p>
+          <p className="text-sm font-black" style={{ color: '#B8956A' }}>{subject}</p>
+        </div>
+      )}
     </div>
   )
 }

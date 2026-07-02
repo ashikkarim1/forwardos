@@ -1,0 +1,49 @@
+# Saved-search alert digest — daily 13:00 UTC (morning across US/Canada,
+# late afternoon UAE — inside the inbox-attention window for both regions).
+#
+# Fires /api/saved-searches/run-alerts, which diffs new published listings
+# against every alert-enabled saved search since lastAlertedAt and emails a
+# ranked digest. Matching is deterministic (no LLM); the one-line intro is
+# generated on Haiku (COPILOT_DIGEST_MODEL) and falls back to static copy.
+#
+# Required GitHub repo secrets:
+#   CRON_SECRET    must match process.env.CRON_SECRET on Vercel
+#   SITE_URL       e.g. https://www.forwardos.ai  (defaults below if unset)
+name: cron · saved-search-alerts
+
+on:
+  schedule:
+    - cron: "0 13 * * *"   # daily 13:00 UTC
+  workflow_dispatch:  # manual fire for testing
+
+concurrency:
+  group: cron-saved-search-alerts
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  fire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Hit run-alerts endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SITE_URL: ${{ vars.SITE_URL || 'https://www.forwardos.ai' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::CRON_SECRET secret is not set in this repo."
+            exit 1
+          fi
+          response=$(curl -fsS -X POST \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "Accept: application/json" \
+            "${SITE_URL}/api/saved-searches/run-alerts")
+          echo "$response"
+          echo "$response" | grep -q '"success":true' || {
+            echo "::error::Endpoint returned non-ok payload"
+            exit 1
+          }

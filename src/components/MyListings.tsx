@@ -110,12 +110,26 @@ function DealRow({ deal, onChange }: { deal: Deal; onChange: () => void }) {
 
   async function fire(action: string, confirmMessage?: string) {
     if (confirmMessage && !confirm(confirmMessage)) return
+
+    // Outcome capture on close: optional, but every recorded final price
+    // strengthens the platform's comparables and predictive dataset.
+    let extra: Record<string, unknown> = {}
+    if (action === 'sold') {
+      const raw = prompt(
+        'Final sale price in USD (optional — improves market comparables; kept private, never shown on your listing):'
+      )
+      if (raw && raw.trim()) {
+        const parsed = Number(raw.replace(/[$,\s]/g, ''))
+        if (Number.isFinite(parsed) && parsed > 0) extra = { finalPriceUsd: parsed }
+      }
+    }
+
     setBusy(action); setError('')
     try {
       const r = await fetch(`/api/seller/deals/${deal.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ action, ...extra }),
       })
       const data = await r.json()
       if (!r.ok) { setError(data.error || 'Action failed'); return }

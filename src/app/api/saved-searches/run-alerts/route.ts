@@ -6,6 +6,43 @@ import { formatAskingRange } from '@/lib/public-listing'
 import { industryLabel } from '@/lib/listing-narrative'
 import { maskCity } from '@/lib/listing-helpers'
 import { luxuryEmail, listingBlock } from '@/lib/email-templates'
+import Anthropic from '@anthropic-ai/sdk'
+
+// Background digests run on Haiku — summarizing 10 listing snippets into one
+// intro line needs no frontier reasoning, and Haiku is ~1/3 the cost of
+// Sonnet. Interactive copilot chat stays on Sonnet (COPILOT_MODEL).
+const DIGEST_MODEL = process.env.COPILOT_DIGEST_MODEL || 'claude-haiku-4-5-20251001'
+
+const STATIC_INTRO =
+  'Ranked by Forward Intelligence — strongest opportunities first. Identities are revealed to qualified buyers through Forward.'
+
+async function digestIntro(
+  searchName: string,
+  matches: Array<{ industry: string; country: string; heatScore: number | null }>,
+): Promise<string> {
+  if (!process.env.ANTHROPIC_API_KEY) return STATIC_INTRO
+  try {
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+    const summary = matches
+      .map((m) => `${industryLabel(m.industry)} in ${m.country}${m.heatScore != null ? ` (heat ${m.heatScore})` : ''}`)
+      .join('; ')
+    const res = await client.messages.create({
+      model: DIGEST_MODEL,
+      max_tokens: 120,
+      messages: [{
+        role: 'user',
+        content: `Write ONE sentence (max 30 words) introducing today's matches for a buyer's saved search "${searchName}". Matches: ${summary}. Professional M&A tone, no hype words, no exclamation marks, mention the strongest pattern you see (e.g. a hot sector or region). Return only the sentence.`,
+      }],
+    })
+    const text = res.content.find((b) => b.type === 'text')
+    const line = text && 'text' in text ? text.text.trim() : ''
+    // Guard against a chatty or malformed response — fall back rather than
+    // send something odd to a buyer's inbox.
+    return line && line.length <= 220 && !line.includes('\n') ? line : STATIC_INTRO
+  } catch {
+    return STATIC_INTRO
+  }
+}
 
 /**
  * POST /api/saved-searches/run-alerts  (cron-callable)
@@ -13,8 +50,17 @@ import { luxuryEmail, listingBlock } from '@/lib/email-templates'
  * For every alert-enabled saved search, finds deals published since the last
  * alert, emails an AI-ranked digest, records an AlertDelivery, and advances
  * lastAlertedAt. Email service logs to console when no provider key is set.
+ *
+ * Protected by CRON_SECRET — this endpoint sends email, so it must not be
+ * publicly callable. Deterministic matching; the only LLM use is the optional
+ * one-line digest intro on Haiku (cheap, and falls back to static copy).
  */
-export async function POST(_request: NextRequest) {
+export async function POST(request: NextRequest) {
+  const auth = request.headers.get('authorization') || ''
+  const expected = process.env.CRON_SECRET
+  if (expected && auth !== `Bearer ${expected}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
   try {
     const searches = await prisma.savedSearch.findMany({
       where: { alertEnabled: true },
@@ -46,6 +92,11 @@ export async function POST(_request: NextRequest) {
         }))
         .join('')
 
+      const intro = await digestIntro(
+        search.name,
+        matches.map((m) => ({ industry: m.industry, country: m.country, heatScore: m.heatScore ?? null })),
+      )
+
       await sendEmail({
         to: search.user.email,
         subject: `${matches.length} new confidential ${matches.length > 1 ? 'businesses' : 'business'} matched your saved search`,
@@ -54,7 +105,7 @@ export async function POST(_request: NextRequest) {
           eyebrow: 'Curated for you',
           title: `${matches.length} new ${matches.length === 1 ? 'opportunity' : 'opportunities'} matched your saved search`,
           greetingName: (search.user.name || '').split(' ')[0] || undefined,
-          intro: `Ranked by Forward Intelligence — strongest opportunities first. Identities are revealed to qualified buyers through Forward.`,
+          intro,
           innerHtml: cards,
           cta: { label: 'Browse all matches on Forward', href: `${SITE}/marketplace` },
           secondaryCta: { label: 'Manage your alert preferences →', href: `${SITE}/saved-searches` },

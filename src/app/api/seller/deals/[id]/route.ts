@@ -87,7 +87,11 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   if ('error' in res) return NextResponse.json({ error: res.error }, { status: res.status })
   const deal = res.deal
 
-  const { action } = (await request.json().catch(() => ({}))) as { action?: string }
+  const { action, finalPriceUsd, soldVia } = (await request.json().catch(() => ({}))) as {
+    action?: string
+    finalPriceUsd?: number
+    soldVia?: 'platform' | 'off_platform'
+  }
   if (!action || !VALID_ACTIONS.has(action)) {
     return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
   }
@@ -121,7 +125,21 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
     case 'sold': {
       if (deal.status === 'CLOSED') return NextResponse.json({ success: true, status: 'CLOSED' })
-      await prisma.deal.update({ where: { id: deal.id }, data: { status: 'CLOSED', closedAt: new Date() } })
+      // Outcome capture: final price is optional (sellers may keep it private)
+      // but every one recorded strengthens the comparables + predictive dataset.
+      const finalPrice =
+        typeof finalPriceUsd === 'number' && finalPriceUsd > 0 && finalPriceUsd < 1e12
+          ? BigInt(Math.round(finalPriceUsd * 100))
+          : null
+      await prisma.deal.update({
+        where: { id: deal.id },
+        data: {
+          status: 'CLOSED',
+          closedAt: new Date(),
+          finalPrice,
+          closeOutcome: soldVia === 'off_platform' ? 'sold_off_platform' : 'sold_on_platform',
+        },
+      })
       // Anonymized follower notification + add to deals-closed log.
       const notify = await notifySoldFollowers(deal.id).catch((e) => {
         console.error('[seller/deals/sold] notify failed', e)
@@ -132,7 +150,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
     case 'cancel': {
       // Permanent withdrawal for THIS listing; doesn't affect seller's account.
-      await prisma.deal.update({ where: { id: deal.id }, data: { status: 'WITHDRAWN' } })
+      await prisma.deal.update({ where: { id: deal.id }, data: { status: 'WITHDRAWN', closeOutcome: 'withdrawn' } })
       return NextResponse.json({ success: true, status: 'WITHDRAWN' })
     }
 

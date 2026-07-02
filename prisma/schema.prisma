@@ -581,6 +581,12 @@ model Deal {
   updatedAt             DateTime  @updatedAt
   closedAt              DateTime?
 
+  // Outcome capture — recorded when a deal closes. Final price vs asking is
+  // the training set for the future predictive model; every close without it
+  // is a lost data point.
+  finalPrice            BigInt?   // cents, what it actually sold for
+  closeOutcome          String?   // sold_on_platform | sold_off_platform | withdrawn | expired
+
   @@index([sellerId])
   @@index([status])
   @@index([industry])
